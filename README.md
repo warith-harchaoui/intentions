@@ -51,7 +51,7 @@ Read the engine table top to bottom and you are walking the field's history:
 flowchart LR
     A["1 · TF-IDF<br/>bag-of-words<br/>49 %"] --> B["2 · fastText<br/>learned subwords<br/>67 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>87 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>82 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style B fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
@@ -233,27 +233,27 @@ The Markdown knowledge base feeds every engine; all five implement the same
 identically. Only the **representation + classifier** changes.
 
 ```mermaid
-flowchart LR
-    KB["📄 knowledge_base/<br/>Markdown · h1 = intent"] --> R
+flowchart TB
+    KB["📄 knowledge_base/ — Markdown, h1 = intent"] --> Engines
 
-    subgraph Engines["Five engines · same IntentEngine contract"]
-        direction TB
+    subgraph Engines["Five engines — same IntentEngine contract"]
+        direction LR
         E1["1 · TF-IDF<br/>+ Random Forest"]
-        E2["2 · fastText<br/>learned on examples"]
-        E3["3 · fastText<br/>pretrained cc.fr.300"]
-        E4["4 · BERT SBERT<br/>+ PyTorch MLP"]
-        E5["5 · LLM Gemma<br/>Ollama · strict JSON"]
+        E2["2 · fastText<br/>learned"]
+        E3["3 · fastText<br/>pretrained"]
+        E4["4 · BERT<br/>SBERT + MLP"]
+        E5["5 · LLM<br/>Gemma · JSON"]
     end
 
-    R["router.py<br/>registry · compare · execute"] --> Engines
-    Engines --> R
-    R --> API["api.py · FastAPI"] & CLI["cli.py · terminal"]
-    API --> WEB["web/ · vanilla JS + Tailwind<br/>5-engine comparator · voice"]
+    Engines --> R["router.py — registry · compare · execute"]
+    R --> API["api.py · FastAPI"]
+    R --> CLI["cli.py · terminal"]
+    API --> WEB["web/ — vanilla JS + Tailwind · comparator (text)"]
 
     style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
     style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style E2 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E2 fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E

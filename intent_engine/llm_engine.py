@@ -78,6 +78,17 @@ Schéma de sortie :
 "reformulation": "<texte>"}\
 """
 
+# A **naive / quick-and-dirty** prompt ("à la va-vite"): the kind you dash off
+# in thirty seconds. It names the task and the JSON fields and nothing else —
+# no few-shot examples, no reasoning step, no anti-hallucination rule, no
+# out-of-scope escape hatch. It is the *low* end of the prompt-quality axis, so
+# the shootout can show how much a careful prompt buys over a careless one.
+_NAIVE_SYSTEM_PROMPT = """\
+Tu classes des phrases de clients d'assurance. Choisis UNE intention parmi le \
+catalogue fourni et réponds en JSON.
+Format : {"intent": "<id du catalogue>", "confidence": <nombre entre 0 et 1>}\
+"""
+
 # An **improved** prompt used to demonstrate the value of prompt engineering:
 # same task, same JSON contract, but (1) a short reasoning field *before* the
 # decision ("think then answer" lifts accuracy on small models), (2) three

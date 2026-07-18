@@ -36,14 +36,15 @@ _OUT_PATH = (
     Path(__file__).resolve().parent.parent / "docs" / "img" / "violin-accuracy.png"
 )
 
-# Display order (the pedagogical progression) + human labels + UI-matching
-# hues (the same dark, WCAG-friendly chip colours the front end uses).
+# Display order (the pedagogical progression) + human labels + colours from
+# the house palette (https://harchaoui.org/warith/colors/), matching the
+# Mermaid progression diagram: blue → turquoise → purple → green → orange.
 _ENGINE_META: dict[str, dict[str, str]] = {
-    "tfidf": {"label": "TF-IDF\n+RandomForest", "color": "#0055CC"},
-    "fasttext_custom": {"label": "fastText\n(appris)", "color": "#0E7490"},
-    "fasttext_pretrained": {"label": "fastText\n(pré-entraîné)", "color": "#4338CA"},
-    "bert": {"label": "BERT\n+MLP", "color": "#15803D"},
-    "llm": {"label": "LLM\n(Gemma)", "color": "#B45309"},
+    "tfidf": {"label": "TF-IDF\n+RandomForest", "color": "#007AFF"},
+    "fasttext_custom": {"label": "fastText\n(appris)", "color": "#79DBDC"},
+    "fasttext_pretrained": {"label": "fastText\n(pré-entraîné)", "color": "#AF52DE"},
+    "bert": {"label": "BERT\n+MLP", "color": "#28CD41"},
+    "llm": {"label": "LLM\n(Gemma)", "color": "#FF9500"},
 }
 
 

@@ -40,7 +40,11 @@ from pathlib import Path
 import numpy as np
 
 from intent_engine.config import get_settings
-from intent_engine.llm_engine import _IMPROVED_SYSTEM_PROMPT, LlmIntentEngine
+from intent_engine.llm_engine import (
+    _IMPROVED_SYSTEM_PROMPT,
+    _NAIVE_SYSTEM_PROMPT,
+    LlmIntentEngine,
+)
 from intent_engine.router import IntentRouter
 
 from .crossval import bootstrap_accuracy
@@ -48,15 +52,25 @@ from .thresholds import load_dataset
 
 logger = logging.getLogger(__name__)
 
-# The configurations, in display order. ``prompt`` is "baseline" (the engine's
-# default system prompt) or "improved" (the prompt-engineered variant). We run
-# every model on the improved prompt (model comparison), and the two *fast*
-# models on both prompts (prompt-engineering comparison) so the slow Gemma
-# builds are only queried once.
+# Prompt variants along the prompt-quality axis. Internal keys are stable (they
+# name the on-disk caches); ``_PROMPT_LABEL`` maps them to the human wording.
+# ``naive`` is the quick-and-dirty prompt ("à la va-vite"); ``improved`` is the
+# engineered one (few-shot + reason-first). ``None`` = the engine's default.
+_PROMPTS: dict[str, str | None] = {
+    "naive": _NAIVE_SYSTEM_PROMPT,
+    "improved": _IMPROVED_SYSTEM_PROMPT,
+}
+_PROMPT_LABEL: dict[str, str] = {"naive": "va-vite", "improved": "soigné"}
+
+# The configurations, in display order. Every model runs the **improved**
+# (soigné) prompt (the model comparison); the two *fast* models also run the
+# **naive** (va-vite) prompt (the prompt-engineering comparison), so the slow
+# Gemma builds are queried once. Two takeaways from one table: what the *model*
+# buys, and what a *good prompt* buys.
 _CONFIGS: list[dict[str, str]] = [
-    {"model": "qwen2.5:3b", "prompt": "baseline"},
+    {"model": "qwen2.5:3b", "prompt": "naive"},
     {"model": "qwen2.5:3b", "prompt": "improved"},
-    {"model": "gemma3:4b", "prompt": "baseline"},
+    {"model": "gemma3:4b", "prompt": "naive"},
     {"model": "gemma3:4b", "prompt": "improved"},
     {"model": "gemma4:e2b-mlx", "prompt": "improved"},
     {"model": "gemma4:e4b-mlx", "prompt": "improved"},
@@ -87,8 +101,9 @@ def _config_key(model: str, prompt: str) -> str:
     str
         e.g. ``"gemma3:4b · improved"``.
     """
-    # Space-dot-space separator reads well in the table and as a violin label.
-    return f"{model} · {prompt}"
+    # Space-dot-space separator reads well in the table and as a violin label;
+    # show the human wording (va-vite / soigné) rather than the internal key.
+    return f"{model} · {_PROMPT_LABEL.get(prompt, prompt)}"
 
 
 def _cache_path(model: str, prompt: str) -> Path:
@@ -122,8 +137,8 @@ def classify_sample(model: str, prompt: str, kb, sample: int) -> dict[str, str]:
     cache: dict[str, str] = (
         json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     )
-    # Swap in the improved prompt when requested; else the engine default.
-    system_prompt = _IMPROVED_SYSTEM_PROMPT if prompt == "improved" else None
+    # Pick the prompt variant (va-vite / soigné); ``None`` → engine default.
+    system_prompt = _PROMPTS.get(prompt)
     engine = LlmIntentEngine(model=model, system_prompt=system_prompt).fit(kb)
 
     for case in load_dataset()[:sample]:

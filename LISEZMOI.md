@@ -56,7 +56,7 @@ domaine :
 flowchart LR
     A["1 · TF-IDF<br/>sac-de-mots<br/>49 %"] --> B["2 · fastText<br/>sous-mots appris<br/>67 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>87 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style B fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
@@ -230,27 +230,27 @@ le front les traitent à l'identique. Seuls la **représentation et le
 classifieur** changent.
 
 ```mermaid
-flowchart LR
-    KB["📄 knowledge_base/<br/>Markdown · h1 = intention"] --> R
+flowchart TB
+    KB["📄 knowledge_base/ — Markdown, h1 = intention"] --> Moteurs
 
-    subgraph Moteurs["Cinq moteurs · même contrat IntentEngine"]
-        direction TB
+    subgraph Moteurs["Cinq moteurs — même contrat IntentEngine"]
+        direction LR
         E1["1 · TF-IDF<br/>+ Random Forest"]
-        E2["2 · fastText<br/>appris sur nos exemples"]
-        E3["3 · fastText<br/>pré-entraîné cc.fr.300"]
-        E4["4 · BERT SBERT<br/>+ MLP PyTorch"]
-        E5["5 · LLM Gemma<br/>Ollama · JSON strict"]
+        E2["2 · fastText<br/>appris"]
+        E3["3 · fastText<br/>pré-entraîné"]
+        E4["4 · BERT<br/>SBERT + MLP"]
+        E5["5 · LLM<br/>Gemma · JSON"]
     end
 
-    R["router.py<br/>registre · comparaison · exécution"] --> Moteurs
-    Moteurs --> R
-    R --> API["api.py · FastAPI"] & CLI["cli.py · terminal"]
-    API --> WEB["web/ · vanilla JS + Tailwind<br/>comparateur 5 moteurs · voix"]
+    Moteurs --> R["router.py — registre · comparaison · exécution"]
+    R --> API["api.py · FastAPI"]
+    R --> CLI["cli.py · terminal"]
+    API --> WEB["web/ — vanilla JS + Tailwind · comparateur (texte)"]
 
     style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
     style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style E2 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E2 fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
