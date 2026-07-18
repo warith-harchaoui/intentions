@@ -78,6 +78,58 @@ Schéma de sortie :
 "reformulation": "<texte>"}\
 """
 
+# An **improved** prompt used to demonstrate the value of prompt engineering:
+# same task, same JSON contract, but (1) a short reasoning field *before* the
+# decision ("think then answer" lifts accuracy on small models), (2) three
+# worked few-shot examples that anchor the input→JSON mapping, and (3) a
+# sharper anti-hallucination + normalisation rule set. Compared head-to-head
+# against ``_SYSTEM_PROMPT`` in ``eval/llm_shootout.py``.
+_IMPROVED_SYSTEM_PROMPT = """\
+Tu es l'aiguilleur d'intentions du centre d'appels de « Déraison Assurances ». \
+Un client écrit ou dit une phrase ; tu dois choisir UNE intention du catalogue \
+fourni et extraire les informations utiles.
+
+Méthode (réfléchis puis réponds) :
+- Lis la phrase, repère le VERBE d'action et l'OBJET (voiture, logement, santé, \
+contrat, paiement…).
+- Compare au catalogue et choisis l'identifiant EXACT le plus proche.
+- Si vraiment aucune intention ne colle, choisis "hors_perimetre".
+- Ne confonds pas des intentions voisines : « déclarer un accident » (sinistre) \
+≠ « souscrire » (nouveau contrat) ≠ « vol » (on m'a pris le bien).
+
+Règles de sortie :
+1. Réponds UNIQUEMENT par un objet JSON valide, sans texte ni balises autour.
+2. "raison" : une courte phrase expliquant ton choix (verbe + objet repérés).
+3. "intent" : un identifiant EXACT du catalogue (ou "hors_perimetre"). Jamais \
+un identifiant inventé.
+4. "confidence" : ta certitude entre 0.0 et 1.0 (sois honnête : bas si tu hésites).
+5. "slots" : entités utiles — "urgence" ∈ {faible, moyenne, haute}, "type_bien", \
+numéro de contrat, etc. Objet vide si rien.
+6. "reformulation" : la demande résumée en une phrase.
+
+Exemples :
+Phrase : "on s'est rentrés dedans à un carrefour, tôle froissée"
+{"raison":"choc entre véhicules, dégâts matériels → sinistre auto",\
+"intent":"declarer_sinistre_auto","confidence":0.95,"slots":\
+{"type_bien":"auto","urgence":"moyenne"},"reformulation":\
+"Le client déclare un accident matériel de voiture."}
+
+Phrase : "je viens d'acheter une voiture, il me faut une couverture"
+{"raison":"nouveau véhicule à assurer → souscription",\
+"intent":"souscrire_assurance_auto","confidence":0.94,\
+"slots":{"type_bien":"auto"},"reformulation":\
+"Le client veut assurer une voiture qu'il vient d'acheter."}
+
+Phrase : "on a fracturé ma portière et pris mon sac dans la voiture"
+{"raison":"effraction et vol d'objets dans le véhicule → vol",\
+"intent":"vol_vehicule","confidence":0.9,"slots":\
+{"type_bien":"auto","urgence":"haute"},"reformulation":\
+"Le client signale un vol dans sa voiture."}
+
+Schéma de sortie :
+{"raison":"<texte>","intent":"<id>","confidence":<float>,"slots":{<clé>:<valeur>},"reformulation":"<texte>"}\
+"""
+
 
 def _extract_json(raw: str) -> str:
     """Pull a JSON object out of a possibly fenced / chatty model answer.
@@ -161,8 +213,9 @@ class LlmIntentEngine(IntentEngine):
         self,
         client: OllamaClient | None = None,
         model: str | None = None,
+        system_prompt: str | None = None,
     ) -> None:
-        """Store the (optional) injected client and model override."""
+        """Store the (optional) injected client, model and prompt overrides."""
         settings = get_settings()
         # Allow dependency injection for tests; otherwise build a real client.
         self._client: OllamaClient = client or OllamaClient(
@@ -170,6 +223,9 @@ class LlmIntentEngine(IntentEngine):
         )
         # Model tag: explicit override wins, else the host-aware default.
         self._model: str = model or settings.llm_model
+        # System prompt: lets the eval swap the baseline for the improved,
+        # prompt-engineered variant to measure the accuracy lift.
+        self._system_prompt: str = system_prompt or _SYSTEM_PROMPT
         # Retained for answer/routing lookup and to build the catalogue.
         self._kb: KnowledgeBase | None = None
         # The pre-rendered catalogue block injected into every prompt. Built
@@ -257,7 +313,7 @@ class LlmIntentEngine(IntentEngine):
         # Assemble the two-message chat: the fixed system prompt, then a user
         # message carrying the catalogue and the sentence to classify.
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": self._system_prompt},
             {
                 "role": "user",
                 "content": (

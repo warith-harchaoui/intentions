@@ -6,7 +6,7 @@
  *   1. charger l'état (/api/health) et la base de connaissance (/api/kb) ;
  *   2. envoyer la demande de l'utilisateur (/api/compare ou /api/classify)
  *      et rendre une carte par moteur, plus l'action d'exécution ;
- *   3. la voix : dictée (Web Speech reconnaissance) et lecture (synthèse).
+ *   3. l'exécution : l'action d'aiguillage concrète (service + slots).
  *
  * Le standard de code s'applique au JS : chaque fonction a un doc-comment,
  * chaque bloc logique est commenté.
@@ -282,23 +282,6 @@ function renderEngineCard(engine, result) {
 }
 
 /**
- * Lit un texte à voix haute via l'API de synthèse vocale du navigateur.
- * C'est le "speech-helper" : le bot répond aussi à l'oral.
- * @param {string} text Texte à prononcer (français).
- * @returns {void}
- */
-function speak(text) {
-  // Garde-fou : API absente (vieux navigateur) → on ne fait rien.
-  if (!('speechSynthesis' in window) || !text) return;
-  // On annule toute lecture en cours pour ne pas empiler les voix.
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  // Voix française : la réponse client est en français.
-  utter.lang = 'fr-FR';
-  window.speechSynthesis.speak(utter);
-}
-
-/**
  * Envoie la demande à l'API, rend les cartes moteur et l'action exécutée.
  * @param {Event} event Événement submit du formulaire.
  * @returns {Promise<void>}
@@ -338,8 +321,6 @@ async function onSubmit(event) {
       results.innerHTML = order
         .map((e) => renderEngineCard(e, data[e]))
         .join('');
-      // Lecture vocale : on lit la réponse du meilleur moteur disponible.
-      maybeSpeakBest(order.map((e) => data[e]));
     } else {
       // Moteur unique : /api/classify.
       const res = await fetch('/api/classify', {
@@ -349,7 +330,6 @@ async function onSubmit(event) {
       });
       const data = await res.json();
       results.innerHTML = renderEngineCard(engine, data);
-      maybeSpeakBest([data]);
     }
 
     // Action concrète : on "exécute" la demande avec le moteur choisi. En
@@ -448,62 +428,12 @@ async function renderExecution(text, engine) {
 }
 
 /**
- * Lit à voix haute la meilleure réponse disponible si l'option est cochée.
- * @param {object[]} resultList Résultats moteurs, ordre de préférence.
- * @returns {void}
- */
-function maybeSpeakBest(resultList) {
-  // On ne parle que si l'utilisateur a activé la lecture vocale.
-  if (!$('speak-toggle').checked) return;
-  // On prend la première réponse non vide (moteur le plus fiable en tête).
-  const withAnswer = resultList.find((r) => r && r.response);
-  if (withAnswer) speak(withAnswer.response);
-}
-
-/**
- * Initialise la dictée vocale (Web Speech reconnaissance) sur le bouton
- * micro. C'est le "vocal-helper" : l'utilisateur parle, le texte s'écrit.
- * @returns {void}
- */
-function setupMic() {
-  const btn = $('mic-btn');
-  // Compat : l'API est préfixée webkit sur Safari/Chrome.
-  const Recognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  // Navigateur sans reconnaissance vocale : on masque le bouton proprement.
-  if (!Recognition) {
-    btn.classList.add('hidden');
-    return;
-  }
-  const recognizer = new Recognition();
-  // Français, pas de résultats intermédiaires : on veut la phrase finale.
-  recognizer.lang = 'fr-FR';
-  recognizer.interimResults = false;
-
-  // Clic : démarre l'écoute et signale l'état par la couleur du bouton.
-  btn.addEventListener('click', () => {
-    recognizer.start();
-    btn.classList.add('bg-sysblue', 'text-white');
-  });
-  // Résultat : on écrit la transcription dans le champ de saisie.
-  recognizer.addEventListener('result', (e) => {
-    $('query').value = e.results[0][0].transcript;
-  });
-  // Fin/erreur : on rétablit l'apparence normale du bouton.
-  const reset = () => btn.classList.remove('bg-sysblue', 'text-white');
-  recognizer.addEventListener('end', reset);
-  recognizer.addEventListener('error', reset);
-}
-
-/**
  * Point d'entrée : câble les événements et charge l'état initial.
  * @returns {void}
  */
 function init() {
-  // Formulaire principal.
+  // Formulaire principal (texte uniquement).
   $('ask-form').addEventListener('submit', onSubmit);
-  // Voix (dictée).
-  setupMic();
   // Chargements réseau en parallèle : état serveur + base de connaissance.
   loadHealth();
   loadKnowledgeBase();

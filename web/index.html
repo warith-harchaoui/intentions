@@ -168,29 +168,17 @@
                     dark:bg-surface-secondary-dark">
       <form id="ask-form" class="flex flex-col gap-3">
         <label for="query" class="text-[14px] font-medium">
-          Écrivez (ou dictez) votre demande, comme au téléphone
+          Écrivez votre demande, comme un client au téléphone ou à l'écrit
         </label>
-        <div class="flex items-end gap-2">
-          <textarea id="query" name="query" rows="2"
-                    placeholder="Ex : j'ai eu un accident ce matin, ma voiture est cabossée"
-                    class="min-h-11 flex-1 resize-y rounded border border-surface-tertiary
-                           bg-canvas px-3 py-2 text-[16px] text-label-primary
-                           placeholder:text-label-tertiary
-                           focus:border-sysblue focus:outline-none focus-visible:ring-2
-                           focus-visible:ring-sysblue
-                           dark:border-surface-tertiary-dark dark:bg-surface-primary-dark
-                           dark:text-label-primary-dark"></textarea>
-          <!-- Micro : reconnaissance vocale navigateur (vocal-helper). -->
-          <button type="button" id="mic-btn" aria-label="Dicter à la voix"
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded
-                         bg-surface-tertiary text-label-primary transition-transform
-                         hover:opacity-90 active:scale-95 focus:outline-none
-                         focus-visible:ring-2 focus-visible:ring-sysblue
-                         motion-reduce:active:scale-100
-                         dark:bg-surface-tertiary-dark dark:text-label-primary-dark">
-            <span aria-hidden="true">🎙️</span>
-          </button>
-        </div>
+        <textarea id="query" name="query" rows="2"
+                  placeholder="Ex : j'ai eu un accident ce matin, ma voiture est cabossée"
+                  class="min-h-11 w-full resize-y rounded border border-surface-tertiary
+                         bg-canvas px-3 py-2 text-[16px] text-label-primary
+                         placeholder:text-label-tertiary
+                         focus:border-sysblue focus:outline-none focus-visible:ring-2
+                         focus-visible:ring-sysblue
+                         dark:border-surface-tertiary-dark dark:bg-surface-primary-dark
+                         dark:text-label-primary-dark"></textarea>
 
         <!-- Sélecteur de moteur : contrôle segmenté (radios stylées). -->
         <fieldset class="flex flex-wrap items-center gap-2">
@@ -245,26 +233,7 @@
                            dark:peer-checked:bg-surface-primary-dark">LLM</span>
             </label>
           </div>
-
-          <!-- Lecture vocale de la réponse (speech-helper). -->
-          <label class="ml-auto flex items-center gap-2 text-[14px]
-                        text-label-secondary dark:text-label-secondary-dark">
-            <input type="checkbox" id="speak-toggle" role="switch"
-                   class="h-5 w-5 rounded accent-sysblue">
-            Lire la réponse à voix haute
-          </label>
         </fieldset>
-
-        <!-- Avertissement honnête : la reconnaissance vocale du navigateur
-             (Web Speech) peut envoyer l'audio à un service cloud (Chrome →
-             Google). Le NLU, lui, reste 100% local. Pour une voix vraiment
-             locale, brancher whisper.cpp (vocal-helper) côté serveur. -->
-        <p class="text-[12px] text-label-tertiary dark:text-label-tertiary-dark">
-          ⚠️ La voix utilise l'API Web Speech du navigateur : sous Chrome,
-          l'audio peut transiter par le cloud. Le moteur d'intention, lui,
-          reste 100&nbsp;% local. Pour une voix locale, voir <code
-          class="font-mono">vocal-helper</code> (whisper.cpp).
-        </p>
 
         <!-- Bouton principal (CTA sysblue). -->
         <button type="submit" id="submit-btn"

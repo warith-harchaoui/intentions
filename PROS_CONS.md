@@ -56,15 +56,19 @@ paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 | 2 | **fastText appris** (softmax fastText) | 67 % | ~0 ms | ❌ |
 | 3 | **fastText pré-entraîné** cc.fr.300 (+ régression logistique) | 73 % | ~1 ms | ❌ |
 | 4 | **BERT** SBERT + **MLP PyTorch** | **88 %** | ~15 ms | ❌ |
-| 5 | **LLM** gemma4:e4b (Ollama, JSON) | ~90 % | ~20 s | ✅ (urgence, type de bien…) |
+| 5 | **LLM** gemma3:4b (Ollama, JSON) | 82 % | ~5 s | ✅ (urgence, type de bien…) |
 
-> **La progression, c'est ça la leçon.** 49 → 67 → 73 → 88 % : chaque marche
+> **La progression, c'est ça la leçon.** 49 → 67 → 73 → **88 %** : chaque marche
 > ajoute de la *sémantique* à la représentation, et l'exactitude suit. Le
 > sac-de-mots mémorise des chaînes ; fastText apprend des sous-mots ; les
-> vecteurs pré-entraînés apportent le sens de milliards de mots ; BERT y ajoute
-> le contexte. Le LLM, lui, égale BERT **et** extrait les slots — mais
-> **~1 000× plus lent**. *Plus lourd n'est pas toujours meilleur : on choisit
-> selon le besoin (vitesse ? slots ? démarrage à froid ? explicabilité ?).*
+> vecteurs pré-entraînés apportent le sens de milliards de mots ; **BERT y
+> ajoute le contexte et culmine à 88 %.** Le petit LLM `gemma3:4b` (82 %,
+> ~5 s) **reste sous BERT** en exactitude et **~150× plus lent** : son intérêt
+> n'est *pas* la précision brute mais l'**extraction de slots**, le **zero-shot**
+> (aucune donnée) et un catalogue qui bouge à la vitesse d'une ligne de prompt.
+> *Plus lourd n'est pas toujours meilleur : on choisit selon le besoin (vitesse ?
+> slots ? démarrage à froid ? explicabilité ?).* Un plus gros LLM (`gemma4:e4b`)
+> remonte à ~93 % mais à ~40 s/appel — l'arbitrage vitesse/exactitude en direct.
 
 ### Les distributions, pas juste les points (bootstrap + violin)
 
@@ -83,6 +87,32 @@ chevauchent pas), pas séparés par le hasard :
   ~72 % (TF-IDF) / 69 % (fastText appris) / 82 % (BERT). Les moteurs sont
   **plus proches** quand le test ressemble à l'entraînement. C'est *toute*
   l'histoire : le lexical marche « chez lui » et s'effondre dès qu'on paraphrase.
+
+### Chronométrage robuste : temps CPU + compute Ollama (pas le wall-clock)
+
+Le wall-clock est faussé par les autres activités de la machine. On mesure donc
+le **travail utile** (`python -m eval.bench`) : le **temps CPU**
+(`time.process_time`, insensible aux autres apps) pour les moteurs locaux, et
+la **durée de calcul rapportée par Ollama** (`eval_duration`) pour le LLM.
+
+| Moteur | wall (ms) | **CPU (ms)** | hors-CPU ≈ GPU (ms) |
+|---|---:|---:|---:|
+| TF-IDF + RandomForest | ~26 | **~20** | ~6 |
+| fastText appris | ~0,01 | **~0,01** | ~0 |
+| fastText pré-entraîné | ~0,08 | **~0,08** | ~0 |
+| BERT (SBERT + MLP) | ~16 | **~7,5** | **~8 (MPS/GPU)** |
+
+- **fastText est réellement instantané** (~0,01–0,08 ms CPU) — le wall-clock ne
+  le montrait pas.
+- **BERT** : ~7,5 ms de CPU **plus ~8 ms hors-CPU** = le **GPU Metal (MPS)** fait
+  la moitié du travail. Le split CPU/GPU est directement visible.
+- **LLM** (gemma3:4b) : notre process attend le HTTP (CPU ≈ 0). Ollama rapporte
+  le vrai calcul : **prompt + génération ≈ 0,5–1 s** à chaud (hors chargement du
+  modèle, ~11 s une seule fois). Les ~5 s de wall-clock sont surtout de
+  l'attente/ordonnancement, pas du calcul.
+
+Leçon : sur une machine partagée, **le temps CPU (et le compute rapporté par le
+serveur) sont bien plus fiables que le wall-clock** pour comparer des coûts.
 
 ### Calibration & abstention hors-périmètre (15 phrases hors sujet)
 
@@ -163,7 +193,7 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 - **Gratuit en local** (Ollama/Gemma) : coût = matériel + électricité.
 
 **Contre**
-- **Le plus lent et le plus lourd** : de la seconde aux dizaines de secondes par requête en local³ (ici ~10–16 s sur `gemma4:e4b`).
+- **Le plus lent et le plus lourd** : de quelques secondes à quelques dizaines de secondes par requête en local³ (ici **~5 s à chaud** sur `gemma3:4b`, contre ~40 s pour le plus gros `gemma4:e4b` — le choix du modèle change tout ; ~25 s au tout premier appel à froid).
 - **Hallucination** : peut inventer une intention hors catalogue. **Mitigation** : JSON contraint (Ollama `format:"json"`) + rejet des id inconnus — implémenté ici⁸. ⚠️ Contrepartie : forcer un format strict peut légèrement dégrader le raisonnement¹⁰ (d'où l'astuce d'un champ `reformulation` libre).
 - **Précision qui chute quand les intentions sont nombreuses/fines** : ~89 % zero-shot sur 9 intentions, mais ~74 % sur 60 intentions et ~61 % sur 13 intentions ambiguës⁹.
 - **En API cloud** : coût par token⁴ **et surtout** exfiltration de données — critique en assurance (voir ci-dessous).

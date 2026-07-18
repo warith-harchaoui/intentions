@@ -2,8 +2,8 @@
 
 [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md) — 🏠 [🇫🇷 LISEZMOI](LISEZMOI.md) · [🇬🇧 README](README.md)
 
-Une prise en main pas à pas de la démo : l'interface web, la voix, la ligne de
-commande, et comment lire les résultats. Pour l'installation et l'architecture,
+Une prise en main pas à pas de la démo : l'interface web, la ligne de commande,
+et comment lire les résultats. Pour l'installation et l'architecture,
 voir [`LISEZMOI.md`](LISEZMOI.md) ; pour le comparatif des approches,
 [`PROS_CONS.md`](PROS_CONS.md).
 
@@ -21,11 +21,11 @@ Ouvrez <http://localhost:8000>. Vous arrivez sur l'écran d'accueil :
 
 De haut en bas :
 - **En-tête** — la marque, et un badge qui indique honnêtement l'état du moteur
-  LLM : vert *« LLM en ligne · gemma4:e4b-mlx »* quand Ollama répond, gris
+  LLM : vert *« LLM en ligne · gemma3:4b »* quand Ollama répond, gris
   *« LLM hors ligne »* sinon (le bouton LLM est alors désactivé).
 - **Cinq cartes** — un rappel en une ligne de chaque approche (TF-IDF, fastText×2, BERT, LLM).
-- **Zone de saisie** — un champ texte, un bouton micro, un sélecteur de moteur,
-  un interrupteur « lire à voix haute », et le bouton **Analyser l'intention**.
+- **Zone de saisie** — un champ texte, un sélecteur de moteur, et le bouton
+  **Analyser l'intention**.
 
 ---
 
@@ -46,7 +46,7 @@ Cliquez **Analyser l'intention**.
 
 Chaque moteur a une carte qui montre :
 - sa **pastille colorée** (bleu, teal, indigo, vert, orange) et sa
-  **latence** (en haut à droite) — comparez TF-IDF en ~1 ms au LLM en ~20 s ;
+  **latence** (en haut à droite) — comparez TF-IDF en ~1 ms au LLM en ~5 s (gemma3:4b) ;
 - des **barres de confiance** pour les intentions de tête (l'identifiant + un %) ;
 - la **réponse scriptée** de l'intention gagnante, en serif ;
 - pour le LLM, les **slots extraits** (ex. `urgence: haute`) en petits badges.
@@ -70,20 +70,7 @@ phrases correspondent à l'intention dédiée `escalade_humain`.
 
 ---
 
-## 4. La voix — parler et être répondu
-
-- **Dicter** (*vocal-helper*) : cliquez le micro 🎙️ et parlez ; la reconnaissance
-  vocale du navigateur écrit vos mots dans le champ. (Fonctionne sous Chrome/Edge ;
-  le bouton se masque si le navigateur n'a pas de reconnaissance vocale.)
-- **Lire à voix haute** (*speech-helper*) : activez l'interrupteur **Lire la
-  réponse à voix haute** et la réponse gagnante est prononcée en français.
-
-Les deux utilisent l'API Web Speech intégrée au navigateur — rien n'est envoyé
-à un serveur.
-
----
-
-## 5. Mode sombre
+## 4. Mode sombre
 
 L'interface suit automatiquement l'apparence de votre système (clair ou sombre) :
 
@@ -91,7 +78,7 @@ L'interface suit automatiquement l'apparence de votre système (clair ou sombre)
 
 ---
 
-## 6. Parcourir la base de connaissance
+## 5. Parcourir la base de connaissance
 
 En bas, dépliez **Base de connaissance** pour voir chaque intention, son service
 cible et des phrases d'exemple. **Cliquez un exemple** pour le déposer dans le
@@ -105,7 +92,7 @@ au code.
 
 ---
 
-## 7. En ligne de commande
+## 6. En ligne de commande
 
 Tout ce que fait l'application web est disponible au terminal, pratique pour une
 démo en direct :
@@ -119,18 +106,17 @@ python -m intent_engine execute "il me faut une prise en charge hôpital"
 
 ---
 
-## 8. Dépannage
+## 7. Dépannage
 
 | Symptôme | Solution |
 |---|---|
-| Badge *« LLM hors ligne »* | Démarrez Ollama (`ollama serve`) et `ollama pull gemma4:e4b`. Le reste de l'app fonctionne. |
+| Badge *« LLM hors ligne »* | Démarrez Ollama (`ollama serve`) et `ollama pull gemma3:4b`. Le reste de l'app fonctionne. |
 | BERT lent / différent | Sans `sentence-transformers`, il utilise le repli d'embeddings Ollama. `pip install "sentence-transformers>=3.0.0"` pour le chemin SBERT. |
-| Le micro ne fait rien | Utilisez Chrome/Edge ; autorisez le micro ; l'API Web Speech n'existe pas partout. |
 | Port déjà utilisé | `PORT=9000 ./start.sh` ou passez `--port 9000` à uvicorn. |
 
 ---
 
-## 9. Pour aller plus loin
+## 8. Pour aller plus loin
 
 - [`LISEZMOI.md`](LISEZMOI.md) — installation, architecture, résultats mesurés.
 - [`PROS_CONS.md`](PROS_CONS.md) — comparatif sourcé des cinq approches.

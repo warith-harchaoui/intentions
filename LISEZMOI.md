@@ -5,7 +5,7 @@
 > « Mes collègues me demandent **comment on fait** un moteur de détection
 > d'intention. » — Ce dépôt répond, en montrant **cinq façons** de le faire,
 > côte à côte, sur un cas concret : le chatbot d'aiguillage d'une compagnie
-> d'assurance (fictive) qui oriente ses clients au **téléphone** (voix) comme
+> d'assurance (fictive) qui oriente ses clients au **téléphone** comme
 > à l'**écrit**.
 
 ![Comparateur des 5 moteurs](docs/img/02-comparateur-5-moteurs.png)
@@ -51,6 +51,16 @@ domaine :
    dépend du contexte, plus un classifieur non-linéaire.
 5. **LLM génératif (Gemma)** — aucun entraînement ; du raisonnement à partir
    d'un prompt, et — c'est unique — l'extraction de *slots* structurés.
+
+```mermaid
+flowchart LR
+    A["1 · TF-IDF<br/>sac-de-mots<br/>49 %"] --> B["2 · fastText<br/>sous-mots appris<br/>67 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>87 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
+    style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style B fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
+    style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+```
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
 des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
@@ -105,7 +115,7 @@ BERT), **Ollama** en local.
 Puis récupérez les modèles :
 
 ```bash
-ollama pull gemma4:e4b          # moteur LLM (sur Apple Silicon : gemma4:e4b-mlx)
+ollama pull gemma3:4b           # moteur LLM (compact + rapide ; ~5 s/appel à chaud)
 ollama pull nomic-embed-text    # repli d'embeddings pour le moteur BERT
 ```
 
@@ -140,10 +150,10 @@ pip install ".[eval]"
 # puis ouvrez http://localhost:8000
 ```
 
-Écrivez **ou dictez** une demande (reconnaissance vocale du navigateur —
-*vocal-helper*), comparez les 3 moteurs avec barres de confiance et latences,
-**lisez la réponse à voix haute** (synthèse vocale — *speech-helper*) et
-parcourez la base de connaissance.
+Écrivez une demande, choisissez un moteur (ou **Comparer tout**), et voyez les
+prédictions des 5 moteurs côte à côte : barres de confiance, latences, slots
+extraits et action d'aiguillage. Parcourez la base de connaissance pour essayer
+des exemples.
 
 ### En ligne de commande
 
@@ -154,12 +164,15 @@ python -m intent_engine classify --engine tfidf "je veux résilier"
 python -m intent_engine execute "il me faut une prise en charge pour l'hôpital"
 ```
 
-Exemple de sortie de `compare` :
+Exemple de sortie de `compare` (sur une paraphrase — voyez les moteurs lexicaux
+s'abstenir tandis que les sémantiques trouvent) :
 
 ```text
-tfidf   | declarer_sinistre_auto  [0.86]  — 1 ms
-bert    | declarer_sinistre_auto  [0.59]  — 39 ms
-llm     | declarer_sinistre_auto  [1.00]  — 16565 ms
+tfidf               | (abstention)                 — 28 ms
+fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
+fasttext_pretrained | (abstention)                 — 0 ms
+bert                | declarer_sinistre_auto [0.98] — 18 ms
+llm                 | declarer_sinistre_auto [0.95] — 4725 ms
         slots: {'type_bien': 'auto', 'urgence': 'haute'}
 ```
 
@@ -180,7 +193,7 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 | 2 | **fastText (appris)** | 67 % | ~0 ms | ❌ |
 | 3 | **fastText (pré-entraîné cc.fr.300)** | 73 % | ~1 ms | ❌ |
 | 4 | **BERT (SBERT + MLP)** | **88 %** | ~15 ms | ❌ |
-| 5 | **LLM (Gemma via Ollama)** | ~90 % | ~20 s | ✅ |
+| 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
 
 **Les distributions, pas juste les points** — le rééchantillonnage bootstrap
 (2000×) du jeu de test montre que les moteurs sont *réellement* différents sur
@@ -199,37 +212,61 @@ ce jeu difficile (TF-IDF et BERT ne se chevauchent même pas) :
 > temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) —
 > une vraie leçon sur la **calibration des réseaux de neurones**. Analyse
 > complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
+>
+> **Sur le choix du LLM.** Le défaut est le compact `gemma3:4b` (~5 s à chaud) :
+> il atteint **82 %**, *sous* BERT — un petit LLM local troque de l'exactitude
+> contre de la vitesse, et son vrai atout est l'**extraction de slots + le
+> zero-shot**, pas la précision brute. Le plus gros `gemma4:e4b` monte à ~93 %
+> mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
+> on choisit selon le besoin.
 
 ---
 
 ## Architecture
 
-```
-intent_engine/
-  kb.py              # parseur Markdown : # h1 = intention
-  base.py            # contrats communs : IntentEngine, IntentResult
-  tfidf_engine.py    # 1 — TF-IDF + Random Forest (scikit-learn)
-  fasttext_engine.py # 2 & 3 — fastText supervisé + pré-entraîné cc.fr.300
-  embeddings.py      # backends d'embeddings enfichables (SBERT / Ollama)
-  mlp.py             # tête MLP PyTorch (API façon scikit-learn)
-  bert_engine.py     # 4 — embeddings SBERT + MLP PyTorch
-  llm_engine.py      # 5 — Ollama + JSON strict + anti-hallucination + slots
-  ollama_client.py   # client Ollama synchrone (chat JSON + embeddings)
-  router.py          # registre des moteurs + comparaison + exécution
-  api.py             # API FastAPI
-  cli.py             # interface terminal
-knowledge_base/      # la connaissance (Markdown, h1 = intention)
-web/                 # front vanilla JS + Tailwind (+ polices self-hostées)
-eval/                # datasets + seuils + banc d'essai + crossval + violin
-                     # + intégrations DeepEval (LLM) et Giskard (ML)
-tests/               # pytest
+La base de connaissance Markdown alimente tous les moteurs ; les cinq
+implémentent le même contrat `IntentEngine`, donc le routeur, l'API, la CLI et
+le front les traitent à l'identique. Seuls la **représentation et le
+classifieur** changent.
+
+```mermaid
+flowchart LR
+    KB["📄 knowledge_base/<br/>Markdown · h1 = intention"] --> R
+
+    subgraph Moteurs["Cinq moteurs · même contrat IntentEngine"]
+        direction TB
+        E1["1 · TF-IDF<br/>+ Random Forest"]
+        E2["2 · fastText<br/>appris sur nos exemples"]
+        E3["3 · fastText<br/>pré-entraîné cc.fr.300"]
+        E4["4 · BERT SBERT<br/>+ MLP PyTorch"]
+        E5["5 · LLM Gemma<br/>Ollama · JSON strict"]
+    end
+
+    R["router.py<br/>registre · comparaison · exécution"] --> Moteurs
+    Moteurs --> R
+    R --> API["api.py · FastAPI"] & CLI["cli.py · terminal"]
+    API --> WEB["web/ · vanilla JS + Tailwind<br/>comparateur 5 moteurs · voix"]
+
+    style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
+    style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style E2 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
+    style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style WEB fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
 ```
 
-Les cinq moteurs implémentent **le même contrat** (`IntentEngine`), donc le
-routeur, l'API et le front les traitent de façon identique. C'est tout
-l'intérêt pédagogique : seuls la **représentation et le classifieur** changent
-— la tuyauterie reste constante, on voit la qualité bouger le long de la
-progression.
+Modules-clés : `kb.py` (parseur), `base.py` (contrats), `tfidf_engine.py`,
+`fasttext_engine.py`, `embeddings.py` + `mlp.py`, `bert_engine.py`,
+`llm_engine.py` + `ollama_client.py`, `router.py`, `api.py`, `cli.py` ;
+`eval/` contient les datasets, le banc d'essai, `crossval.py`, `violin.py` et
+les intégrations DeepEval/Giskard.
+
+Les cinq moteurs partagent la même « tuyauterie » : on voit la qualité bouger
+le long de la progression, seule la représentation change.
 
 ---
 
@@ -252,14 +289,6 @@ machine — un choix délibéré, car en assurance une seule phrase peut être u
 en charge pour l'Institut de cancérologie »* révèle un diagnostic de cancer ;
 l'envoyer à un LLM cloud exfiltrerait exactement la donnée que la loi protège
 le plus. Ici, elle reste sur la machine.
-
-> ⚠️ **Réserve honnête sur la voix.** Les fonctions vocales de l'interface
-> utilisent l'API Web Speech du navigateur. Sous Chrome, **la reconnaissance
-> vocale envoie l'audio aux serveurs de Google** — le chemin *voix* n'est donc
-> *pas* local, contrairement au NLU. Pour une voix vraiment locale, brancher un
-> *vocal-helper* (whisper.cpp) côté serveur pour la transcription et une TTS OSS
-> pour la réponse. C'est signalé dans [`ASSESSMENT.md`](ASSESSMENT.md) et dans
-> l'interface.
 
 Détails et discussion RGPD dans [`PROS_CONS.md`](PROS_CONS.md#le-point-qui-décide-en-assurance--rgpd--données-de-santé).
 

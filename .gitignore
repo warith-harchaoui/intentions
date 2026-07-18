@@ -89,3 +89,7 @@ desktop.ini
 *~
 .idea/
 .vscode/
+
+# LLM shootout cache + results (regenerable)
+eval/.llm_shootout/
+eval/llm_shootout_results.json

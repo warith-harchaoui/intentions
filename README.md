@@ -5,7 +5,7 @@
 > "My colleagues keep asking me **how you build** an intent-detection engine."
 > — This repo answers by showing **five ways** to do it, side by side, on a
 > concrete case: the routing chatbot of a (fictional) insurance company that
-> helps its customers on the **phone** (voice) and in **writing**.
+> helps its customers on the **phone** and in **writing**.
 
 ![Five-engine comparator](docs/img/02-comparateur-5-moteurs.png)
 
@@ -47,9 +47,19 @@ Read the engine table top to bottom and you are walking the field's history:
 5. **Generative LLM (Gemma)** — no training at all; reasoning from a prompt,
    and — uniquely — pulling structured *slots* out of the sentence.
 
+```mermaid
+flowchart LR
+    A["1 · TF-IDF<br/>bag-of-words<br/>49 %"] --> B["2 · fastText<br/>learned subwords<br/>67 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>87 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>82 %"]
+    style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style B fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
+    style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+```
+
 The comparator then shows the **pay-off** with real, measured numbers (not
 opinions): on a **paraphrase-heavy** test set, accuracy climbs monotonically
-**49 % → 63 % → 73 % → 88 %** across engines 1→4, and the LLM adds slot
+**49 % → 67 % → 73 % → 88 %** across engines 1→4, and the LLM adds slot
 extraction on top. And crucially, it shows the **honest caveats** an ML
 practitioner cares about — sampling uncertainty (bootstrap violin plots),
 train/test-split variance (k-fold cross-validation), model mis-calibration
@@ -106,7 +116,7 @@ fallback), a local **Ollama**.
 Then pull the models:
 
 ```bash
-ollama pull gemma4:e4b          # LLM engine (on Apple Silicon: gemma4:e4b-mlx)
+ollama pull gemma3:4b           # LLM engine (compact + fast; ~5 s/call warm)
 ollama pull nomic-embed-text    # embedding fallback for the BERT engine
 ```
 
@@ -141,9 +151,9 @@ pip install ".[eval]"
 # then open http://localhost:8000
 ```
 
-Type **or dictate** a request (browser speech recognition — *vocal-helper*),
-compare the three engines with confidence bars and latencies, **read the answer
-aloud** (speech synthesis — *speech-helper*), and browse the knowledge base.
+Type a request, pick an engine (or **Compare all**), and see the five engines'
+predictions side by side with confidence bars, latencies, extracted slots and
+the routed action. Browse the knowledge base to try example phrases.
 
 ### Command line
 
@@ -162,7 +172,7 @@ tfidf               | (abstention)                — 28 ms
 fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
 fasttext_pretrained | (abstention)                — 0 ms
 bert                | declarer_sinistre_auto [0.98] — 18 ms
-llm                 | declarer_sinistre_auto [0.95] — 14378 ms
+llm                 | declarer_sinistre_auto [0.95] — 4725 ms
         slots: {'type_bien': 'auto', 'urgence': 'haute'}
 ```
 
@@ -178,13 +188,18 @@ overlap with the training phrasings), so it measures *generalisation*, not
 vocabulary memorisation — which is exactly where the representation shows its
 worth:
 
+> ⏱️ **Read latencies as orders of magnitude, not benchmarks.** They were
+> timed on a busy dev Mac (other apps running), so the *accuracy* numbers are
+> the reproducible, seeded ones (bootstrap + CV); the millisecond/second
+> figures just convey the ~4-orders-of-magnitude spread TF-IDF → LLM.
+
 | # | Engine | Accuracy (held-out) | Mean latency | Slots |
 |---|--------|--------------------:|-------------:|:-----:|
 | 1 | **TF-IDF + Random Forest** | 49 % | ~30 ms | ❌ |
 | 2 | **fastText (custom)** | 67 % | ~0 ms | ❌ |
 | 3 | **fastText (pretrained cc.fr.300)** | 73 % | ~1 ms | ❌ |
 | 4 | **BERT (SBERT + MLP)** | **88 %** | ~15 ms | ❌ |
-| 5 | **LLM (Gemma via Ollama)** | ~90 % | ~20 s | ✅ |
+| 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
 
 **The distributions, not just the point estimates** — bootstrap resampling of
 the test set (2000×) shows the engines are *genuinely* different on this hard
@@ -202,36 +217,56 @@ set (TF-IDF and BERT distributions don't even overlap), not noise apart:
 > TF-IDF abstains ~93 % of the time; the neural BERT is more over-confident
 > (~73 % after tuning its threshold) — a real lesson on **neural-net
 > calibration**. Full analysis + sources in [`PROS_CONS.md`](PROS_CONS.md).
+>
+> **On the LLM choice.** The default is the compact `gemma3:4b` (~5 s warm): it
+> lands at **82 %**, *below* BERT — a small local LLM trades accuracy for speed
+> and its real edge is **slot extraction + zero-shot**, not top accuracy. The
+> larger `gemma4:e4b` reaches ~93 % but at ~40 s/call (`INTENT_LLM_MODEL` swaps
+> it back). Heavier ≠ better — pick by need.
 
 ---
 
 ## Architecture
 
-```
-intent_engine/
-  kb.py              # Markdown parser: # h1 = intent
-  base.py            # shared contracts: IntentEngine, IntentResult
-  tfidf_engine.py    # 1 — TF-IDF + Random Forest (scikit-learn)
-  fasttext_engine.py # 2 & 3 — fastText supervised + pretrained cc.fr.300
-  embeddings.py      # pluggable embedding backends (SBERT / Ollama)
-  mlp.py             # PyTorch MLP head (scikit-learn-like fit/predict_proba)
-  bert_engine.py     # 4 — SBERT embeddings + PyTorch MLP
-  llm_engine.py      # 5 — Ollama + strict JSON + anti-hallucination + slots
-  ollama_client.py   # synchronous Ollama client (JSON chat + embeddings)
-  router.py          # engine registry + comparison + execution
-  api.py             # FastAPI app
-  cli.py             # terminal interface
-knowledge_base/      # the knowledge (Markdown, h1 = intent)
-web/                 # vanilla JS + Tailwind front (+ self-hosted fonts)
-eval/                # datasets + thresholds + harness + crossval + violin
-                     # + DeepEval (LLM) + Giskard (ML) integrations
-tests/               # pytest
+The Markdown knowledge base feeds every engine; all five implement the same
+`IntentEngine` contract, so the router, API, CLI and front end treat them
+identically. Only the **representation + classifier** changes.
+
+```mermaid
+flowchart LR
+    KB["📄 knowledge_base/<br/>Markdown · h1 = intent"] --> R
+
+    subgraph Engines["Five engines · same IntentEngine contract"]
+        direction TB
+        E1["1 · TF-IDF<br/>+ Random Forest"]
+        E2["2 · fastText<br/>learned on examples"]
+        E3["3 · fastText<br/>pretrained cc.fr.300"]
+        E4["4 · BERT SBERT<br/>+ PyTorch MLP"]
+        E5["5 · LLM Gemma<br/>Ollama · strict JSON"]
+    end
+
+    R["router.py<br/>registry · compare · execute"] --> Engines
+    Engines --> R
+    R --> API["api.py · FastAPI"] & CLI["cli.py · terminal"]
+    API --> WEB["web/ · vanilla JS + Tailwind<br/>5-engine comparator · voice"]
+
+    style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
+    style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style E2 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
+    style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
+    style WEB fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
 ```
 
-All five engines implement **the same contract** (`IntentEngine`), so the
-router, the API and the front end treat them identically. That is the teaching
-point: only the **representation + classifier** changes — the plumbing is
-constant, so you can watch quality move as you climb the progression.
+Key modules: `kb.py` (parser), `base.py` (contracts), `tfidf_engine.py`,
+`fasttext_engine.py`, `embeddings.py` + `mlp.py`, `bert_engine.py`,
+`llm_engine.py` + `ollama_client.py`, `router.py`, `api.py`, `cli.py`;
+`eval/` holds the datasets, harness, `crossval.py`, `violin.py` and the
+DeepEval/Giskard integrations.
 
 ---
 
@@ -263,13 +298,6 @@ deliberate choice, because in insurance a single sentence can be **sensitive
 health data** under GDPR art. 9. *"Il me faut une prise en charge pour l'Institut
 de cancérologie"* reveals a cancer diagnosis; sending it to a cloud LLM would
 exfiltrate exactly the data the law protects most. Here it stays on the box.
-
-> ⚠️ **Honest caveat about voice.** The web UI's speech features use the
-> browser's Web Speech API. In Chrome, **speech recognition sends audio to
-> Google's servers** — so the *voice* path is *not* local, unlike the NLU. For a
-> genuinely local voice pipeline, plug a server-side *vocal-helper*
-> (whisper.cpp) for speech-to-text and an OSS TTS for the reply. This is called
-> out in [`ASSESSMENT.md`](ASSESSMENT.md) and in the UI itself.
 
 Details and the GDPR discussion in [`PROS_CONS.md`](PROS_CONS.md).
 

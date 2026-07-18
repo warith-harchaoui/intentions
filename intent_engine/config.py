@@ -28,8 +28,6 @@ Project maintainers.
 
 from __future__ import annotations
 
-import platform
-import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -44,31 +42,30 @@ _REPO_ROOT = _PACKAGE_DIR.parent
 
 
 def _default_llm_model() -> str:
-    """Pick the best-fit local Gemma tag for the current host.
+    """Pick the default local Gemma tag for the LLM engine.
 
-    On Apple Silicon Macs we prefer the MLX build of ``gemma4:e4b`` so the
-    model runs on Apple's Metal-optimised inference path; everywhere else
-    we fall back to the plain tag that Ollama serves through llama.cpp.
-    The value stays fully overridable through the ``INTENT_LLM_MODEL``
-    environment variable.
+    We default to ``gemma3:4b``: on this project's hardware it answers in
+    ~5 s warm, roughly **8× faster** than the larger ``gemma4:e4b`` (~40 s
+    warm) for a small accuracy trade-off — the right pick for an assistant
+    where latency matters. The value stays fully overridable through the
+    ``INTENT_LLM_MODEL`` environment variable (e.g. set ``gemma4:e4b-mlx``
+    back if you want the bigger model).
 
     Returns
     -------
     str
-        ``gemma4:e4b-mlx`` on Apple Silicon, ``gemma4:e4b`` otherwise.
+        ``gemma3:4b`` (a compact, fast, multilingual Gemma).
 
     Examples
     --------
-    >>> tag = _default_llm_model()
-    >>> tag.startswith("gemma4:e4b")
-    True
+    >>> _default_llm_model()
+    'gemma3:4b'
     """
-    # ``sys.platform == 'darwin'`` is macOS; ``machine() == 'arm64'`` is
-    # Apple Silicon specifically (Intel Macs report ``x86_64``). Only that
-    # combination has the MLX runtime, so guard on both.
-    if sys.platform == "darwin" and platform.machine() == "arm64":
-        return "gemma4:e4b-mlx"
-    return "gemma4:e4b"
+    # A single fast default across platforms: gemma3:4b is a GGUF model Ollama
+    # serves everywhere, and its small size keeps latency low. (There is no
+    # widely-pulled MLX build of gemma3:4b, so we skip the host-aware -mlx
+    # dance the previous gemma4 default used.)
+    return "gemma3:4b"
 
 
 class Settings(BaseSettings):

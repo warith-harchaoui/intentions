@@ -170,6 +170,151 @@ def build_spec(results: dict) -> dict:
     }
 
 
+# --- LLM shootout violin (models × prompts) ------------------------------
+_SHOOTOUT_RESULTS = Path(__file__).resolve().parent / "llm_shootout_results.json"
+_SHOOTOUT_OUT = (
+    Path(__file__).resolve().parent.parent / "docs" / "img" / "violin-llm-shootout.png"
+)
+# One hue per model family (harchaoui palette); baseline vs improved share the
+# model colour and are told apart by the x-axis label.
+_MODEL_HUE: dict[str, str] = {
+    "qwen2.5:3b": "#007AFF",
+    "gemma3:4b": "#28CD41",
+    "gemma4:e2b-mlx": "#FF9500",
+    "gemma4:e4b-mlx": "#AF52DE",
+}
+
+
+def build_shootout_spec(results: dict) -> dict:
+    """Build a Vega-Lite violin spec for the LLM shootout results.
+
+    Parameters
+    ----------
+    results : dict
+        Parsed ``llm_shootout_results.json`` (``bootstrap`` keyed by
+        ``"model · prompt"``, plus ``summary`` carrying the model tag).
+
+    Returns
+    -------
+    dict
+        A Vega-Lite v5 faceted-density (violin) specification.
+    """
+    bootstrap: dict[str, list[float]] = results.get("bootstrap", {})
+    summary: dict[str, dict] = results.get("summary", {})
+    sample = results.get("sample", 0)
+    # Long-format rows + per-config colour (by the config's model family).
+    rows: list[dict[str, object]] = []
+    order: list[str] = []
+    colours: list[str] = []
+    for key, samples in bootstrap.items():
+        order.append(key)
+        model = summary.get(key, {}).get("model", "")
+        colours.append(_MODEL_HUE.get(model, "#6E6E73"))
+        for value in samples:
+            rows.append({"config": key, "accuracy": value})
+
+    return {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "title": {
+            "text": "LLM shootout — modèle × prompt (bootstrap)",
+            "subtitle": f"paraphrases · n={sample} · baseline vs prompt amélioré",
+            "font": "Roboto",
+            "subtitleFont": "Roboto",
+            "anchor": "start",
+            "fontSize": 15,
+            "subtitleFontSize": 11,
+            "subtitleColor": "#6E6E73",
+        },
+        "config": {
+            "font": "Roboto",
+            "view": {"stroke": None},
+            "axis": {"labelFont": "Roboto", "titleFont": "Roboto", "grid": False},
+            "header": {"labelFont": "Roboto", "titleFont": "Roboto"},
+        },
+        "data": {"values": rows},
+        "transform": [
+            {
+                "density": "accuracy",
+                "groupby": ["config"],
+                "extent": [0, 1],
+                "as": ["accuracy", "density"],
+            }
+        ],
+        "mark": {"type": "area", "orient": "horizontal"},
+        "width": 80,
+        "height": 400,
+        "encoding": {
+            "y": {
+                "field": "accuracy",
+                "type": "quantitative",
+                "title": "Exactitude (top-1)",
+                "axis": {"format": "%"},
+                "scale": {"domain": [0, 1]},
+            },
+            "x": {
+                "field": "density",
+                "type": "quantitative",
+                "stack": "center",
+                "impute": None,
+                "title": None,
+                "axis": {"labels": False, "ticks": False, "grid": False, "values": []},
+            },
+            "column": {
+                "field": "config",
+                "type": "nominal",
+                "sort": order,
+                "header": {
+                    "titleOrient": "bottom",
+                    "labelOrient": "bottom",
+                    "labelAngle": -35,
+                    "labelPadding": 6,
+                },
+                "title": None,
+            },
+            "color": {
+                "field": "config",
+                "type": "nominal",
+                "scale": {"domain": order, "range": colours},
+                "legend": None,
+            },
+        },
+    }
+
+
+def render_shootout(results: dict | None = None) -> Path:
+    """Render the LLM-shootout violin plot to PNG and return its path.
+
+    Parameters
+    ----------
+    results : dict | None, optional
+        Pre-loaded shootout results; loaded from disk when ``None``.
+
+    Returns
+    -------
+    Path
+        The written PNG path.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the shootout results file is missing.
+    """
+    import vl_convert as vlc
+
+    if results is None:
+        if not _SHOOTOUT_RESULTS.is_file():
+            raise FileNotFoundError(
+                f"{_SHOOTOUT_RESULTS} manquant — lancez `python -m eval.llm_shootout`."
+            )
+        results = json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
+    png = vlc.vegalite_to_png(
+        vl_spec=json.dumps(build_shootout_spec(results)), scale=2.0
+    )
+    _SHOOTOUT_OUT.parent.mkdir(parents=True, exist_ok=True)
+    _SHOOTOUT_OUT.write_bytes(png)
+    return _SHOOTOUT_OUT
+
+
 def render(results: dict | None = None) -> Path:
     """Render the violin plot to PNG and return its path.
 
@@ -221,7 +366,10 @@ def main(argv: list[str] | None = None) -> int:
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     path = render()
-    print(f"Violin plot écrit : {path}")
+    print(f"Violin plot (5 moteurs) écrit : {path}")
+    # Also render the LLM shootout violin when its results are present.
+    if _SHOOTOUT_RESULTS.is_file():
+        print(f"Violin plot (LLM shootout) écrit : {render_shootout()}")
     return 0
 
 

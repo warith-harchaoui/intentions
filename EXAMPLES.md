@@ -21,7 +21,7 @@ pip install "sentence-transformers>=3.0.0"
 For the LLM engine, run Ollama and pull the models:
 
 ```bash
-ollama pull gemma4:e4b          # on Apple Silicon, gemma4:e4b-mlx is auto-picked
+ollama pull gemma3:4b           # compact, fast LLM (~5 s/call warm)
 ollama pull nomic-embed-text    # embedding fallback for the BERT engine
 ```
 
@@ -52,7 +52,7 @@ tfidf               | (abstention)                 — 28 ms
 fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
 fasttext_pretrained | (abstention)                 — 0 ms
 bert                | declarer_sinistre_auto [0.98] — 18 ms
-llm                 | declarer_sinistre_auto [0.95] — 14378 ms
+llm                 | declarer_sinistre_auto [0.95] — 4725 ms
         slots: {'type_bien': 'auto', 'urgence': 'haute'}
 ```
 
@@ -150,8 +150,8 @@ uvicorn intent_engine.api:app --reload --port 8000
 # open http://localhost:8000
 ```
 
-Type or dictate a request, compare the five engines with confidence bars and
-latencies, toggle "read the answer aloud", and browse the knowledge base.
+Type a request, compare the five engines with confidence bars and latencies,
+and browse the knowledge base.
 
 ## 9. HTTP API directly
 
