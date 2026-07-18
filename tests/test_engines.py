@@ -201,6 +201,19 @@ def test_llm_engine_sanitizes_slots(kb: KnowledgeBase) -> None:
     assert isinstance(slots["meta"], str)
 
 
+def test_llm_engine_strips_markdown_fences(kb: KnowledgeBase) -> None:
+    """A JSON answer wrapped in a ```json fence is still parsed."""
+    # Small local models often ignore JSON mode and fence their answer; the
+    # engine must recover it rather than abstaining.
+    fenced = (
+        '```json\n{"intent": "declarer_sinistre", "confidence": 0.9, "slots": {}}\n```'
+    )
+    engine = LlmIntentEngine(client=FakeOllamaClient(fenced)).fit(kb)
+    top = engine.classify("j'ai eu un accident").top()
+    assert top is not None
+    assert top.intent == "declarer_sinistre"
+
+
 def test_llm_engine_handles_invalid_json(kb: KnowledgeBase) -> None:
     """Non-JSON model output degrades to a clean abstention."""
     # Even in JSON mode a tiny model can misbehave; we must not crash.

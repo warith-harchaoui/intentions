@@ -13,11 +13,16 @@ python-multipart>=0.0.20    # form parsing (future file uploads)
 scikit-learn>=1.5.0         # TfidfVectorizer + LogisticRegression
 numpy>=1.26.0               # array math shared by both classifiers
 
-# --- LLM + embeddings backends (Approach 3, and BERT via Ollama) ---------
-httpx>=0.27.0               # synchronous Ollama REST client
+# --- fastText engine (Approach 2 — trained on our examples) --------------
+fasttext-wheel>=0.9.2      # prebuilt fastText (no compiler needed)
 
-# --- Optional heavy backend (Approach 2, the "proper" SBERT path) --------
-# sentence-transformers pulls PyTorch (~2 GB). The BERT engine falls back to
-# the Ollama embedding model when this is absent, so it is intentionally
-# NOT required here. Install it explicitly to use the SBERT path:
-#     pip install "sentence-transformers>=3.0.0"
+# --- LLM + embeddings backends (Approach 5, and BERT via Ollama) ---------
+httpx>=0.27.0              # synchronous Ollama REST client
+
+# --- Optional heavy backend (Approach 4, the SBERT + PyTorch MLP path) ---
+# sentence-transformers pulls PyTorch (~2 GB); torch also runs the BERT
+# engine's MLP head. Install to enable the BERT engine on the SBERT path:
+#     pip install "sentence-transformers>=3.0.0" torch
+#
+# The pretrained fastText engine (Approach 3) needs the ~4.5 GB cc.fr.300
+# model, downloaded on demand (see the README / scripts).

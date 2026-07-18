@@ -1,31 +1,66 @@
-# Déraison Assurances — un *intent engine*, en 3 approches
+# Déraison Assurances — un *intent engine*, en 5 approches
 
 [🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md) — 📖 Mode d'emploi : [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
 > « Mes collègues me demandent **comment on fait** un moteur de détection
-> d'intention. » — Ce dépôt répond, en montrant **trois façons** de le faire,
+> d'intention. » — Ce dépôt répond, en montrant **cinq façons** de le faire,
 > côte à côte, sur un cas concret : le chatbot d'aiguillage d'une compagnie
 > d'assurance (fictive) qui oriente ses clients au **téléphone** (voix) comme
 > à l'**écrit**.
 
-![Comparateur des 3 moteurs](docs/img/02-comparateur-3-moteurs.png)
+![Comparateur des 5 moteurs](docs/img/02-comparateur-5-moteurs.png)
 
 Un client dit *« j'ai eu un accident ce matin, ma voiture est cabossée »* et le
 système doit comprendre l'**intention** (`declarer_sinistre_auto`), aiguiller
 vers le bon **service** et, idéalement, extraire les **informations utiles**
-(urgence, type de bien). Trois moteurs font ce travail, du plus « à l'ancienne »
-au plus « bourrin » :
+(urgence, type de bien). Cinq moteurs font ce travail — une **traversée
+volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 
-| # | Moteur | Techno | Le compromis |
-|---|--------|--------|--------------|
-| 1 | **TF-IDF** | scikit-learn (n-grammes + régression logistique) | Instantané, minuscule, hors-ligne. Colle aux mots. |
-| 2 | **BERT** | Embeddings de phrases (SBERT) + classifieur ML | Comprend le sens, généralise aux paraphrases. |
-| 3 | **LLM** | Gemma en local via Ollama, prompt + **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent. |
+| # | Moteur | Représentation | Classifieur | Le compromis |
+|---|--------|----------------|-------------|--------------|
+| 1 | **TF-IDF** | n-grammes creux (car./mots) | **Random Forest** | Instantané, minuscule. Mémorise les formes de surface. |
+| 2 | **fastText (appris)** | sous-mots **appris sur nos exemples** | softmax fastText | Léger ; un cran au-dessus du sac-de-mots. |
+| 3 | **fastText (pré-entraîné)** | vecteurs **cc.fr.300** (Common Crawl) | régression logistique | Transfert : sait déjà que *voiture* ≈ *véhicule*. |
+| 4 | **BERT** | embeddings contextuels (**SBERT**) | **MLP PyTorch** | Comprend le sens ; gagne sur les paraphrases. Local. |
+| 5 | **LLM** | — (prompt) | **Gemma** via Ollama, **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent, le plus malin. |
 
 📊 Le comparatif détaillé et sourcé (benchmarks, RGPD, coûts) : **[`PROS_CONS.md`](PROS_CONS.md)**.
 📖 Le mode d'emploi pas à pas (avec captures) : **[`MODEDEMPLOI.md`](MODEDEMPLOI.md)**.
 🍳 Le cookbook exécutable : **[`EXAMPLES.md`](EXAMPLES.md)**.
+🎯 Mon avis honnête sur le projet : **[`ASSESSMENT.md`](ASSESSMENT.md)**.
 📐 Le standard de code suivi partout : **[`CODING.md`](CODING.md)**.
+
+## Pourquoi ce projet — l'objectif pédagogique
+
+C'est un **artefact d'enseignement Data Science / Machine Learning / IA**. Le
+but n'est pas de livrer le meilleur classifieur ; c'est de faire **ressentir,
+en un écran**, à des collègues qui ne pratiquent *pas* le ML, l'idée la plus
+importante du NLP appliqué : **la représentation compte plus que le
+classifieur.**
+
+Lisez le tableau des moteurs de haut en bas et vous parcourez l'histoire du
+domaine :
+
+1. **Sac-de-mots (TF-IDF)** — on compte des n-grammes ; le modèle voit des
+   *chaînes*, pas du *sens*. Un synonyme jamais vu lui est invisible.
+2. **Sous-mots appris (fastText, sur nos données)** — le modèle commence à
+   rapprocher les mots proches, à partir de quelques centaines d'exemples.
+3. **Vecteurs pré-entraînés (fastText cc.fr.300)** — transfert : la
+   connaissance de milliards de mots de français est versée gratuitement.
+4. **Embeddings contextuels (BERT/SBERT) + réseau de neurones** — du sens qui
+   dépend du contexte, plus un classifieur non-linéaire.
+5. **LLM génératif (Gemma)** — aucun entraînement ; du raisonnement à partir
+   d'un prompt, et — c'est unique — l'extraction de *slots* structurés.
+
+Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
+des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
+**49 % → 67 % → 73 % → 88 %** des moteurs 1→4, et le LLM ajoute l'extraction de
+slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un·e
+praticien·ne : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
+variance train/test (**validation croisée** k-fold), la mauvaise calibration
+des réseaux de neurones (trop sûrs d'eux hors-périmètre) et la confidentialité
+(pourquoi tout tourne en local). But : qu'un·e collègue non-ML reparte en
+comprenant *pourquoi* choisir une approche plutôt qu'une autre.
 
 ---
 
@@ -81,14 +116,18 @@ python -m venv .venv
 source .venv/bin/activate        # Windows 🪟 : .venv\Scripts\activate
 pip install -r requirements.txt
 
-# Optionnel — le "vrai" chemin SBERT du moteur BERT (tire PyTorch, ~2 Go) :
-pip install "sentence-transformers>=3.0.0"
-# Optionnel — la couche d'évaluation (DeepEval + Giskard) :
+# Optionnel — le chemin SBERT + MLP PyTorch du moteur BERT (~2 Go) :
+pip install "sentence-transformers>=3.0.0" torch
+# Optionnel — le moteur fastText pré-entraîné : télécharger cc.fr.300 (~4,5 Go) :
+python scripts/download_fasttext.py
+# Optionnel — la couche d'évaluation (DeepEval ; Giskard exige Python ≤ 3.11) :
 pip install ".[eval]"
 ```
 
-> Sans `sentence-transformers`, le moteur BERT **bascule automatiquement** sur
-> les embeddings Ollama (`nomic-embed-text`) : le démo tourne quand même.
+> La démo **se dégrade gracieusement** : sans `sentence-transformers`+`torch`,
+> le moteur BERT est indisponible ; sans `cc.fr.300.bin`, le fastText
+> pré-entraîné est masqué ; sans Ollama, le LLM est masqué. TF-IDF et fastText
+> appris tournent toujours.
 
 ---
 
@@ -126,24 +165,40 @@ llm     | declarer_sinistre_auto  [1.00]  — 16565 ms
 
 ---
 
-## Résultats mesurés (base de 21 intentions, 33 exemples d'éval)
+## Résultats mesurés (21 intentions, 88 paraphrases tenues à l'écart)
 
-Reproductibles avec `python -m eval.harness`.
+Reproductibles : `python -m eval.harness` (exactitude/latence) et
+`python -m eval.crossval` (distributions bootstrap + validation croisée).
 
-| Moteur | Exactitude | Latence moyenne | Slots |
-|---|---|---|---|
-| **TF-IDF** | 97 % (32/33) | ~1 ms | ❌ |
-| **BERT — SBERT** | 82 % (27/33) | ~15 ms | ❌ |
-| **BERT — repli Ollama** | 79 % (26/33) | ~28 ms | ❌ |
-| **LLM — gemma4:e4b** | 94 % (31/33) | ~20 s | ✅ |
+Le jeu de test est volontairement **riche en paraphrases** (faible recouvrement
+lexical avec l'entraînement) : il mesure la **généralisation**, pas la
+mémorisation du vocabulaire — c'est là que la représentation prouve sa valeur.
 
-> Plus un contrôle d'**abstention hors-périmètre** : sur 8 phrases hors sujet
-> (météo, calcul, cuisine…), TF-IDF et le LLM s'abstiennent 100 % du temps — ils
-> disent « je ne sais pas » au lieu de mal aiguiller.
+| # | Moteur | Exactitude (held-out) | Latence moyenne | Slots |
+|---|--------|----------------------:|----------------:|:-----:|
+| 1 | **TF-IDF + RandomForest** | 49 % | ~30 ms | ❌ |
+| 2 | **fastText (appris)** | 67 % | ~0 ms | ❌ |
+| 3 | **fastText (pré-entraîné cc.fr.300)** | 73 % | ~1 ms | ❌ |
+| 4 | **BERT (SBERT + MLP)** | **88 %** | ~15 ms | ❌ |
+| 5 | **LLM (Gemma via Ollama)** | ~90 % | ~20 s | ✅ |
 
-> À exactitude égale, le LLM est **~20 000× plus lent** que TF-IDF mais extrait
-> des slots. *Plus lourd ≠ meilleur : on choisit selon le besoin.* Détails et
-> sources dans [`PROS_CONS.md`](PROS_CONS.md).
+**Les distributions, pas juste les points** — le rééchantillonnage bootstrap
+(2000×) du jeu de test montre que les moteurs sont *réellement* différents sur
+ce jeu difficile (TF-IDF et BERT ne se chevauchent même pas) :
+
+![Distribution d'exactitude par moteur (violin plot)](docs/img/violin-accuracy.png)
+
+> **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
+> l'exactitude monte 49 → 67 → 73 → 88 %. Mais en **validation croisée** k-fold
+> sur les exemples in-distribution de la KB, les moteurs sont *plus proches*
+> (~72 / 69 / — / 82 %) : le lexical s'en sort quand le test ressemble à
+> l'entraînement, et s'effondre sous le changement de distribution (paraphrases)
+> — la raison d'être des représentations sémantiques.
+>
+> Filet hors-périmètre : sur 15 phrases hors sujet, TF-IDF s'abstient ~93 % du
+> temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) —
+> une vraie leçon sur la **calibration des réseaux de neurones**. Analyse
+> complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
 
 ---
 
@@ -151,25 +206,30 @@ Reproductibles avec `python -m eval.harness`.
 
 ```
 intent_engine/
-  kb.py            # parseur Markdown : # h1 = intention
-  base.py          # contrats communs : IntentEngine, IntentResult
-  tfidf_engine.py  # Approche 1 — scikit-learn
-  embeddings.py    # backends d'embeddings enfichables (SBERT / Ollama)
-  bert_engine.py   # Approche 2 — embeddings + classifieur
-  llm_engine.py    # Approche 3 — Ollama + JSON strict + anti-hallucination
-  ollama_client.py # client Ollama synchrone (chat JSON + embeddings)
-  router.py        # registre des moteurs + comparaison + exécution
-  api.py           # API FastAPI
-  cli.py           # interface terminal
-knowledge_base/    # la connaissance (Markdown, h1 = intention)
-web/               # front vanilla JS + Tailwind (+ polices self-hostées)
-eval/              # dataset étiqueté + seuils + banc d'essai + DeepEval + Giskard
-tests/             # pytest
+  kb.py              # parseur Markdown : # h1 = intention
+  base.py            # contrats communs : IntentEngine, IntentResult
+  tfidf_engine.py    # 1 — TF-IDF + Random Forest (scikit-learn)
+  fasttext_engine.py # 2 & 3 — fastText supervisé + pré-entraîné cc.fr.300
+  embeddings.py      # backends d'embeddings enfichables (SBERT / Ollama)
+  mlp.py             # tête MLP PyTorch (API façon scikit-learn)
+  bert_engine.py     # 4 — embeddings SBERT + MLP PyTorch
+  llm_engine.py      # 5 — Ollama + JSON strict + anti-hallucination + slots
+  ollama_client.py   # client Ollama synchrone (chat JSON + embeddings)
+  router.py          # registre des moteurs + comparaison + exécution
+  api.py             # API FastAPI
+  cli.py             # interface terminal
+knowledge_base/      # la connaissance (Markdown, h1 = intention)
+web/                 # front vanilla JS + Tailwind (+ polices self-hostées)
+eval/                # datasets + seuils + banc d'essai + crossval + violin
+                     # + intégrations DeepEval (LLM) et Giskard (ML)
+tests/               # pytest
 ```
 
-Les trois moteurs implémentent **le même contrat** (`IntentEngine`), donc le
-routeur, l'API et le front les traitent de façon identique. C'est tout l'intérêt
-pédagogique : seule la **représentation** change.
+Les cinq moteurs implémentent **le même contrat** (`IntentEngine`), donc le
+routeur, l'API et le front les traitent de façon identique. C'est tout
+l'intérêt pédagogique : seuls la **représentation et le classifieur** changent
+— la tuyauterie reste constante, on voit la qualité bouger le long de la
+progression.
 
 ---
 
@@ -185,10 +245,13 @@ python -m eval.harness                 # exactitude/latence des 3 moteurs
 
 ## Confidentialité
 
-Le **moteur d'intention** tourne **en local** (scikit-learn, SBERT auto-hébergé,
-LLM via Ollama) : le texte d'une requête ne quitte pas la machine — un choix
-délibéré, car en assurance les requêtes peuvent contenir des **données de
-santé** (art. 9 RGPD).
+Le **moteur d'intention** tourne **en local** (scikit-learn, fastText & SBERT
+auto-hébergés, LLM via Ollama) : le texte d'une requête ne quitte pas la
+machine — un choix délibéré, car en assurance une seule phrase peut être une
+**donnée de santé sensible** au sens de l'art. 9 RGPD. *« Il me faut une prise
+en charge pour l'Institut de cancérologie »* révèle un diagnostic de cancer ;
+l'envoyer à un LLM cloud exfiltrerait exactement la donnée que la loi protège
+le plus. Ici, elle reste sur la machine.
 
 > ⚠️ **Réserve honnête sur la voix.** Les fonctions vocales de l'interface
 > utilisent l'API Web Speech du navigateur. Sous Chrome, **la reconnaissance

@@ -1,11 +1,11 @@
 # Examples — Déraison Assurances intent engine
 
-A runnable cookbook for the three-approaches intent engine. Every snippet is
+A runnable cookbook for the five-approaches intent engine. Every snippet is
 copy-pasteable. English per the coding standard; the domain data and answers
 are French (it is a French insurance assistant).
 
 See [`README.md`](README.md) for install, and [`PROS_CONS.md`](PROS_CONS.md)
-for the sourced comparison of the three approaches.
+for the sourced comparison of the five approaches.
 
 ---
 
@@ -41,18 +41,23 @@ python -m intent_engine intents
   ...
 ```
 
-## 2. CLI — compare the three engines
+## 2. CLI — compare the five engines
 
 ```bash
-python -m intent_engine compare "on m'a volé ma voiture cette nuit"
+python -m intent_engine compare "on s'est rentrés dedans à un carrefour"
 ```
 
 ```text
-tfidf  | vol_vehicule  [0.86]  — 0 ms
-bert   | vol_vehicule  [0.61]  — 30 ms
-llm    | vol_vehicule  [1.00]  — 10394 ms
-        slots: {'type_bien': 'véhicule', 'urgence': 'haute'}
+tfidf               | (abstention)                 — 28 ms
+fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
+fasttext_pretrained | (abstention)                 — 0 ms
+bert                | declarer_sinistre_auto [0.98] — 18 ms
+llm                 | declarer_sinistre_auto [0.95] — 14378 ms
+        slots: {'type_bien': 'auto', 'urgence': 'haute'}
 ```
+
+Watch the lexical engines abstain on a paraphrase while the semantic ones
+nail it — the whole pedagogical point in one command.
 
 ## 3. CLI — one engine, natural-language execution
 
@@ -91,9 +96,10 @@ from intent_engine import IntentRouter
 
 router = IntentRouter.from_directory("knowledge_base")
 
-# Which engines can run right now (LLM only if Ollama answers)?
+# Which engines can run right now (fastText-pretrained only if cc.fr.300 is
+# downloaded; LLM only if Ollama answers)?
 print(router.available_engines())
-# ['tfidf', 'bert', 'llm']
+# ['tfidf', 'fasttext_custom', 'fasttext_pretrained', 'bert', 'llm']
 
 # Run all engines on one utterance:
 for name, res in router.compare("j'ai un dégât des eaux chez moi").items():
@@ -144,7 +150,7 @@ uvicorn intent_engine.api:app --reload --port 8000
 # open http://localhost:8000
 ```
 
-Type or dictate a request, compare the three engines with confidence bars and
+Type or dictate a request, compare the five engines with confidence bars and
 latencies, toggle "read the answer aloud", and browse the knowledge base.
 
 ## 9. HTTP API directly
@@ -177,10 +183,18 @@ python -m eval.harness --engine bert
 ```
 
 ```text
-[PASS] tfidf  accuracy=97% (32/33) mean_latency=0ms (bars: acc≥75%, lat≤50ms)
-    [PASS] abstention hors-périmètre: 100% (bar ≥75%)
-[PASS] bert   accuracy=82% (27/33) mean_latency=15ms (bars: acc≥80%, lat≤2000ms)
-    [PASS] abstention hors-périmètre: 75% (bar ≥50%)
+[PASS] tfidf               accuracy=49% mean_latency=30ms (bars: acc≥45%)
+    [PASS] abstention hors-périmètre: 93% (bar ≥60%)
+[PASS] fasttext_custom     accuracy=67% mean_latency=0ms  (bars: acc≥55%)
+[PASS] fasttext_pretrained accuracy=73% mean_latency=1ms  (bars: acc≥65%)
+[PASS] bert                accuracy=88% mean_latency=15ms  (bars: acc≥75%)
+```
+
+Distributions (bootstrap CIs + k-fold CV) and the violin plot:
+
+```bash
+python -m eval.crossval     # writes eval/crossval_results.json + prints mean ± std
+python -m eval.violin       # renders docs/img/violin-accuracy.png
 ```
 
 DeepEval (LLM) and Giskard (ML) integrations run with the eval extra:
@@ -188,6 +202,7 @@ DeepEval (LLM) and Giskard (ML) integrations run with the eval extra:
 ```bash
 pip install ".[eval]"
 pytest -m slow eval/test_eval_deepeval.py   # DeepEval, exact-intent-match metric
+# Giskard needs Python <= 3.11 (no 3.13 wheel); run it in a 3.11 venv:
 pytest -m slow eval/test_eval_giskard.py    # Giskard vulnerability scan (TF-IDF)
 ```
 

@@ -1,4 +1,4 @@
-"""Approach 3 — the "brute force" LLM engine with a strict JSON contract.
+"""Approach 5 — the "brute force" LLM engine with a strict JSON contract.
 
 Module summary
 --------------
@@ -77,6 +77,53 @@ Schéma de sortie :
 {"intent": "<id>", "confidence": <float>, "slots": {<clé>: <valeur>}, \
 "reformulation": "<texte>"}\
 """
+
+
+def _extract_json(raw: str) -> str:
+    """Pull a JSON object out of a possibly fenced / chatty model answer.
+
+    Small local models sometimes ignore JSON mode and wrap the object in a
+    Markdown ```json … ``` fence, or add a sentence around it. This peels off
+    the fence and, as a last resort, returns the substring from the first
+    ``{`` to the last ``}`` so ``json.loads`` sees a bare object.
+
+    Parameters
+    ----------
+    raw : str
+        The raw model output.
+
+    Returns
+    -------
+    str
+        A best-effort JSON string (may still be invalid; the caller catches).
+
+    Examples
+    --------
+    >>> _extract_json('{"a": 1}')
+    '{"a": 1}'
+    >>> _extract_json('Voici la réponse : {"a": 1} voilà')
+    '{"a": 1}'
+    """
+    text = raw.strip()
+    # Strip an opening code fence (``` or ```json) and any closing fence.
+    if text.startswith("```"):
+        # Drop the first line (``` or ```json) and a trailing ``` if present.
+        text = text.split("\n", 1)[-1] if "\n" in text else text
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+        text = text.strip()
+    # If it already looks like a bare object, use it as-is.
+    if text.startswith("{") and text.endswith("}"):
+        return text
+    # Otherwise, carve out the outermost {...} span (handles stray prose).
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end > start:
+        return text[start : end + 1]
+    # Nothing object-like found; return the original so the caller's
+    # json.loads raises and we abstain cleanly.
+    return raw
+
 
 # Below this self-reported confidence we abstain and hand off to a human,
 # mirroring the two classifier engines so the comparison is apples-to-apples.
@@ -257,12 +304,13 @@ class LlmIntentEngine(IntentEngine):
         IntentResult
             A validated result, or an abstention if parsing/validation fails.
         """
-        # Defensive parse: even in JSON mode a tiny local model can, rarely,
-        # emit something we cannot load. Treat that as an abstention rather
-        # than letting a JSONDecodeError bubble up and crash the request.
+        # Defensive parse: even in JSON mode a tiny local model can wrap its
+        # answer in a Markdown ```json fence or add stray prose. We strip
+        # fences and, failing that, extract the outermost {...} block before
+        # giving up — a JSONDecodeError becomes a clean abstention, not a crash.
         try:
-            payload: dict[str, Any] = json.loads(raw)
-        except json.JSONDecodeError:
+            payload: dict[str, Any] = json.loads(_extract_json(raw))
+        except (json.JSONDecodeError, ValueError):
             logger.warning("LLM returned non-JSON output: %r", raw[:200])
             return self._abstention(text, elapsed_ms, error="invalid_json")
 

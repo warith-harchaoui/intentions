@@ -25,7 +25,7 @@ Top to bottom:
 - **Header** — the brand, and a badge that honestly reports the LLM engine
   state: green *"LLM en ligne · gemma4:e4b-mlx"* when Ollama answers, grey
   *"LLM hors ligne"* otherwise (the LLM button is then disabled).
-- **Three cards** — a one-line reminder of each approach (TF-IDF / BERT / LLM).
+- **Five cards** — a one-line reminder of each approach (TF-IDF, fastText×2, BERT, LLM).
 - **Input area** — a text box, a microphone button, an engine selector, a
   "read aloud" switch, and the **Analyser l'intention** button.
 
@@ -37,17 +37,17 @@ Type a customer sentence — as if heard on the phone — e.g.
 *"j'ai eu un accident ce matin, ma voiture est cabossée"*.
 
 Pick a mode with the segmented control:
-- **Comparer les 3** (default) — run all engines side by side.
+- **Comparer tout** (default) — run all engines side by side.
 - **TF-IDF** / **BERT** / **LLM** — run a single engine.
 
 Press **Analyser l'intention**.
 
 ### Reading the comparator
 
-![Three-engine comparator](docs/img/02-comparateur-3-moteurs.png)
+![Five-engine comparator](docs/img/02-comparateur-5-moteurs.png)
 
 Each engine gets a card showing:
-- its **coloured chip** (1·TF-IDF blue, 2·BERT green, 3·LLM orange) and its
+- its **coloured chip** (blue, teal, indigo, green, orange) and its
   **latency** (top-right) — note TF-IDF in ~1 ms vs the LLM in ~20 s;
 - **confidence bars** for the top intents (the id + a percentage);
 - the **scripted answer** for the winning intent, in serif;
@@ -133,6 +133,6 @@ python -m intent_engine execute "il me faut une prise en charge hôpital"
 ## 9. Where to go next
 
 - [`README.md`](README.md) — install, architecture, measured results.
-- [`PROS_CONS.md`](PROS_CONS.md) — sourced comparison of the three approaches.
+- [`PROS_CONS.md`](PROS_CONS.md) — sourced comparison of the five approaches.
 - [`EXAMPLES.md`](EXAMPLES.md) — Python + HTTP + CLI recipes.
 - [`knowledge_base/_FORMAT.md`](knowledge_base/_FORMAT.md) — how to add an intent.

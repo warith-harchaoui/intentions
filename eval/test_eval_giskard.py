@@ -12,7 +12,16 @@ a known weakness of surface-level TF-IDF worth surfacing explicitly.
 The module is marked ``slow`` and skips cleanly when Giskard (the ``eval``
 extra) is not installed, so the default test suite is unaffected.
 
-Run it with:
+.. note::
+   **Python version.** Giskard currently ships wheels for Python 3.10–3.11
+   only. On newer interpreters (e.g. 3.13, this repo's dev machine) ``pip
+   install giskard`` fails with *"No matching distribution found"*, so this
+   scan is **written but not executed here** — the ``importorskip`` below
+   turns that into a clean skip. Run it on a Python 3.11 environment to
+   exercise it for real. (DeepEval, by contrast, installs on 3.13 and the
+   LLM eval in ``test_eval_deepeval.py`` was run end-to-end.)
+
+Run it with (Python ≤ 3.11):
     pip install ".[eval]"
     pytest -m slow eval/test_eval_giskard.py
 

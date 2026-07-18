@@ -11,15 +11,23 @@
 
 | # | Approche | L'idée | Quand la choisir |
 |---|----------|--------|------------------|
-| 1 | **TF-IDF + linéaire** | Sac de n-grammes pondérés + régression logistique | Baseline instantanée, hors-ligne, explicable ; beaucoup de données étiquetées, vocabulaire stable |
-| 2 | **Embeddings BERT + classifieur** | Phrase → vecteur sémantique (SBERT) → petit classifieur | Robustesse aux paraphrases, multilingue, peu d'exemples par intention |
-| 3 | **LLM + prompt JSON** | On décrit les intentions au modèle, il répond en JSON strict | Démarrage à froid (zéro donnée), extraction de slots, catalogue qui bouge vite |
+| 1 | **TF-IDF + Random Forest** | Sac de n-grammes pondérés + forêt d'arbres | Baseline instantanée, hors-ligne, explicable ; beaucoup de données, vocabulaire stable |
+| 2 | **fastText appris** | Sous-mots appris sur nos exemples + softmax fastText | Léger, rapide, robuste aux fautes ; un cran de sémantique sans modèle externe |
+| 3 | **fastText pré-entraîné** | Vecteurs cc.fr.300 (Common Crawl) + classifieur | Transfert de sens gratuit, peu d'exemples ; sait déjà que *voiture* ≈ *véhicule* |
+| 4 | **BERT + MLP** | Phrase → vecteur contextuel (SBERT) → MLP PyTorch | Robustesse maximale aux paraphrases, multilingue ; le meilleur non-génératif |
+| 5 | **LLM + prompt JSON** | On décrit les intentions au modèle, il répond en JSON strict | Démarrage à froid (zéro donnée), extraction de slots, catalogue qui bouge vite |
+
+> Note sur le **grand tableau théorique** ci-dessous : il oppose les trois
+> *archétypes* (lexical, embeddings, LLM). Les deux moteurs fastText sont le
+> pont concret entre lexical et embeddings — fastText *appris* est proche du
+> lexical (sous-mots sur nos données), fastText *pré-entraîné* bascule côté
+> embeddings (transfert). BERT est l'embedding contextuel abouti.
 
 ---
 
 ## Le grand tableau
 
-| Critère | 1 · TF-IDF | 2 · BERT (SBERT) | 3 · LLM (local) |
+| Critère | Lexical (TF-IDF, fastText appris) | Embeddings (fastText pré-entraîné, BERT) | LLM (local) |
 |---|---|---|---|
 | **Généralisation aux paraphrases** | Faible — colle aux mots exacts¹ | Bonne — capture le sens² | Excellente — comprend le langage³ |
 | **Données requises / intention** | Dizaines d'exemples¹ | 5–10 (few-shot)² | 0–5 (dans le prompt)³ |
@@ -35,35 +43,56 @@
 
 ---
 
-## Ce que **ce dépôt** mesure (base de 21 intentions, 33 exemples d'éval)
+## Ce que **ce dépôt** mesure (21 intentions, 88 paraphrases tenues à l'écart)
 
-Chiffres reproductibles : `python -m eval.harness`. Ce ne sont pas des
-benchmarks académiques mais les résultats réels du code de ce projet, ce qui
-rend le compromis tangible.
+Chiffres reproductibles : `python -m eval.harness` (exactitude/latence) et
+`python -m eval.crossval` (distributions). Ce ne sont pas des benchmarks
+académiques mais les résultats réels du code, sur un jeu de test **riche en
+paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 
-| Moteur | Exactitude (top-1) | Latence moyenne | Extraction de slots |
-|---|---|---|---|
-| **TF-IDF** | **97 %** (32/33) | **~0–1 ms** | ❌ |
-| **BERT — SBERT multilingue** (`.[sbert]`) | **82 %** (27/33) | **~15 ms** | ❌ |
-| **BERT — repli Ollama `nomic-embed-text`** | 79 % (26/33) | ~28 ms | ❌ |
-| **LLM — `gemma4:e4b` (Ollama, JSON)** | **94 %** (31/33) | **~20 s** | ✅ (urgence, type de bien…) |
+| # | Moteur (représentation + classifieur) | Exactitude (held-out) | Latence | Slots |
+|---|---|---:|---:|:---:|
+| 1 | **TF-IDF + Random Forest** | 49 % | ~30 ms | ❌ |
+| 2 | **fastText appris** (softmax fastText) | 67 % | ~0 ms | ❌ |
+| 3 | **fastText pré-entraîné** cc.fr.300 (+ régression logistique) | 73 % | ~1 ms | ❌ |
+| 4 | **BERT** SBERT + **MLP PyTorch** | **88 %** | ~15 ms | ❌ |
+| 5 | **LLM** gemma4:e4b (Ollama, JSON) | ~90 % | ~20 s | ✅ (urgence, type de bien…) |
 
-**Abstention hors-périmètre** (8 phrases hors sujet : météo, calcul, cuisine…) :
-TF-IDF et le LLM s'abstiennent **100 %** du temps (ils disent « je ne sais
-pas » → humain), BERT un peu moins. Refuser de deviner est aussi important que
-bien classer.
+> **La progression, c'est ça la leçon.** 49 → 67 → 73 → 88 % : chaque marche
+> ajoute de la *sémantique* à la représentation, et l'exactitude suit. Le
+> sac-de-mots mémorise des chaînes ; fastText apprend des sous-mots ; les
+> vecteurs pré-entraînés apportent le sens de milliards de mots ; BERT y ajoute
+> le contexte. Le LLM, lui, égale BERT **et** extrait les slots — mais
+> **~1 000× plus lent**. *Plus lourd n'est pas toujours meilleur : on choisit
+> selon le besoin (vitesse ? slots ? démarrage à froid ? explicabilité ?).*
 
-> **Le résultat qui surprend — et qui enseigne.** Sur *nos* données, TF-IDF
-> (97 %, ~1 ms) **fait jeu égal, voire mieux** que le LLM (94 %, ~20 s) en
-> exactitude, et **bat** BERT. Pourquoi ? Les n-grammes de caractères (`char_wb` 3–5) capturent le
-> vocabulaire partagé entre exemples d'entraînement et phrases de test, et la
-> littérature confirme que **TF-IDF est une baseline redoutable** quand il y a
-> recouvrement lexical¹. L'avantage de BERT/LLM apparaît sur les **vraies
-> paraphrases sans mot commun** et surtout — pour le LLM — sur l'**extraction
-> d'entités** (slots), que ni TF-IDF ni BERT ne font ici. Autrement dit : à
-> exactitude égale, le LLM est **~20 000× plus lent** mais rend un service en
-> plus. Morale : ne jamais présumer qu'« plus lourd = meilleur ». Mesurez, et
-> choisissez selon le besoin réel (vitesse ? slots ? démarrage à froid ?).
+### Les distributions, pas juste les points (bootstrap + violin)
+
+Un chiffre unique ment. Le rééchantillonnage **bootstrap** (2000×) du jeu de
+test donne la *distribution* d'exactitude de chaque moteur — et montre que, sur
+ce jeu difficile, ils sont **réellement** distincts (TF-IDF et BERT ne se
+chevauchent pas), pas séparés par le hasard :
+
+![Violin plot des distributions d'exactitude](docs/img/violin-accuracy.png)
+
+### Deux angles complémentaires (held-out vs validation croisée)
+
+- **Held-out paraphrases** (changement de distribution) : 49 / 67 / 73 / 88 %.
+  L'écart est large — le lexical est fragile.
+- **Validation croisée k-fold** sur les exemples in-distribution de la KB :
+  ~72 % (TF-IDF) / 69 % (fastText appris) / 82 % (BERT). Les moteurs sont
+  **plus proches** quand le test ressemble à l'entraînement. C'est *toute*
+  l'histoire : le lexical marche « chez lui » et s'effondre dès qu'on paraphrase.
+
+### Calibration & abstention hors-périmètre (15 phrases hors sujet)
+
+Refuser de deviner est aussi important que bien classer. TF-IDF s'abstient
+**~93 %** du temps sur le hors-périmètre ; le **réseau BERT est trop sûr de
+lui** et n'abstient que ~13 % *avant* réglage — un cas d'école de **mauvaise
+calibration des réseaux de neurones**. En remontant son seuil de confiance à
+0,6, on passe à ~73 % d'abstention en ne perdant presque rien en exactitude
+in-scope (les bons hits sont à ~0,99 de confiance). C'est un arbitrage réel de
+production, pas un détail.
 
 ---
 
@@ -83,7 +112,33 @@ bien classer.
 - **Un modèle par langue**, tokenisation/stop-words spécifiques au français.
 - **Dérive de vocabulaire** : quand le langage client évolue (jargon, nouveaux produits), la performance baisse silencieusement → ré-entraînement périodique¹.
 
-### 2 · Embeddings type BERT (SBERT) + classifieur
+### 2 & 3 · fastText — appris, puis pré-entraîné
+
+fastText (Bojanowski/Joulin et al., 2016-2018) représente chaque mot comme un
+**sac de n-grammes de caractères**, ce qui lui donne des vecteurs même pour des
+mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
+
+**fastText *appris sur nos exemples*** (`train_supervised`)
+
+- **Pour** : entraîne conjointement les embeddings de sous-mots **et** un
+  classifieur softmax, en une commande, en une fraction de seconde. Robuste aux
+  fautes de frappe par construction. 100 % local, minuscule. Ici **67 %** sur
+  les paraphrases — nettement au-dessus du sac-de-mots (49 %).
+- **Contre** : n'apprend que ce que contiennent nos quelques centaines
+  d'exemples ; pas de connaissance du monde extérieur. Plafonne vite.
+
+**fastText *pré-entraîné* (cc.fr.300)**
+
+- **Pour** : **transfert d'apprentissage** — les vecteurs sont entraînés sur
+  Common Crawl + Wikipédia français (des milliards de mots), donc « voiture » et
+  « véhicule » sont déjà proches. On moyenne les vecteurs de la phrase et on
+  pose une régression logistique dessus. Ici **73 %**, sans avoir vu nos
+  paraphrases. Excellent rapport sens/simplicité.
+- **Contre** : le modèle pèse **~4,5 Go** (téléchargement), quelques Go de RAM.
+  Les vecteurs sont **statiques** : « avocat » (fruit vs juriste) a un seul
+  vecteur, sans contexte — c'est la limite que BERT lève.
+
+### 4 · Embeddings type BERT (SBERT) + classifieur
 
 **Pour**
 - **Généralise au sens** : SBERT (Reimers & Gurevych, 2019) rend les phrases comparables par cosinus, ramenant la recherche de similarité de **~65 h à ~5 s** vs BERT brut². Paraphrases sans mot commun → même voisinage.
@@ -98,7 +153,7 @@ bien classer.
 - Sans exemples, **pas de zero-shot strict** (il faut au moins amorcer le classifieur).
 - La **qualité dépend du modèle d'embedding** : notre repli `nomic-embed-text` fait 77 %, le SBERT multilingue fait 84 % — le choix du modèle compte.
 
-### 3 · LLM génératif + prompt JSON (Ollama, local)
+### 5 · LLM génératif + prompt JSON (Ollama, local)
 
 **Pour**
 - **Zero-shot / few-shot** : fonctionne sans donnée d'entraînement, juste le catalogue dans le prompt³. Démarrage à froid immédiat.

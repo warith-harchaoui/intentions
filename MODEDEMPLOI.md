@@ -23,7 +23,7 @@ De haut en bas :
 - **En-tête** — la marque, et un badge qui indique honnêtement l'état du moteur
   LLM : vert *« LLM en ligne · gemma4:e4b-mlx »* quand Ollama répond, gris
   *« LLM hors ligne »* sinon (le bouton LLM est alors désactivé).
-- **Trois cartes** — un rappel en une ligne de chaque approche (TF-IDF / BERT / LLM).
+- **Cinq cartes** — un rappel en une ligne de chaque approche (TF-IDF, fastText×2, BERT, LLM).
 - **Zone de saisie** — un champ texte, un bouton micro, un sélecteur de moteur,
   un interrupteur « lire à voix haute », et le bouton **Analyser l'intention**.
 
@@ -35,17 +35,17 @@ Tapez une phrase de client — comme entendue au téléphone — par ex.
 *« j'ai eu un accident ce matin, ma voiture est cabossée »*.
 
 Choisissez un mode avec le contrôle segmenté :
-- **Comparer les 3** (défaut) — lance les trois moteurs côte à côte.
+- **Comparer tout** (défaut) — lance les cinq moteurs côte à côte.
 - **TF-IDF** / **BERT** / **LLM** — lance un seul moteur.
 
 Cliquez **Analyser l'intention**.
 
 ### Lire le comparateur
 
-![Comparateur des 3 moteurs](docs/img/02-comparateur-3-moteurs.png)
+![Comparateur des 5 moteurs](docs/img/02-comparateur-5-moteurs.png)
 
 Chaque moteur a une carte qui montre :
-- sa **pastille colorée** (1·TF-IDF bleu, 2·BERT vert, 3·LLM orange) et sa
+- sa **pastille colorée** (bleu, teal, indigo, vert, orange) et sa
   **latence** (en haut à droite) — comparez TF-IDF en ~1 ms au LLM en ~20 s ;
 - des **barres de confiance** pour les intentions de tête (l'identifiant + un %) ;
 - la **réponse scriptée** de l'intention gagnante, en serif ;
@@ -133,6 +133,6 @@ python -m intent_engine execute "il me faut une prise en charge hôpital"
 ## 9. Pour aller plus loin
 
 - [`LISEZMOI.md`](LISEZMOI.md) — installation, architecture, résultats mesurés.
-- [`PROS_CONS.md`](PROS_CONS.md) — comparatif sourcé des trois approches.
+- [`PROS_CONS.md`](PROS_CONS.md) — comparatif sourcé des cinq approches.
 - [`EXAMPLES.md`](EXAMPLES.md) — recettes Python + HTTP + CLI.
 - [`knowledge_base/_FORMAT.md`](knowledge_base/_FORMAT.md) — comment ajouter une intention.

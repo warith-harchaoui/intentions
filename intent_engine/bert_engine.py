@@ -1,4 +1,4 @@
-"""Approach 2 — BERT sentence embeddings + a learned ML classifier.
+"""Approach 4 — BERT sentence embeddings + a PyTorch MLP classifier.
 
 Module summary
 --------------
@@ -59,7 +59,7 @@ _CONFIDENCE_FLOOR = 0.60
 
 
 class BertIntentEngine(IntentEngine):
-    """Sentence-embedding representation + logistic-regression classifier.
+    """Sentence-embedding representation + PyTorch MLP classifier.
 
     Parameters
     ----------

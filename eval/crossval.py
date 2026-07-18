@@ -143,17 +143,23 @@ def _engine_correctness(
             result = router.classify(text, engine)
             top = result.top()
             predicted = top.intent if top is not None else ""
-            # Populate the cache for the LLM as we go.
-            if engine == "llm":
+            # Populate the cache for the LLM as we go, and persist it
+            # **incrementally** after each call: the LLM bootstrap is ~20 min
+            # and memory-heavy, so a crash mid-way must not lose progress —
+            # a re-run then resumes from the on-disk cache.
+            if engine == "llm" and use_cache:
                 cache[text] = predicted
+                _LLM_CACHE_PATH.write_text(
+                    json.dumps(cache, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
         flags.append(1 if predicted == case["expected"] else 0)
-
-    # Persist the (possibly extended) LLM cache for next time.
-    if engine == "llm" and use_cache:
-        _LLM_CACHE_PATH.write_text(
-            json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
     return np.asarray(flags, dtype=float)
+
+
+# The trainable engines that get a k-fold CV distribution (the LLM is
+# zero-shot, so it has no training/CV — it only appears in the bootstrap).
+_CV_ENGINES = ("tfidf", "fasttext_custom", "fasttext_pretrained", "bert")
 
 
 def cross_validate_engine(
@@ -161,14 +167,22 @@ def cross_validate_engine(
 ) -> np.ndarray:
     """Repeated stratified k-fold CV accuracy for a *trainable* engine.
 
-    The engine is retrained on each train fold and scored on the held-out
-    fold, so this measures how stable its accuracy is across train/test
-    splits of the KB examples — a fairer picture than one fixed split.
+    The classifier is retrained on each train fold and scored on the held-out
+    fold, measuring how stable its accuracy is across true train/test splits
+    of the KB examples — the honest generalisation picture a single fixed
+    split hides.
+
+    For the two embedding-based engines (``fasttext_pretrained``, ``bert``)
+    the heavy backbone is loaded/applied **once** to embed every example, and
+    only the light classifier head (logistic regression / MLP) is refit per
+    fold — otherwise reloading a multi-GB model 25 times would be absurd. The
+    text-based engines (``tfidf``, ``fasttext_custom``) are refit whole per
+    fold since their vectoriser must see raw text.
 
     Parameters
     ----------
     engine_name : str
-        ``"tfidf"`` or ``"bert"`` (the engines that actually train).
+        One of :data:`_CV_ENGINES`.
     kb : KnowledgeBase
         Knowledge base whose examples provide ``(texts, labels)``.
     n_splits : int, optional
@@ -181,11 +195,6 @@ def cross_validate_engine(
     np.ndarray
         One accuracy per fold (``n_splits * n_repeats`` values).
     """
-    # Lazy import so a machine without sentence-transformers can still run the
-    # TF-IDF CV without importing the BERT engine's heavy dependency chain.
-    from intent_engine.bert_engine import BertIntentEngine
-    from intent_engine.embeddings import build_embedder
-
     texts, labels = kb.training_pairs()
     x = np.asarray(texts, dtype=object)
     y = np.asarray(labels, dtype=object)
@@ -194,29 +203,149 @@ def cross_validate_engine(
     splitter = RepeatedStratifiedKFold(
         n_splits=n_splits, n_repeats=n_repeats, random_state=_SEED
     )
-    # For BERT, build the embedder once and reuse it across folds — the model
-    # is fixed; only the small classifier on top is retrained per fold.
-    embedder = build_embedder() if engine_name == "bert" else None
+
+    # Text-based engines: refit the whole engine per fold on the fold's texts.
+    if engine_name in ("tfidf", "fasttext_custom"):
+        return _cv_text_engine(engine_name, x, y, splitter)
+    # Embedding-based engines: embed once, then CV the light head on vectors.
+    if engine_name in ("fasttext_pretrained", "bert"):
+        return _cv_embedding_engine(engine_name, x, y, splitter)
+    raise ValueError(f"cross_validate_engine: engine {engine_name!r} is not trainable")
+
+
+def _cv_text_engine(
+    engine_name: str, x: np.ndarray, y: np.ndarray, splitter
+) -> np.ndarray:
+    """CV a text-based engine by refitting it whole on each fold.
+
+    Parameters
+    ----------
+    engine_name : str
+        ``"tfidf"`` or ``"fasttext_custom"``.
+    x : np.ndarray
+        Object array of utterance strings.
+    y : np.ndarray
+        Object array of intent-id labels.
+    splitter : RepeatedStratifiedKFold
+        The configured fold generator.
+
+    Returns
+    -------
+    np.ndarray
+        One accuracy per fold.
+    """
+    from intent_engine.fasttext_engine import FastTextSupervisedEngine
 
     scores: list[float] = []
     # Each split gives disjoint train/test indices over the KB examples.
     for train_idx, test_idx in splitter.split(x, y):
-        # Build a throwaway KB from the training slice so we reuse the engines'
+        # Build a throwaway KB from the training slice so we reuse the engine's
         # normal ``fit(kb)`` path unchanged.
         train_kb = _kb_from_pairs(x[train_idx].tolist(), y[train_idx].tolist())
         if engine_name == "tfidf":
             engine = TfidfIntentEngine().fit(train_kb)
         else:
-            engine = BertIntentEngine(embedder=embedder).fit(train_kb)
-        # Score the held-out fold: fraction of test utterances whose top-1
-        # prediction matches the gold label.
-        correct = 0
-        for text, gold in zip(x[test_idx], y[test_idx]):
-            top = engine.classify(text).top()
-            if top is not None and top.intent == gold:
-                correct += 1
+            engine = FastTextSupervisedEngine().fit(train_kb)
+        # Score the held-out fold via the engine's own classify path.
+        correct = sum(
+            1
+            for text, gold in zip(x[test_idx], y[test_idx])
+            if (top := engine.classify(text).top()) is not None and top.intent == gold
+        )
         scores.append(correct / len(test_idx))
     return np.asarray(scores, dtype=float)
+
+
+def _cv_embedding_engine(
+    engine_name: str, x: np.ndarray, y: np.ndarray, splitter
+) -> np.ndarray:
+    """CV an embedding-based engine by embedding once, refitting the head.
+
+    Parameters
+    ----------
+    engine_name : str
+        ``"fasttext_pretrained"`` or ``"bert"``.
+    x : np.ndarray
+        Object array of utterance strings.
+    y : np.ndarray
+        Object array of intent-id labels.
+    splitter : RepeatedStratifiedKFold
+        The configured fold generator.
+
+    Returns
+    -------
+    np.ndarray
+        One accuracy per fold.
+    """
+    # Embed every utterance ONCE with the (heavy) backbone, then only the
+    # light head is refit per fold.
+    features = _embed_all(engine_name, x.tolist())
+
+    scores: list[float] = []
+    for train_idx, test_idx in splitter.split(x, y):
+        # A fresh head each fold: logistic regression for fastText vectors,
+        # the PyTorch MLP for SBERT (matching each engine's real classifier).
+        head = _make_head(engine_name)
+        head.fit(features[train_idx], y[train_idx])
+        proba = head.predict_proba(features[test_idx])
+        predicted = head.classes_[proba.argmax(axis=1)]
+        scores.append(float((predicted == y[test_idx]).mean()))
+    return np.asarray(scores, dtype=float)
+
+
+def _embed_all(engine_name: str, texts: list[str]) -> np.ndarray:
+    """Embed all texts once with the engine's pretrained backbone.
+
+    Parameters
+    ----------
+    engine_name : str
+        ``"fasttext_pretrained"`` or ``"bert"``.
+    texts : list[str]
+        Utterances to embed.
+
+    Returns
+    -------
+    np.ndarray
+        ``(n, dim)`` embedding matrix.
+    """
+    if engine_name == "bert":
+        # SBERT (or the Ollama fallback) sentence embeddings.
+        from intent_engine.embeddings import build_embedder
+
+        return build_embedder().encode(texts)
+    # fastText pretrained: reuse the engine's own loaded vectors + normaliser.
+    from intent_engine.fasttext_engine import FastTextPretrainedEngine
+
+    engine = FastTextPretrainedEngine()
+    # Load the big model once via a throwaway 2-intent fit is wasteful; instead
+    # load vectors directly and embed. We borrow the engine's private embedder.
+    import fasttext
+
+    engine._vectors = fasttext.load_model(str(engine._model_path))
+    return engine._embed(texts)
+
+
+def _make_head(engine_name: str):
+    """Return a fresh classifier head matching the engine's real classifier.
+
+    Parameters
+    ----------
+    engine_name : str
+        ``"fasttext_pretrained"`` (logistic regression) or ``"bert"`` (MLP).
+
+    Returns
+    -------
+    object
+        An estimator exposing ``fit`` / ``predict_proba`` / ``classes_``.
+    """
+    if engine_name == "bert":
+        from intent_engine.mlp import TorchMLPClassifier
+
+        return TorchMLPClassifier()
+    # fastText pretrained uses a classic logistic regression on the vectors.
+    from sklearn.linear_model import LogisticRegression
+
+    return LogisticRegression(C=10.0, max_iter=1000)
 
 
 def _kb_from_pairs(texts: list[str], labels: list[str]) -> KnowledgeBase:
@@ -261,7 +390,13 @@ def run(engines: list[str] | None = None) -> dict[str, object]:
     dict[str, object]
         The results dict (also written to ``crossval_results.json``).
     """
-    engines = engines or ["tfidf", "bert", "llm"]
+    engines = engines or [
+        "tfidf",
+        "fasttext_custom",
+        "fasttext_pretrained",
+        "bert",
+        "llm",
+    ]
     settings = get_settings()
     router = IntentRouter.from_directory(settings.knowledge_base_dir)
     kb = router.kb
