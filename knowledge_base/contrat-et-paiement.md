@@ -15,6 +15,22 @@
 - Je veux résilier avec la loi Hamon
 - Comment ne pas être reconduit automatiquement
 
+- Bonjour je voudrais résilier mon assurance
+- Je veux arrêter mon contrat chez vous
+- Comment faire pour mettre fin à mon assurance auto ?
+- je souhaite résilier ma police d'assurance
+- J'ai vendu ma voiture, je veux stopper le contrat
+- Je pars chez un autre assureur, je résilie
+- je veux annuler mon contrat dassurance
+- Quelle est la procédure pour résilier avant l'échéance ?
+- Je ne veux plus de cette assurance, comment l'arrêter ?
+- Résiliation loi Hamon, je voudrais partir
+- arrété mon assurance habitation svp
+- Je déménage à l'étranger, je dois clôturer mon contrat
+- Comment je fais pour ne pas être reconduit l'année prochaine ?
+- Je souhaite mettre un terme à ma mutuelle
+- je veut plus payer cette assurance je resilie
+- Envoyez-moi la marche à suivre pour résilier mon contrat auto
 ## Réponse
 Je comprends. Grâce à la loi Hamon, après un an d'engagement vous pouvez
 résilier à tout moment, sans frais. Je prépare votre demande de résiliation ;
@@ -39,6 +55,22 @@ d'abord si une nouvelle formule pourrait mieux vous convenir ?
 - Retirer une option de mon contrat
 - Ajouter mon conjoint sur la mutuelle
 
+- Bonjour j'ai déménagé, je dois changer mon adresse sur le contrat
+- Je veux ajouter un conducteur à mon assurance auto
+- Comment modifier les garanties de mon contrat ?
+- J'ai changé de voiture, il faut mettre à jour le contrat
+- je voudrais rajouter ma femme comme conductrice
+- Je souhaite passer du tiers au tous risques
+- il faut changer l'adresse de mon logement assuré
+- Mon fils va conduire ma voiture, je dois l'ajouter
+- je veux modifié mon contrat pour ajouter une option
+- Est-ce que je peux enlever une garantie que je n'utilise pas ?
+- changement de véhicule sur mon assurance auto
+- J'aimerais augmenter le niveau de couverture de mon habitation
+- je dois mettre a jour mon contrat suite a mon déménagement
+- Retirer mon ex-conjoint des conducteurs déclarés, c'est possible ?
+- Je veux modifier ma franchise, comment on fait ?
+- Ajouter la garantie bris de glace à mon contrat auto
 ## Réponse
 Pas de problème. Dites-moi ce que vous souhaitez changer (véhicule, adresse,
 conducteur, garanties) et votre numéro de contrat. Je transmets la
@@ -63,6 +95,22 @@ pour validation.
 - Ma carte a expiré, comment mettre à jour le paiement
 - Contester un prélèvement
 
+- Bonjour j'ai été prélevé deux fois ce mois-ci
+- Il y a un souci avec mon prélèvement automatique
+- Je veux changer mon RIB pour les prélèvements
+- Vous m'avez débité en double, je veux un remboursement
+- mon paiement n'est pas passé, que faire ?
+- j'ai changé de banque, il faut mettre à jour mes coordonnées bancaires
+- Le montant prélevé n'est pas le bon ce mois-ci
+- problème de prelevement sur mon compte
+- Je n'arrive pas à payer ma cotisation en ligne
+- on m'a prélevé alors que j'avais résilié
+- je veux modifié mes infos bancaire pour le paiement
+- Double débit sur mon compte, pouvez-vous corriger ?
+- Mon virement a échoué, comment régulariser ?
+- changement de rib svp pour mes mensualités
+- Ma carte a expiré, il faut mettre à jour le moyen de paiement
+- Pourquoi ai-je été débité d'un montant plus élevé ?
 ## Réponse
 Je vais regarder cela avec vous. Pour un changement de RIB ou de date de
 prélèvement, j'ai besoin de votre numéro de contrat et de vos nouvelles
@@ -86,6 +134,22 @@ comptabilité peut étudier un échéancier.
 - J'ai besoin d'un justificatif d'assurance pour la préfecture
 - Attestation responsabilité civile
 
+- Bonjour j'ai besoin de mon attestation d'assurance
+- Pouvez-vous m'envoyer ma carte verte ?
+- Il me faut un justificatif d'assurance pour le contrôle technique
+- Je voudrais un document prouvant que je suis assuré
+- jai besoin de lattestation dassurance pour mon employeur
+- Comment obtenir ma carte verte auto ?
+- Envoyez-moi mon attestation habitation pour le propriétaire
+- il me faut un papier d'assurance pour l'école de mon fils
+- Je dois fournir une preuve d'assurance à la préfecture
+- attestation scolaire assurance svp
+- Pouvez-vous me renvoyer ma carte verte, j'ai perdu la mienne ?
+- J'ai besoin du justificatif d'assurance pour louer un appartement
+- je voudrai récupéré mon attestation par mail
+- Mon garagiste demande une attestation d'assurance, où la trouver ?
+- Il me faut une attestation de responsabilité civile
+- Où télécharger ma carte verte sur votre site ?
 ## Réponse
 Je vous prépare cela. Précisez le contrat concerné et le type d'attestation
 (auto, habitation, responsabilité civile, scolaire). Le document est généré

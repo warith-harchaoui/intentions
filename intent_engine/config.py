@@ -140,6 +140,13 @@ class Settings(BaseSettings):
     # without a heavyweight PyTorch install.
     ollama_embedding_model: str = Field(default="nomic-embed-text")
 
+    # --- fastText engines ----------------------------------------------
+    # Path to the pretrained French fastText model (cc.fr.300.bin, ~4.5 GB).
+    # Downloaded on demand (see scripts/download_fasttext.py); the pretrained
+    # engine is simply unavailable until this file exists, degrading
+    # gracefully like the LLM engine does when Ollama is down.
+    fasttext_model_path: Path = Field(default=_REPO_ROOT / "models" / "cc.fr.300.bin")
+
     # --- Networking / defaults -----------------------------------------
     # Local models on CPU can be slow; a generous timeout avoids counting a
     # slow-but-valid completion as an error.

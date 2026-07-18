@@ -150,7 +150,9 @@ def _engine_correctness(
 
     # Persist the (possibly extended) LLM cache for next time.
     if engine == "llm" and use_cache:
-        _LLM_CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
+        _LLM_CACHE_PATH.write_text(
+            json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
     return np.asarray(flags, dtype=float)
 
 
@@ -330,7 +332,9 @@ def main(argv: list[str] | None = None) -> int:
         description="Base de test statistique (bootstrap + validation croisée).",
     )
     parser.add_argument(
-        "--engine", choices=["tfidf", "bert", "llm"], action="append",
+        "--engine",
+        choices=["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"],
+        action="append",
         help="Restreindre aux moteurs donnés (répétable).",
     )
     args = parser.parse_args(argv)

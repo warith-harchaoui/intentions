@@ -1,34 +1,91 @@
-# --- Real config (keep the .example tracked) -----------------------------
-# The committed template is .env.example; the real .env is machine-specific
-# and may hold local paths/keys, so it stays out of version control.
+# =====================================================================
+#  Déraison Assurances — .gitignore
+#  On ignore les secrets, les artefacts lourds (modèles), les caches et
+#  le bruit d'OS/éditeur. On GARDE les exemples de config (*.example) et
+#  les datasets d'évaluation (petits, versionnés à dessein).
+# =====================================================================
+
+# --- Secrets / config réelle (on garde le modèle .example) -----------
+# `.env` peut contenir des chemins/clefs machine ; seul `.env.example`
+# (commenté) est suivi.
 .env
+*.env.local
 *config.json
 !*config.json.example
 
-# --- Python --------------------------------------------------------------
+# --- Python ----------------------------------------------------------
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
 .eggs/
 build/
 dist/
+.installed.cfg
+# Environnements virtuels (quel que soit le nom).
 .venv/
 venv/
-.env/
+env/
+ENV/
 
-# --- Tooling caches ------------------------------------------------------
+# --- Caches d'outils -------------------------------------------------
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-.deepeval/
+.dmypy.json
 .coverage
+.coverage.*
 htmlcov/
+.cache/
+# DeepEval écrit sa télémétrie/cache ici.
+.deepeval/
+.deepeval_telemetry.txt
 
-# --- ML / model artefacts ------------------------------------------------
-# Cached SBERT weights and any pickled classifiers we might dump locally.
+# --- Modèles & artefacts ML (LOURDS — jamais dans git) ---------------
+# Le modèle fastText français cc.fr.300.bin fait ~4,5 Go : il se
+# télécharge (voir README / scripts/download_fasttext.py), il ne se
+# commite pas. Idem pour tout binaire de modèle ou vecteurs.
+models/
+*.bin
+*.vec
+*.ftz
+*.gz
+# Poids sentence-transformers / HuggingFace mis en cache localement.
+.cache/huggingface/
+# Cache de prédictions LLM (reproductibilité locale, pas du code).
+eval/.llm_cache.json
+# Classifieurs éventuellement sérialisés.
 *.joblib
 *.pkl
-models/
+*.pt
+*.pth
+*.onnx
 
-# --- OS noise ------------------------------------------------------------
+# --- Résultats d'expériences (régénérables) --------------------------
+# Le JSON de résultats crossval et les figures régénérées ; on garde les
+# captures curées de docs/img/ (référencées par la doc), pas les temporaires.
+eval/crossval_results.json
+
+# --- Node / front (si un build Tailwind est ajouté un jour) ----------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --- Playwright (tests visuels) --------------------------------------
+test-results/
+playwright-report/
+.playwright/
+
+# --- OS / éditeurs ---------------------------------------------------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

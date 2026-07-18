@@ -18,11 +18,46 @@ const $ = (id) => document.getElementById(id);
 // Couleur d'accent par moteur, pour teinter les cartes et les barres. Les
 // clés correspondent aux noms renvoyés par l'API ; les valeurs sont des
 // classes Tailwind (jamais de hex brut dans le markup, règle front-ui n°7).
+// Le texte des pastilles (``chip``) utilise des variantes FONCÉES qui
+// passent le contraste WCAG AA sur fond teinté clair ; les barres (``bar``)
+// utilisent les teintes vives (fond, pas de texte dessus).
 const ENGINE_THEME = {
-  tfidf: { label: '1 · TF-IDF', bar: 'bg-sysblue', chip: 'text-sysblue bg-sysblue/10' },
-  bert: { label: '2 · BERT', bar: 'bg-sysgreen', chip: 'text-sysgreen bg-sysgreen/10' },
-  llm: { label: '3 · LLM', bar: 'bg-sysorange', chip: 'text-sysorange bg-sysorange/10' },
+  tfidf: {
+    label: '1 · TF-IDF + RandomForest',
+    bar: 'bg-sysblue',
+    chip: 'text-chipblue bg-sysblue/10',
+  },
+  fasttext_custom: {
+    label: '2 · fastText (appris)',
+    bar: 'bg-systeal',
+    chip: 'text-chipteal bg-systeal/10',
+  },
+  fasttext_pretrained: {
+    label: '3 · fastText (pré-entraîné)',
+    bar: 'bg-sysindigo',
+    chip: 'text-chipindigo bg-sysindigo/10',
+  },
+  bert: {
+    label: '4 · BERT + MLP',
+    bar: 'bg-sysgreen',
+    chip: 'text-chipgreen bg-sysgreen/10',
+  },
+  llm: {
+    label: '5 · LLM',
+    bar: 'bg-sysorange',
+    chip: 'text-chiporange bg-sysorange/10',
+  },
 };
+
+// Display order for the comparator columns: the pedagogical progression from
+// sparse bag-of-words to generative LLM.
+const ENGINE_ORDER = [
+  'tfidf',
+  'fasttext_custom',
+  'fasttext_pretrained',
+  'bert',
+  'llm',
+];
 
 // État applicatif minimal : quels moteurs sont utilisables (renvoyé par
 // /api/health) et si une requête est en cours (anti double-soumission).
@@ -53,20 +88,22 @@ async function loadHealth() {
     const res = await fetch('/api/health');
     const data = await res.json();
     state.engines = data.engines || [];
-    // Le moteur LLM n'est listé par l'API que si Ollama répond.
+    // Grise tout moteur que l'API ne liste pas comme utilisable maintenant
+    // (LLM si Ollama est down, fastText pré-entraîné si le modèle cc.fr.300
+    // n'est pas téléchargé) — on ne propose jamais une colonne vouée à échouer.
+    disableUnavailableEngines();
+    // Le badge d'en-tête reflète l'état du moteur LLM (le plus « fragile »).
     const llmUp = state.engines.includes('llm');
     if (llmUp) {
       // Vert : on affiche le tag du modèle local qui sert le moteur LLM.
       badge.textContent = `LLM en ligne · ${data.llm_model}`;
       badge.className =
-        'rounded px-2.5 py-1 text-[12px] font-medium bg-sysgreen/15 text-sysgreen';
+        'rounded px-2.5 py-1 text-[12px] font-medium bg-sysgreen/15 text-chipgreen';
     } else {
-      // Ollama absent : on grise le bouton LLM pour ne pas promettre en vain.
       badge.textContent = 'LLM hors ligne (Ollama absent)';
       badge.className =
         'rounded px-2.5 py-1 text-[12px] font-medium bg-surface-tertiary ' +
         'text-label-tertiary dark:bg-surface-tertiary-dark';
-      disableLlmChoice();
     }
   } catch (err) {
     // API injoignable : on le dit clairement plutôt que de laisser "…".
@@ -77,20 +114,28 @@ async function loadHealth() {
 }
 
 /**
- * Désactive l'option "LLM" du sélecteur quand Ollama n'est pas disponible,
- * et bascule la sélection sur "Comparer les 3" si elle pointait sur LLM.
+ * Grise, dans le sélecteur, tout moteur absent de state.engines (moteurs
+ * que l'API ne peut pas exécuter maintenant). Si l'un d'eux était coché, on
+ * retombe sur "Comparer tout".
  * @returns {void}
  */
-function disableLlmChoice() {
-  const label = $('engine-llm-label');
-  const input = label.querySelector('input');
-  // On coupe l'interaction et on atténue visuellement l'option indisponible.
-  input.disabled = true;
-  label.classList.add('opacity-40', 'pointer-events-none');
-  // Si l'utilisateur avait déjà coché LLM, on retombe sur "tout comparer".
-  if (input.checked) {
-    document.querySelector('input[name="engine"][value="all"]').checked = true;
-  }
+function disableUnavailableEngines() {
+  // Parcourt chaque radio de moteur (hors "all", toujours disponible).
+  document
+    .querySelectorAll('input[name="engine"]')
+    .forEach((input) => {
+      if (input.value === 'all') return;
+      const available = state.engines.includes(input.value);
+      // Coupe l'interaction et atténue visuellement l'option indisponible.
+      input.disabled = !available;
+      const label = input.closest('label');
+      if (label) label.classList.toggle('opacity-40', !available);
+      if (label) label.classList.toggle('pointer-events-none', !available);
+      // Si l'option cochée devient indisponible, on revient à "Comparer tout".
+      if (!available && input.checked) {
+        document.querySelector('input[name="engine"][value="all"]').checked = true;
+      }
+    });
 }
 
 /**
@@ -287,8 +332,9 @@ async function onSubmit(event) {
         body: JSON.stringify({ text }),
       });
       const data = await res.json();
-      // Ordre d'affichage stable : tfidf, bert, llm (croissant en coût).
-      const order = ['tfidf', 'bert', 'llm'].filter((e) => data[e]);
+      // Ordre d'affichage stable : la progression pédagogique (croissant en
+      // coût/sophistication), en ne gardant que les moteurs renvoyés.
+      const order = ENGINE_ORDER.filter((e) => data[e]);
       results.innerHTML = order
         .map((e) => renderEngineCard(e, data[e]))
         .join('');
@@ -306,9 +352,16 @@ async function onSubmit(event) {
       maybeSpeakBest([data]);
     }
 
-    // Action concrète : on "exécute" la demande avec le moteur choisi
-    // (ou TF-IDF par défaut en mode comparateur, le plus fiable/rapide).
-    await renderExecution(text, engine === 'all' ? null : engine);
+    // Action concrète : on "exécute" la demande avec le moteur choisi. En
+    // mode comparateur, on prend BERT s'il est disponible (le moteur rapide
+    // le plus exact) plutôt que le défaut serveur, pour une action pertinente.
+    const execEngine =
+      engine === 'all'
+        ? state.engines.includes('bert')
+          ? 'bert'
+          : null
+        : engine;
+    await renderExecution(text, execEngine);
   } catch (err) {
     // Erreur réseau : message clair dans la zone de résultats.
     results.innerHTML =

@@ -1,26 +1,28 @@
-"""Approach 1 — the classic TF-IDF + linear classifier intent engine.
+"""Approach 1 — the classic TF-IDF + Random Forest intent engine.
 
 Module summary
 --------------
-This is the "old school" baseline every NLP practitioner should know
-before reaching for anything heavier. It turns each utterance into a
-sparse bag-of-character-and-word n-grams weighted by TF-IDF, then fits a
-plain linear classifier (logistic regression) on top. No neural network,
-no GPU, no network — a few kilobytes of model that trains in milliseconds
-and predicts in microseconds.
+The "old school" baseline every NLP practitioner should know before
+reaching for anything heavier. It turns each utterance into a sparse
+bag-of-character-and-word n-grams weighted by TF-IDF, then fits a good old
+**Random Forest** on top — the workhorse ensemble classifier of the
+pre-deep-learning era. No neural network, no GPU, no network: a model that
+trains in a second and predicts in milliseconds.
 
 What it teaches
 ---------------
 * Intent classification is, at heart, supervised text classification.
 * Character n-grams give surprising robustness to typos and French
   morphology ("assurer", "assurance", "assurée") without any lemmatiser.
-* The ``decision_function`` margins, squashed through a softmax, give a
-  usable confidence and a natural abstention threshold.
+* A Random Forest gives calibrated-ish class probabilities out of the box
+  (``predict_proba``), which drive the confidence threshold and abstention.
 
-Strengths: instant, tiny, fully offline, perfectly explainable.
+Strengths: fast, tiny, fully offline, robust, no tuning.
 Weakness: it matches *surface forms*; a paraphrase with no shared words
 ("mon pare-brise est fissuré" vs. a training phrase about "vitre cassée")
-can slip past it — which is exactly the gap Approach 2 (BERT) closes.
+can slip past it — the gap the embedding-based approaches close. Under a
+proper train/test split this shows up as a much lower cross-validated
+accuracy than the held-out-with-vocabulary-overlap number suggests.
 
 Usage example
 -------------
@@ -28,8 +30,7 @@ Usage example
 >>> from intent_engine.tfidf_engine import TfidfIntentEngine
 >>> kb = KnowledgeBase.from_directory("knowledge_base")
 >>> engine = TfidfIntentEngine().fit(kb)
->>> result = engine.classify("je veux assurer ma voiture")
->>> result.engine
+>>> engine.classify("je veux assurer ma voiture").engine
 'tfidf'
 
 Author
@@ -42,53 +43,30 @@ from __future__ import annotations
 import time
 
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 from .base import IntentEngine, IntentPrediction, IntentResult
 from .kb import KnowledgeBase
 
-# Below this softmax confidence we treat the top intent as untrustworthy and
-# abstain (hand off to a human). Tuned to be forgiving on a tiny KB where a
-# single strong keyword should already win; raise it in production once you
-# have real traffic to calibrate against.
+# Below this class-probability we treat the top intent as untrustworthy and
+# abstain (hand off to a human). A Random Forest's ``predict_proba`` is the
+# fraction of trees voting for a class, so 0.30 means "≥30 % of the forest
+# agreed" — a sensible floor on this many classes.
 _CONFIDENCE_FLOOR = 0.30
 
-
-def _softmax(scores: np.ndarray) -> np.ndarray:
-    """Convert raw class scores into a probability distribution.
-
-    Parameters
-    ----------
-    scores : np.ndarray
-        1-D array of real-valued class scores (decision-function margins).
-
-    Returns
-    -------
-    np.ndarray
-        Same-shape array of non-negative values summing to 1.
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> p = _softmax(np.array([2.0, 1.0, 0.0]))
-    >>> bool(np.isclose(p.sum(), 1.0))
-    True
-    """
-    # Subtract the max before exponentiating: mathematically a no-op, but it
-    # prevents ``exp`` from overflowing on large margins (numerical safety).
-    shifted = scores - np.max(scores)
-    exp = np.exp(shifted)
-    return exp / exp.sum()
+# Number of trees. 300 is plenty for a few hundred short texts and keeps the
+# forest fast to train; more trees would only marginally smooth the votes.
+_N_ESTIMATORS = 300
 
 
 class TfidfIntentEngine(IntentEngine):
-    """TF-IDF vectoriser + logistic-regression intent classifier.
+    """TF-IDF vectoriser + Random Forest intent classifier.
 
-    The whole model is a two-step scikit-learn :class:`~sklearn.pipeline.Pipeline`,
-    so serialisation, cloning and inspection all work with the standard
-    scikit-learn tooling.
+    The whole model is a two-step scikit-learn
+    :class:`~sklearn.pipeline.Pipeline`, so serialisation, cloning and
+    inspection all work with the standard scikit-learn tooling.
 
     Attributes
     ----------
@@ -110,12 +88,12 @@ class TfidfIntentEngine(IntentEngine):
         # The knowledge base is retained so we can look up the scripted
         # answer and routing metadata for whichever intent wins.
         self._kb: KnowledgeBase | None = None
-        # Cached, ordered class labels (intent ids) as learned by the
-        # classifier, so we can map score columns back to intent ids.
+        # Cached, ordered class labels (intent ids) as learned by the forest,
+        # so we can map probability columns back to intent ids.
         self._labels: list[str] = []
 
     def _build_pipeline(self) -> Pipeline:
-        """Construct the (unfitted) TF-IDF + logistic-regression pipeline.
+        """Construct the (unfitted) TF-IDF + Random Forest pipeline.
 
         Returns
         -------
@@ -124,20 +102,15 @@ class TfidfIntentEngine(IntentEngine):
 
         Notes
         -----
-        Two design choices worth the comment:
-
         * ``analyzer='char_wb'`` with 3–5-grams: character n-grams bounded
           by word edges make the model robust to typos and to French
           inflection without any stemming/lemmatisation step.
-        * ``LogisticRegression`` over ``LinearSVC``: we want calibrated-ish
-          probabilities (via ``predict_proba``/``decision_function`` +
-          softmax) to drive a confidence threshold, which SVC does not give
-          natively.
+        * ``RandomForestClassifier``: the classic, tuning-free ensemble.
+          It gives ``predict_proba`` directly, so no softmax-over-margins
+          trick is needed to obtain a confidence.
         """
-        # Word-level unigrams+bigrams capture obvious keyword signals; the
-        # character analyser below captures sub-word/typo signals. We combine
-        # them by simply using char n-grams as the primary analyzer, which in
-        # practice already carries the word signal for short utterances.
+        # Character n-grams carry both keyword and sub-word/typo signal for
+        # short utterances; accents are folded so "réglé"/"regle" collide.
         vectorizer = TfidfVectorizer(
             analyzer="char_wb",
             ngram_range=(3, 5),
@@ -145,10 +118,14 @@ class TfidfIntentEngine(IntentEngine):
             lowercase=True,
             strip_accents="unicode",
         )
-        # ``C`` is deliberately high (weak regularisation): the KB is small
-        # and clean, so we let the model fit the examples closely. ``max_iter``
-        # is raised so the solver always converges on this tiny problem.
-        classifier = LogisticRegression(C=10.0, max_iter=1000)
+        # ``class_weight='balanced'`` compensates for the small per-intent
+        # count differences; the fixed ``random_state`` keeps runs reproducible.
+        classifier = RandomForestClassifier(
+            n_estimators=_N_ESTIMATORS,
+            class_weight="balanced",
+            random_state=0,
+            n_jobs=-1,
+        )
         # A pipeline keeps vectoriser and classifier as one fitted object.
         return Pipeline([("tfidf", vectorizer), ("clf", classifier)])
 
@@ -173,14 +150,12 @@ class TfidfIntentEngine(IntentEngine):
         """
         # Pull the flattened supervised dataset out of the KB.
         texts, labels = kb.training_pairs()
-        # A single-class problem is degenerate for a classifier; fail early
-        # with a clear message rather than producing a model that always
-        # predicts the one label it ever saw.
+        # A single-class problem is degenerate; fail early with a clear message.
         if len(set(labels)) < 2:
             raise ValueError(
                 "TF-IDF engine needs at least two distinct intents to train."
             )
-        # Build and fit the pipeline; on this data size this is milliseconds.
+        # Build and fit the pipeline; on this data size this is ~1 second.
         self._pipeline = self._build_pipeline()
         self._pipeline.fit(texts, labels)
         # Cache the label ordering and the KB for prediction-time lookups.
@@ -216,10 +191,9 @@ class TfidfIntentEngine(IntentEngine):
         # Time only the inference so the comparison UI reflects prediction
         # cost, not the (one-off) training cost.
         started = time.perf_counter()
-        # ``decision_function`` returns the signed margin per class; softmax
-        # turns those margins into a comparable confidence distribution.
-        margins = self._pipeline.decision_function([text])[0]
-        probabilities = _softmax(np.asarray(margins, dtype=float))
+        # ``predict_proba`` returns the fraction of trees voting per class —
+        # already a probability distribution, no softmax needed.
+        probabilities = self._pipeline.predict_proba([text])[0]
         elapsed_ms = (time.perf_counter() - started) * 1000.0
 
         # Rank classes by probability, highest first, and keep the top-k.
@@ -248,8 +222,9 @@ class TfidfIntentEngine(IntentEngine):
             latency_ms=elapsed_ms,
             confident=confident,
             meta={
-                "backend": "sklearn TfidfVectorizer + LogisticRegression",
+                "backend": "sklearn TfidfVectorizer + RandomForest",
                 "vectorizer": "char_wb 3-5grams",
+                "n_estimators": _N_ESTIMATORS,
                 "confidence_floor": _CONFIDENCE_FLOOR,
             },
         )

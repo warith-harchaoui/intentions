@@ -227,7 +227,11 @@ def build_parser() -> argparse.ArgumentParser:
     # ``classify`` — single engine.
     p_classify = sub.add_parser("classify", help="Classer avec un moteur.")
     p_classify.add_argument("text", help="La phrase du client.")
-    p_classify.add_argument("--engine", choices=["tfidf", "bert", "llm"], default=None)
+    p_classify.add_argument(
+        "--engine",
+        choices=["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"],
+        default=None,
+    )
     p_classify.set_defaults(func=_cmd_classify)
 
     # ``compare`` — all engines.
@@ -238,7 +242,11 @@ def build_parser() -> argparse.ArgumentParser:
     # ``execute`` — classify + act.
     p_execute = sub.add_parser("execute", help="Exécuter la requête.")
     p_execute.add_argument("text", help="La requête en langage naturel.")
-    p_execute.add_argument("--engine", choices=["tfidf", "bert", "llm"], default=None)
+    p_execute.add_argument(
+        "--engine",
+        choices=["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"],
+        default=None,
+    )
     p_execute.set_defaults(func=_cmd_execute)
 
     # ``intents`` — list the KB.

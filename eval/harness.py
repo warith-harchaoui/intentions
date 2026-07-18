@@ -234,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
     # ``--engine`` restricts the run; omit it to evaluate all three.
     parser.add_argument(
         "--engine",
-        choices=["tfidf", "bert", "llm"],
+        choices=["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"],
         default=None,
         help="Moteur à évaluer (défaut : les trois).",
     )
@@ -242,7 +242,11 @@ def main(argv: list[str] | None = None) -> int:
 
     # Build one router and reuse it so the KB is parsed a single time.
     router = IntentRouter.from_directory(get_settings().knowledge_base_dir)
-    engines = [args.engine] if args.engine else ["tfidf", "bert", "llm"]
+    engines = (
+        [args.engine]
+        if args.engine
+        else ["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"]
+    )
 
     all_passed = True
     # Evaluate each requested engine and track the overall verdict.

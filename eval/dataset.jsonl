@@ -1,33 +1,88 @@
-{"text": "je viens d'acheter une voiture et je dois l'assurer", "expected": "souscrire_assurance_auto"}
-{"text": "combien coûte une assurance tous risques pour mon auto", "expected": "souscrire_assurance_auto"}
-{"text": "j'ai tapé un plot en reculant, la carrosserie est enfoncée", "expected": "declarer_sinistre_auto"}
-{"text": "un chauffard m'est rentré dedans au rond-point", "expected": "declarer_sinistre_auto"}
-{"text": "mon pare-brise s'est étoilé sur l'autoroute", "expected": "declarer_sinistre_auto"}
-{"text": "on a fracturé ma voiture pour voler le GPS", "expected": "vol_vehicule"}
-{"text": "ma bagnole n'est plus là où je l'avais garée, on me l'a piquée", "expected": "vol_vehicule"}
-{"text": "je suis bloqué sur la bande d'arrêt d'urgence, moteur mort", "expected": "assistance_depannage"}
-{"text": "batterie à plat, je n'arrive pas à démarrer", "expected": "assistance_depannage"}
-{"text": "je veux mettre fin à mon contrat auto", "expected": "resilier_contrat"}
-{"text": "comment ne pas être reconduit automatiquement l'an prochain", "expected": "resilier_contrat"}
-{"text": "j'ai déménagé, il faut changer l'adresse sur mon assurance", "expected": "modifier_contrat"}
-{"text": "je veux ajouter ma femme comme conductrice", "expected": "modifier_contrat"}
-{"text": "on m'a prélevé deux fois ce mois-ci", "expected": "probleme_paiement"}
-{"text": "je dois mettre à jour mon RIB pour les prélèvements", "expected": "probleme_paiement"}
-{"text": "il me faut ma carte verte pour la voiture", "expected": "demander_attestation"}
-{"text": "mon proprio réclame une attestation d'assurance habitation", "expected": "demander_attestation"}
-{"text": "je m'installe dans un studio, il me faut une assurance logement", "expected": "souscrire_assurance_habitation"}
-{"text": "une canalisation a lâché et a inondé la cuisine", "expected": "degat_des_eaux"}
-{"text": "il y a de l'eau qui coule du plafond depuis chez le voisin", "expected": "degat_des_eaux"}
-{"text": "on est entrés par effraction pendant les vacances et on a tout pris", "expected": "cambriolage"}
-{"text": "le feu a pris dans le garage cette nuit", "expected": "incendie_habitation"}
-{"text": "je n'ai plus de mutuelle depuis que j'ai quitté mon travail", "expected": "souscrire_mutuelle_sante"}
-{"text": "je n'ai toujours pas été remboursé de mes lunettes", "expected": "remboursement_soins"}
-{"text": "la clinique demande un accord de prise en charge pour mon opération", "expected": "tiers_payant"}
-{"text": "je veux protéger financièrement mes enfants s'il m'arrive malheur", "expected": "souscrire_prevoyance"}
-{"text": "passez-moi quelqu'un, j'en ai assez du robot", "expected": "parler_a_conseiller"}
-{"text": "où en est le traitement de ma déclaration de sinistre", "expected": "suivre_dossier"}
-{"text": "votre expert a sous-évalué mes dégâts, je conteste", "expected": "faire_reclamation"}
-{"text": "vous êtes ouverts le samedi après-midi", "expected": "horaires_et_contact"}
-{"text": "à quel numéro joindre l'assistance la nuit", "expected": "horaires_et_contact"}
-{"text": "je ne sais pas trop, je suis un peu perdu", "expected": "escalade_humain"}
-{"text": "aucune de vos options ne me convient", "expected": "escalade_humain"}
+{"text": "Je passe le permis dans deux semaines et j'ai réservé une citadine, comment mettre une protection dessus ?", "expected": "souscrire_assurance_auto"}
+{"text": "On m'a remis les clés d'un utilitaire hier, il me faut une couverture avant de prendre la route", "expected": "souscrire_assurance_auto"}
+{"text": "Mon fils vient d'avoir sa première voiture, quelles offres avez-vous pour le couvrir ?", "expected": "souscrire_assurance_auto"}
+{"text": "Je change de véhicule et je voudrais repartir sur un nouveau contrat chez vous", "expected": "souscrire_assurance_auto"}
+{"text": "On s'est rentrés dedans à un carrefour, il faut que je vous prévienne", "expected": "declarer_sinistre_auto"}
+{"text": "J'ai frotté un poteau en reculant, l'aile est bien amochée", "expected": "declarer_sinistre_auto"}
+{"text": "Un camion a reculé sur mon capot, comment j'ouvre le dossier ?", "expected": "declarer_sinistre_auto"}
+{"text": "Ma carrosserie est enfoncée après un choc, je dois vous transmettre le papier rempli à deux", "expected": "declarer_sinistre_auto"}
+{"text": "Je retrouve ma place de parking vide, quelqu'un est parti avec mon auto", "expected": "vol_vehicule"}
+{"text": "On a fracturé une portière et embarqué mon sac posé sur le siège", "expected": "vol_vehicule"}
+{"text": "Mon deux-roues a disparu du garage collectif cette nuit", "expected": "vol_vehicule"}
+{"text": "Ils ont brisé la lunette arrière pour prendre ce qu'il y avait dans le coffre", "expected": "vol_vehicule"}
+{"text": "Je suis immobilisé sur la bande d'arrêt d'urgence, le moteur a lâché", "expected": "assistance_depannage"}
+{"text": "Impossible de faire démarrer la voiture ce matin, je crois que c'est la batterie", "expected": "assistance_depannage"}
+{"text": "Un pneu à plat en pleine campagne et rien pour le changer, je fais quoi ?", "expected": "assistance_depannage"}
+{"text": "Le véhicule s'est arrêté net sur la voie rapide, il faut le remorquer", "expected": "assistance_depannage"}
+{"text": "Je change de compagnie, je souhaite mettre fin à ce qui me lie à vous", "expected": "resilier_contrat"}
+{"text": "Ma maison est vendue, je n'ai plus besoin de la couvrir chez vous", "expected": "resilier_contrat"}
+{"text": "Je ne veux surtout pas que le contrat se renouvelle tout seul l'an prochain", "expected": "resilier_contrat"}
+{"text": "Comment mettre un terme à mon engagement grâce à la loi qui permet de partir à tout moment ?", "expected": "resilier_contrat"}
+{"text": "Je viens de changer de ville, il faut actualiser mes coordonnées sur le dossier", "expected": "modifier_contrat"}
+{"text": "Ma compagne va prendre le volant régulièrement, il faut la mentionner", "expected": "modifier_contrat"}
+{"text": "Je voudrais passer à une formule qui couvre tout plutôt que le minimum", "expected": "modifier_contrat"}
+{"text": "Peut-on rajouter la protection des vitres à ce qui est déjà en place ?", "expected": "modifier_contrat"}
+{"text": "Vous avez pris l'argent deux fois sur mon compte le même jour", "expected": "probleme_paiement"}
+{"text": "J'ai changé d'établissement bancaire, il faut enregistrer mes nouvelles coordonnées", "expected": "probleme_paiement"}
+{"text": "La somme retirée ce mois-ci ne correspond pas à ce qui était prévu", "expected": "probleme_paiement"}
+{"text": "Le retrait automatique a été rejeté faute de provision, comment je régularise ?", "expected": "probleme_paiement"}
+{"text": "L'auto-école me réclame un papier prouvant que je suis couvert", "expected": "demander_attestation"}
+{"text": "Le futur propriétaire veut une preuve écrite que le logement est garanti", "expected": "demander_attestation"}
+{"text": "J'ai égaré le petit papier à coller sur le pare-brise, pouvez-vous m'en refaire un ?", "expected": "demander_attestation"}
+{"text": "Où puis-je récupérer le document qui atteste ma responsabilité civile ?", "expected": "demander_attestation"}
+{"text": "Je viens de poser mes cartons dans un nouvel appart, il faut le protéger", "expected": "souscrire_assurance_habitation"}
+{"text": "L'agence immobilière refuse de me remettre les clés sans garantie sur le logement", "expected": "souscrire_assurance_habitation"}
+{"text": "Je deviens propriétaire d'une maison, que faut-il pour la couvrir dès la signature ?", "expected": "souscrire_assurance_habitation"}
+{"text": "Je pars étudier dans une autre ville et je loue une chambre à protéger", "expected": "souscrire_assurance_habitation"}
+{"text": "L'eau du logement du dessus a traversé mon plafond et abîmé la peinture", "expected": "degat_des_eaux"}
+{"text": "Une canalisation a cédé et mon parquet baigne dans l'eau", "expected": "degat_des_eaux"}
+{"text": "Le ballon d'eau chaude s'est mis à couler partout dans le couloir", "expected": "degat_des_eaux"}
+{"text": "Des traces d'humidité sont apparues au plafond après une fuite chez le voisin", "expected": "degat_des_eaux"}
+{"text": "En rentrant de vacances, la porte était forcée et il manque nos objets de valeur", "expected": "cambriolage"}
+{"text": "Quelqu'un s'est introduit par la fenêtre et a emporté l'écran de télévision", "expected": "cambriolage"}
+{"text": "On a visité l'appartement pendant qu'on dormait, plusieurs affaires ont disparu", "expected": "cambriolage"}
+{"text": "Ils ont pénétré chez moi par effraction et raflé les bijoux du coffre", "expected": "cambriolage"}
+{"text": "Un départ de flammes dans la cuisine a tout noirci de suie", "expected": "incendie_habitation"}
+{"text": "Le tableau électrique a pris feu et une partie du salon est calcinée", "expected": "incendie_habitation"}
+{"text": "Une bougie oubliée a embrasé les rideaux et endommagé la pièce", "expected": "incendie_habitation"}
+{"text": "Les flammes ont ravagé le garage attenant à la maison", "expected": "incendie_habitation"}
+{"text": "Je n'ai plus de couverture santé par mon travail, il m'en faut une pour être mieux remboursé", "expected": "souscrire_mutuelle_sante"}
+{"text": "Je cherche à compléter ce que la Sécu ne prend pas, surtout pour les dents et les yeux", "expected": "souscrire_mutuelle_sante"}
+{"text": "Bientôt à la retraite, je veux une complémentaire adaptée à mon âge", "expected": "souscrire_mutuelle_sante"}
+{"text": "Comment rejoindre votre complémentaire pour couvrir toute la famille ?", "expected": "souscrire_mutuelle_sante"}
+{"text": "J'ai transmis ma feuille de soins il y a un moment mais rien n'est arrivé sur mon compte", "expected": "remboursement_soins"}
+{"text": "Pourquoi on me rend moins que ce que j'attendais pour ma paire de lunettes ?", "expected": "remboursement_soins"}
+{"text": "Où puis-je consulter le détail de ce qui m'a été rendu pour mes soins ?", "expected": "remboursement_soins"}
+{"text": "La somme rendue pour mon dentiste me paraît trop basse, je ne comprends pas", "expected": "remboursement_soins"}
+{"text": "L'hôpital veut un accord pour que je n'aie pas à sortir l'argent de ma poche", "expected": "tiers_payant"}
+{"text": "Mes verres coûtent une fortune, je voudrais que vous régliez directement l'opticien", "expected": "tiers_payant"}
+{"text": "Le dentiste attend un devis validé pour ma prothèse avant de commencer", "expected": "tiers_payant"}
+{"text": "Je préfère ne pas faire l'avance pour mon hospitalisation, c'est possible ?", "expected": "tiers_payant"}
+{"text": "Je veux mettre un capital de côté pour mes proches au cas où il m'arrive quelque chose", "expected": "souscrire_prevoyance"}
+{"text": "Comment garantir mes revenus si un accident m'empêche de travailler ?", "expected": "souscrire_prevoyance"}
+{"text": "Je cherche une rente au cas où je perdrais mon autonomie", "expected": "souscrire_prevoyance"}
+{"text": "Que se passe-t-il pour ma famille et mon crédit si je viens à disparaître ?", "expected": "souscrire_prevoyance"}
+{"text": "Honnêtement je nage complètement, je ne sais pas ce qu'il faut faire", "expected": "escalade_humain"}
+{"text": "Tout ça me dépasse, je n'arrive pas à savoir dans quelle case je rentre", "expected": "escalade_humain"}
+{"text": "Je suis largué, rien n'est clair, quelqu'un peut me guider ?", "expected": "escalade_humain"}
+{"text": "Je bloque, je ne sais absolument pas quelle démarche colle à mon souci", "expected": "escalade_humain"}
+{"text": "J'en ai assez de la machine, mettez-moi quelqu'un en chair et en os", "expected": "parler_a_conseiller"}
+{"text": "Je préfère m'adresser directement à un membre de votre équipe", "expected": "parler_a_conseiller"}
+{"text": "Pouvez-vous me basculer vers une personne du support ?", "expected": "parler_a_conseiller"}
+{"text": "J'aimerais échanger de vive voix avec un de vos agents", "expected": "parler_a_conseiller"}
+{"text": "Ça fait deux semaines, j'aimerais savoir si ça bouge sur ma déclaration", "expected": "suivre_dossier"}
+{"text": "À quelle étape se trouve le traitement de mon accident ?", "expected": "suivre_dossier"}
+{"text": "Je n'ai aucun retour, pouvez-vous me dire si ma demande progresse ?", "expected": "suivre_dossier"}
+{"text": "Je voudrais connaître le statut de mon indemnisation en cours", "expected": "suivre_dossier"}
+{"text": "Le montant que vous m'accordez est trop faible, je m'y oppose formellement", "expected": "faire_reclamation"}
+{"text": "Vous avez rejeté ma prise en charge et je trouve ça inacceptable", "expected": "faire_reclamation"}
+{"text": "Je souhaite contester officiellement la franchise que vous m'imposez", "expected": "faire_reclamation"}
+{"text": "Votre décision me semble injustifiée, je veux la faire réexaminer", "expected": "faire_reclamation"}
+{"text": "Jusqu'à quelle heure vos bureaux restent ouverts en semaine ?", "expected": "horaires_et_contact"}
+{"text": "Peut-on vous joindre le week-end en cas de pépin ?", "expected": "horaires_et_contact"}
+{"text": "Quelle est l'adresse de votre point d'accueil le plus proche de chez moi ?", "expected": "horaires_et_contact"}
+{"text": "Par quel canal puis-je entrer en contact avec vous ?", "expected": "horaires_et_contact"}
+{"text": "Je souhaite enlever mon ancien conjoint de la liste des personnes qui conduisent", "expected": "modifier_contrat"}
+{"text": "On a soulevé la vitre de ma voiture et pris le lecteur à l'intérieur", "expected": "vol_vehicule"}
+{"text": "Je viens d'acquérir un scooter, comment le faire garantir chez vous ?", "expected": "souscrire_assurance_auto"}
+{"text": "L'infiltration après l'orage a détrempé le mur de ma cave", "expected": "degat_des_eaux"}

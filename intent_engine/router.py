@@ -39,6 +39,7 @@ from typing import Any, Callable
 from .base import IntentEngine, IntentResult
 from .bert_engine import BertIntentEngine
 from .config import get_settings
+from .fasttext_engine import FastTextPretrainedEngine, FastTextSupervisedEngine
 from .kb import KnowledgeBase
 from .llm_engine import LlmIntentEngine
 from .ollama_client import OllamaClient
@@ -47,11 +48,18 @@ from .tfidf_engine import TfidfIntentEngine
 # Module logger — no bare prints (coding standard rule 6).
 logger = logging.getLogger(__name__)
 
-# The canonical engine names, in the order we want them shown in the UI:
-# cheapest/oldest first, heaviest/newest last. Mapping each to a zero-arg
-# factory lets the router build them lazily and uniformly.
+# The canonical engine names, in the order we want them shown in the UI —
+# the pedagogical progression from sparse bag-of-words to generative LLM:
+#   tfidf                → TF-IDF + Random Forest (lexical)
+#   fasttext_custom      → fastText supervised, learned on our examples
+#   fasttext_pretrained  → pretrained French fastText vectors + classifier
+#   bert                 → SBERT embeddings + PyTorch MLP (contextual)
+#   llm                  → Gemma via Ollama, JSON (generative, zero-shot)
+# Mapping each to a zero-arg factory lets the router build them lazily.
 _ENGINE_FACTORIES: dict[str, Callable[[], IntentEngine]] = {
     "tfidf": TfidfIntentEngine,
+    "fasttext_custom": FastTextSupervisedEngine,
+    "fasttext_pretrained": FastTextPretrainedEngine,
     "bert": BertIntentEngine,
     "llm": LlmIntentEngine,
 }
@@ -250,10 +258,18 @@ class IntentRouter:
         """
         settings = get_settings()
         usable: list[str] = []
-        # TF-IDF and BERT are self-contained (BERT may fall back to Ollama for
-        # embeddings, but that is handled inside the engine at fit time).
-        for name in ("tfidf", "bert"):
-            usable.append(name)
+        # TF-IDF, fastText-supervised and BERT are self-contained (BERT may
+        # fall back to Ollama for embeddings, handled inside the engine).
+        usable.append("tfidf")
+        usable.append("fasttext_custom")
+        # fastText-pretrained needs the big cc.fr.300 model downloaded; only
+        # advertise it when the file is present, so the UI never offers a
+        # column that would fail — the same honesty as the LLM gating below.
+        if FastTextPretrainedEngine.is_model_available(settings.fasttext_model_path):
+            usable.append("fasttext_pretrained")
+        else:
+            logger.info("Modèle fastText FR absent ; moteur pretrained masqué.")
+        usable.append("bert")
         # Probe Ollama once for the LLM engine so we do not advertise it when
         # the server is down. ``is_available`` is a cheap 5s liveness check.
         if OllamaClient(settings.ollama_base_url).is_available():

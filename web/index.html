@@ -38,6 +38,17 @@
           colors: {
             sysblue: '#007AFF',
             sysblueHover: '#0062CC',
+            // Teintes vives des barres de confiance (fond, pas de texte).
+            systeal: '#30B0C7',
+            sysindigo: '#5E5CE6',
+            // Variantes FONCÉES pour le TEXTE des pastilles : chacune passe
+            // le contraste WCAG AA (>= 4.5:1) sur fond blanc et sur la teinte
+            // claire /10 correspondante. Audit : front-colors audit_contrast.
+            chipblue: '#0055CC',
+            chipteal: '#0E7490',
+            chipindigo: '#4338CA',
+            chipgreen: '#15803D',
+            chiporange: '#B45309',
             'surface-primary': '#F8F8F8',
             'surface-primary-dark': '#1C1C1E',
             'surface-secondary': '#FFFFFF',
@@ -83,7 +94,7 @@
           Déraison Assurances
         </h1>
         <p class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
-          Aiguilleur d'intentions — 3 approches comparées
+          Aiguilleur d'intentions — 5 approches comparées
         </p>
       </div>
       <!-- Badge d'état du moteur LLM (peuplé par app.js après /api/health). -->
@@ -99,39 +110,54 @@
   <main class="mx-auto max-w-6xl px-4 py-6">
 
     <!-- ===================== BANDEAU PÉDAGOGIQUE ===================== -->
-    <!-- Résume les 3 approches pour un public qui découvre le sujet. -->
-    <section aria-label="Les trois approches" class="mb-6 grid gap-3 sm:grid-cols-3">
+    <!-- La progression des 5 approches : du sac-de-mots creux au LLM
+         génératif. Chaque carte porte sa pastille colorée (texte foncé
+         WCAG-conforme) et une phrase de vulgarisation. -->
+    <section aria-label="Les cinq approches, du plus simple au plus puissant"
+             class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
-        <div class="mb-1 flex items-center gap-2">
-          <span class="rounded bg-sysblue/10 px-2 py-0.5 text-[12px] font-semibold
-                       text-sysblue">1 · TF-IDF</span>
-        </div>
-        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
-          Sac de n-grammes pondérés + régression logistique (scikit-learn).
-          Instantané, minuscule, hors-ligne. Colle aux mots exacts.
+        <span class="mb-1 inline-block rounded bg-sysblue/10 px-2 py-0.5
+                     text-[12px] font-semibold text-chipblue">1 · TF-IDF</span>
+        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+          Sac de n-grammes + <strong>Random Forest</strong> (scikit-learn).
+          Instantané. Colle aux mots exacts.
         </p>
       </article>
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
-        <div class="mb-1 flex items-center gap-2">
-          <span class="rounded bg-sysgreen/10 px-2 py-0.5 text-[12px] font-semibold
-                       text-sysgreen">2 · BERT</span>
-        </div>
-        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
-          Embeddings de phrases (type BERT) + classifieur. Comprend le sens,
-          généralise aux paraphrases. Plus lourd, toujours local.
+        <span class="mb-1 inline-block rounded bg-systeal/10 px-2 py-0.5
+                     text-[12px] font-semibold text-chipteal">2 · fastText appris</span>
+        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+          fastText <strong>entraîné sur nos exemples</strong> (sous-mots).
+          Léger, un cran au-dessus du sac-de-mots.
         </p>
       </article>
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
-        <div class="mb-1 flex items-center gap-2">
-          <span class="rounded bg-sysorange/10 px-2 py-0.5 text-[12px] font-semibold
-                       text-sysorange">3 · LLM</span>
-        </div>
-        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
-          Gemma en local (Ollama), prompt + JSON strict. Zéro entraînement,
-          extrait les infos utiles. Le plus lent, le plus malin.
+        <span class="mb-1 inline-block rounded bg-sysindigo/10 px-2 py-0.5
+                     text-[12px] font-semibold text-chipindigo">3 · fastText pré-entraîné</span>
+        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+          Vecteurs <strong>cc.fr.300</strong> (Common Crawl). Sait déjà que
+          « voiture » ≈ « véhicule ».
+        </p>
+      </article>
+      <article class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <span class="mb-1 inline-block rounded bg-sysgreen/10 px-2 py-0.5
+                     text-[12px] font-semibold text-chipgreen">4 · BERT + MLP</span>
+        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+          Embeddings contextuels (SBERT) + <strong>MLP PyTorch</strong>.
+          Comprend le sens, gagne sur les paraphrases.
+        </p>
+      </article>
+      <article class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <span class="mb-1 inline-block rounded bg-sysorange/10 px-2 py-0.5
+                     text-[12px] font-semibold text-chiporange">5 · LLM</span>
+        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+          Gemma en local (Ollama), JSON strict. Zéro entraînement, extrait
+          les infos utiles. Le plus lent.
         </p>
       </article>
     </section>
@@ -169,32 +195,53 @@
         <!-- Sélecteur de moteur : contrôle segmenté (radios stylées). -->
         <fieldset class="flex flex-wrap items-center gap-2">
           <legend class="sr-only">Choisir le moteur</legend>
+          <!-- Contrôle segmenté. Les radios sont ``sr-only`` (masqués
+               visuellement) : on rend le focus CLAVIER visible via
+               ``peer-focus-visible`` sur le libellé, sinon un utilisateur au
+               clavier ne verrait pas où il se trouve (correction a11y). -->
           <div id="engine-seg"
-               class="inline-flex rounded bg-surface-tertiary p-0.5 text-[14px]
+               class="inline-flex flex-wrap rounded bg-surface-tertiary p-0.5 text-[14px]
                       dark:bg-surface-tertiary-dark">
-            <!-- Les boutons sont générés/gérés par app.js selon la dispo LLM. -->
             <label class="cursor-pointer">
               <input type="radio" name="engine" value="all" class="peer sr-only" checked>
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
-                           dark:peer-checked:bg-surface-primary-dark">Comparer les 3</span>
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
+                           dark:peer-checked:bg-surface-primary-dark">Comparer tout</span>
             </label>
             <label class="cursor-pointer">
               <input type="radio" name="engine" value="tfidf" class="peer sr-only">
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
                            dark:peer-checked:bg-surface-primary-dark">TF-IDF</span>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="engine" value="fasttext_custom" class="peer sr-only">
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
+                           dark:peer-checked:bg-surface-primary-dark">fastText appris</span>
+            </label>
+            <label class="cursor-pointer" id="engine-ftpre-label">
+              <input type="radio" name="engine" value="fasttext_pretrained" class="peer sr-only">
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
+                           dark:peer-checked:bg-surface-primary-dark">fastText pré-entraîné</span>
             </label>
             <label class="cursor-pointer">
               <input type="radio" name="engine" value="bert" class="peer sr-only">
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
                            dark:peer-checked:bg-surface-primary-dark">BERT</span>
             </label>
             <label class="cursor-pointer" id="engine-llm-label">
               <input type="radio" name="engine" value="llm" class="peer sr-only">
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
                            dark:peer-checked:bg-surface-primary-dark">LLM</span>
             </label>
           </div>
@@ -236,7 +283,8 @@
 
     <!-- ======================== RÉSULTATS =========================== -->
     <!-- Peuplé par app.js : une carte par moteur, en colonnes. -->
-    <section id="results" aria-live="polite" class="mt-6 grid gap-4 md:grid-cols-3">
+    <section id="results" aria-live="polite"
+             class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <!-- Vide au départ ; app.js injecte les cartes moteur ici. -->
     </section>
 

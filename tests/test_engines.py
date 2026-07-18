@@ -210,6 +210,64 @@ def test_llm_engine_handles_invalid_json(kb: KnowledgeBase) -> None:
     assert result.meta["error"] == "invalid_json"
 
 
+def test_fasttext_custom_classifies(kb: KnowledgeBase) -> None:
+    """The fastText supervised engine learns the toy intents."""
+    from intent_engine.fasttext_engine import FastTextSupervisedEngine
+
+    # Trains fastText's own classifier on the KB examples (no download).
+    engine = FastTextSupervisedEngine().fit(kb)
+    top = engine.classify("je veux résilier mon contrat").top()
+    assert top is not None
+    # A near-training phrasing must land on the resiliation intent.
+    assert top.intent == "resilier"
+    # Diagnostics identify the fastText backend.
+    assert "fastText" in engine.classify("bonjour").meta["backend"]
+
+
+def test_mlp_classifier_learns_separable_data() -> None:
+    """The PyTorch MLP head fits a simple separable two-class problem."""
+    from intent_engine.mlp import TorchMLPClassifier
+
+    # Two clusters around distinct, per-feature-varied centroids (so the
+    # network's first LayerNorm has real within-vector variation to work
+    # with, as it would on real embeddings). Trivially separable → a
+    # correctly wired MLP must reach 100 % training accuracy.
+    rng = np.random.RandomState(0)
+    centroid_a = np.array([3.0, -1.0, 2.0, 0.5])
+    centroid_b = np.array([-2.0, 1.0, -3.0, 0.2])
+    class_a = centroid_a + rng.normal(scale=0.1, size=(15, 4))
+    class_b = centroid_b + rng.normal(scale=0.1, size=(15, 4))
+    x = np.vstack([class_a, class_b])
+    y = np.array(["a"] * 15 + ["b"] * 15)
+    clf = TorchMLPClassifier(epochs=100, seed=0).fit(x, y)
+    proba = clf.predict_proba(x)
+    # Probability matrix shape and normalisation.
+    assert proba.shape == (30, 2)
+    assert np.allclose(proba.sum(axis=1), 1.0, atol=1e-5)
+    # Predictions recover the labels on this easy problem.
+    predicted = clf.classes_[proba.argmax(axis=1)]
+    assert (predicted == y).mean() == 1.0
+
+
+@pytest.mark.slow
+def test_fasttext_pretrained_if_available(kb: KnowledgeBase) -> None:
+    """Integration: the pretrained French fastText engine, if downloaded.
+
+    Marked ``slow`` and skipped when the ~4.5 GB ``cc.fr.300.bin`` model is
+    not present, so the fast suite never needs the big download.
+    """
+    from intent_engine.fasttext_engine import FastTextPretrainedEngine
+
+    # Skip cleanly when the model has not been downloaded on this machine.
+    if not FastTextPretrainedEngine.is_model_available():
+        pytest.skip("Modèle fastText FR (cc.fr.300.bin) absent.")
+    engine = FastTextPretrainedEngine().fit(kb)
+    top = engine.classify("je souhaite mettre fin à mon engagement").top()
+    assert top is not None
+    # Pretrained vectors should map this paraphrase to the resiliation intent.
+    assert top.intent == "resilier"
+
+
 @pytest.mark.slow
 def test_bert_engine_real_backend(kb: KnowledgeBase) -> None:
     """Integration: the real embedding backend classifies correctly.
