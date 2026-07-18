@@ -100,6 +100,17 @@ def test_api_health_and_kb(api_client: TestClient) -> None:
     assert kb["intents"][0]["id"] == "assurer_voiture"
 
 
+def test_api_i18n(api_client: TestClient) -> None:
+    """The i18n endpoint serves the bilingual GUI string table."""
+    data = api_client.get("/api/i18n").json()
+    # Both languages present, with a sensible default.
+    assert set(data["languages"]) == {"fr", "en"}
+    assert data["default"] in data["languages"]
+    # A representative key resolves differently per language.
+    assert data["strings"]["fr"]["form"]["submit_idle"] == "Analyser l'intention"
+    assert data["strings"]["en"]["form"]["submit_idle"] == "Analyse the intent"
+
+
 def test_api_classify_and_execute(api_client: TestClient) -> None:
     """The classify and execute endpoints route a clear request."""
     # Classify with TF-IDF via the HTTP layer.

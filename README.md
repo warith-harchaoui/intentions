@@ -47,7 +47,7 @@ Read the engine table top to bottom and you are walking the field's history:
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>bag-of-words<br/>49 %"] --> B["2 · fastText<br/>learned subwords<br/>67 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>87 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>82 %"]
+    A["1 · TF-IDF<br/>bag-of-words<br/>51 %"] --> B["2 · fastText<br/>learned subwords<br/>66 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>74 %"] --> D["4 · BERT + MLP<br/>contextual<br/>86 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>82 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
@@ -57,7 +57,7 @@ flowchart LR
 
 The comparator then shows the **pay-off** with real, measured numbers (not
 opinions): on a **paraphrase-heavy** test set, accuracy climbs monotonically
-**49 % → 67 % → 73 % → 88 %** across engines 1→4, and the LLM adds slot
+**51 % → 66 % → 74 % → 86 %** across engines 1→4, and the LLM adds slot
 extraction on top. And crucially, it shows the **honest caveats** an ML
 practitioner cares about — sampling uncertainty (bootstrap violin plots),
 train/test-split variance (k-fold cross-validation), model mis-calibration
@@ -165,14 +165,17 @@ python -m intent_engine execute "il me faut une prise en charge pour l'hôpital"
 Example `compare` output (on a paraphrase — note how the lexical engines fall
 apart while the semantic ones hold):
 
-```text
-tfidf               | (abstention)                — 28 ms
-fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
-fasttext_pretrained | (abstention)                — 0 ms
-bert                | declarer_sinistre_auto [0.98] — 18 ms
-llm                 | declarer_sinistre_auto [0.95] — 4725 ms
-        slots: {'type_bien': 'auto', 'urgence': 'haute'}
-```
+| Engine | Prediction | Confidence | CPU / call |
+|--------|-----------|:----------:|-----------:|
+| `tfidf` | *(abstains)* | — | ~50 ms |
+| `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
+| `fasttext_pretrained` | *(abstains)* | — | ~250 µs |
+| `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
+| `llm` | `declarer_sinistre_auto` | **0.95** | ~4.7 s |
+
+The LLM also extracts **slots** — `type_bien: auto`, `urgence: haute` — which no
+classifier does. The two lexical engines abstain or barely clear the bar on this
+paraphrase; the semantic ones are confident. *That* is the lesson in one query.
 
 ---
 
@@ -191,25 +194,35 @@ worth:
 > the reproducible, seeded ones (bootstrap + CV); the millisecond/second
 > figures just convey the ~4-orders-of-magnitude spread TF-IDF → LLM.
 
-| # | Engine | Accuracy (held-out) | Mean latency | Slots |
-|---|--------|--------------------:|-------------:|:-----:|
-| 1 | **TF-IDF + Random Forest** | 49 % | ~30 ms | ❌ |
-| 2 | **fastText (custom)** | 67 % | ~0 ms | ❌ |
-| 3 | **fastText (pretrained cc.fr.300)** | 73 % | ~1 ms | ❌ |
-| 4 | **BERT (SBERT + MLP)** | **88 %** | ~15 ms | ❌ |
+| # | Engine | Accuracy (held-out) | CPU / call | Slots |
+|---|--------|--------------------:|-----------:|:-----:|
+| 1 | **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
+| 2 | **fastText (custom)** | 66 % | ~33 µs | ❌ |
+| 3 | **fastText (pretrained cc.fr.300)** | 74 % | ~250 µs | ❌ |
+| 4 | **BERT (SBERT + MLP)** | **86 %** | ~20 ms | ❌ |
 | 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
 
-**The distributions, not just the point estimates** — bootstrap resampling of
-the test set (2000×) shows the engines are *genuinely* different on this hard
-set (TF-IDF and BERT distributions don't even overlap), not noise apart:
+> **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
+> (~50 ms) is actually the **slowest non-LLM engine** — the forest's hundreds of
+> trees cost more than BERT's two-matmul MLP head (~20 ms) or fastText's vector
+> lookup (~33 µs). "Old-school" doesn't mean "fast", and "neural" doesn't mean
+> "slow": measure, don't assume. (CPU time via `process_time`, immune to other
+> apps' load — see `eval/bench.py`; the LLM figure is Ollama's own compute.)
 
-![Accuracy distribution per engine (violin plot)](docs/img/violin-accuracy.png)
+**The distributions, not just the point estimates** — each violin below is a
+**repeated 5-fold cross-validation**: 5 folds × 5 shuffles = **25 real
+measurements** per engine (train on 4/5 of the K = 21 intents / N = 500
+examples, test on the held-out 1/5). Every point is a genuine generalisation
+score — no resampling tricks — and the densities barely overlap, so the engines
+are *genuinely* different, not noise apart:
+
+![Accuracy distribution per engine (violin plot)](docs/img/violin-accuracy-en.png)
 
 > **Two lenses, one honest story.** On the paraphrase set above, accuracy
-> climbs 49 → 67 → 73 → 88 %. But under **k-fold cross-validation** on the
-> in-distribution KB examples, the engines are *closer* (~72 / 69 / — / 82 %):
-> lexical methods do fine when the test looks like the training, and collapse
-> under paraphrase shift — the whole reason semantic representations exist.
+> climbs 51 → 66 → 74 → 86 %. But under **cross-validation** on the
+> in-distribution KB examples, the engines are *closer*: lexical methods do fine
+> when the test looks like the training, and collapse under paraphrase shift —
+> the whole reason semantic representations exist.
 >
 > Out-of-scope safety net: on 15 off-topic inputs (weather, maths, cooking…),
 > TF-IDF abstains ~93 % of the time; the neural BERT is more over-confident
@@ -221,6 +234,27 @@ set (TF-IDF and BERT distributions don't even overlap), not noise apart:
 > and its real edge is **slot extraction + zero-shot**, not top accuracy. The
 > larger `gemma4:e4b` reaches ~93 % but at ~40 s/call (`INTENT_LLM_MODEL` swaps
 > it back). Heavier ≠ better — pick by need.
+
+### Does prompt engineering actually help? A 2×2 experiment
+
+The *representation* lesson above is about the **model**. This one is about the
+**prompt**. We cross two independent switches — prompt **quality** (a *bad*
+prompt: a plain-but-reasonable task + schema, not a strawman — vs a *good* one
+that adds error-driven disambiguation rules) and **examples** (zero-shot vs
+three worked few-shot examples, on *fresh* sentences never in the test set, so
+no leakage) — giving four prompts along one axis. We ran the full 2×2 on several
+local models and show the **single** one where the *good* prompt genuinely wins,
+climbing the most cleanly:
+
+![Prompt engineering: better and better](docs/img/shootout-en.png)
+
+> **Prompt work pays most when the model is weak.** On the small `qwen2.5:3b`,
+> the four prompts climb **60 → 60 → 67 → 77 %** — a +17-point lift from wording
+> and examples alone. On `gemma3:4b`, already ~90 %, the same effort barely
+> moves the needle (it is near its ceiling). The takeaway a practitioner
+> recognises: *before reaching for a bigger model, fix the prompt — but don't
+> expect miracles once the model is already strong.* (Held-out sample of 30;
+> predictions cached per config in `eval/.llm_shootout/`.)
 
 ---
 
@@ -299,12 +333,4 @@ exfiltrate exactly the data the law protects most. Here it stays on the box.
 
 Details and the GDPR discussion in [`PROS_CONS.md`](PROS_CONS.md).
 
----
 
-## Acknowledgements
-
-Special thanks to the contributors, reviewers, and users who helped improve
-this project.
-
-AI tools may have been used during development, but authorship and
-responsibility remain with the human maintainers.

@@ -47,14 +47,15 @@ python -m intent_engine intents
 python -m intent_engine compare "on s'est rentrés dedans à un carrefour"
 ```
 
-```text
-tfidf               | (abstention)                 — 28 ms
-fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
-fasttext_pretrained | (abstention)                 — 0 ms
-bert                | declarer_sinistre_auto [0.98] — 18 ms
-llm                 | declarer_sinistre_auto [0.95] — 4725 ms
-        slots: {'type_bien': 'auto', 'urgence': 'haute'}
-```
+| Engine | Prediction | Confidence | CPU / call |
+|--------|-----------|:----------:|-----------:|
+| `tfidf` | *(abstains)* | — | ~50 ms |
+| `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
+| `fasttext_pretrained` | *(abstains)* | — | ~250 µs |
+| `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
+| `llm` | `declarer_sinistre_auto` | **0.95** | ~4.7 s |
+
+The LLM also extracts slots — `type_bien: auto`, `urgence: haute`.
 
 Watch the lexical engines abstain on a paraphrase while the semantic ones
 nail it — the whole pedagogical point in one command.
@@ -182,19 +183,21 @@ python -m eval.harness
 python -m eval.harness --engine bert
 ```
 
-```text
-[PASS] tfidf               accuracy=49% mean_latency=30ms (bars: acc≥45%)
-    [PASS] abstention hors-périmètre: 93% (bar ≥60%)
-[PASS] fasttext_custom     accuracy=67% mean_latency=0ms  (bars: acc≥55%)
-[PASS] fasttext_pretrained accuracy=73% mean_latency=1ms  (bars: acc≥65%)
-[PASS] bert                accuracy=88% mean_latency=15ms  (bars: acc≥75%)
-```
+| Engine | Accuracy | CPU / call | Gate (min accuracy) |
+|--------|:--------:|-----------:|:-------------------:|
+| `tfidf` | 51 % | ~50 ms | ✅ ≥ 45 % |
+| `fasttext_custom` | 66 % | ~33 µs | ✅ ≥ 55 % |
+| `fasttext_pretrained` | 74 % | ~250 µs | ✅ ≥ 65 % |
+| `bert` | 86 % | ~20 ms | ✅ ≥ 75 % |
+
+(TF-IDF also passes the out-of-scope abstention gate: it abstains on **93 %** of
+15 off-topic inputs, bar ≥ 60 %.)
 
 Distributions (bootstrap CIs + k-fold CV) and the violin plot:
 
 ```bash
 python -m eval.crossval     # writes eval/crossval_results.json + prints mean ± std
-python -m eval.violin       # renders docs/img/violin-accuracy.png
+python -m eval.violin       # renders docs/img/violin-accuracy-{fr,en}.png + shootout-{fr,en}.png
 ```
 
 DeepEval (LLM) and Giskard (ML) integrations run with the eval extra:

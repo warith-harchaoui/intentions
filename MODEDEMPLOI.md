@@ -19,10 +19,16 @@ Ouvrez <http://localhost:8000>. Vous arrivez sur l'écran d'accueil :
 
 ![Écran d'accueil](docs/img/01-accueil.png)
 
+> L'interface est **bilingue FR/EN** — basculez avec le drapeau 🇫🇷/🇬🇧 en haut à
+> droite, à côté du bouton thème ☀️/🌙. (La *base de connaissance*, elle, reste en
+> français — c'est le contenu d'un assureur français.)
+
 De haut en bas :
-- **En-tête** — la marque, et un badge qui indique honnêtement l'état du moteur
-  LLM : vert *« LLM en ligne · gemma3:4b »* quand Ollama répond, gris
-  *« LLM hors ligne »* sinon (le bouton LLM est alors désactivé).
+- **En-tête** — la marque ; un badge qui indique honnêtement l'état du moteur
+  LLM (vert *« LLM en ligne · gemma3:4b »* quand Ollama répond, gris *« LLM hors
+  ligne »* sinon, le bouton LLM étant alors désactivé) ; et les deux contrôles
+  en haut à droite — le **thème** (☀️/🌙) et le **drapeau de langue** (🇫🇷/🇬🇧).
+  Les deux choix sont mémorisés d'une visite à l'autre.
 - **Cinq cartes** — un rappel en une ligne de chaque approche (TF-IDF, fastText×2, BERT, LLM).
 - **Zone de saisie** — un champ texte, un sélecteur de moteur, et le bouton
   **Analyser l'intention**.
@@ -32,7 +38,9 @@ De haut en bas :
 ## 2. Poser une demande
 
 Tapez une phrase de client — comme entendue au téléphone — par ex.
-*« j'ai eu un accident ce matin, ma voiture est cabossée »*.
+*« j'ai eu un accident ce matin, ma voiture est cabossée »* (ou en anglais). La
+langue de la requête est **détectée automatiquement** (langdetect), et le LLM est
+alors instruit dans cette langue.
 
 Choisissez un mode avec le contrôle segmenté :
 - **Comparer tout** (défaut) — lance les cinq moteurs côte à côte.
@@ -46,7 +54,8 @@ Cliquez **Analyser l'intention**.
 
 Chaque moteur a une carte qui montre :
 - sa **pastille colorée** (bleu, teal, indigo, vert, orange) et sa
-  **latence** (en haut à droite) — comparez TF-IDF en ~1 ms au LLM en ~5 s (gemma3:4b) ;
+  **latence** (en haut à droite) — comparez les moteurs rapides (micro- à
+  millisecondes) au LLM en ~5 s (gemma3:4b) ;
 - des **barres de confiance** pour les intentions de tête (l'identifiant + un %) ;
 - la **réponse scriptée** de l'intention gagnante, en serif ;
 - pour le LLM, les **slots extraits** (ex. `urgence: haute`) en petits badges.
@@ -70,9 +79,10 @@ phrases correspondent à l'intention dédiée `escalade_humain`.
 
 ---
 
-## 4. Mode sombre
+## 4. Thème clair et sombre
 
-L'interface suit automatiquement l'apparence de votre système (clair ou sombre) :
+Basculez le thème vous-même avec le bouton ☀️/🌙 (en haut à droite) ; le choix est
+mémorisé. À la première visite, l'interface suit l'apparence de votre système :
 
 ![Mode sombre](docs/img/03-mode-sombre.png)
 

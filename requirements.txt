@@ -22,6 +22,9 @@ httpx>=0.27.0              # synchronous Ollama REST client
 # --- Query language detection (bilingual EN/FR routing) ------------------
 langdetect>=1.0.9          # detect a query's language → pick the LLM prompt language
 
+# --- i18n string table (GUI copy + LLM prompts) --------------------------
+PyYAML>=6.0                # parse locales/i18n.yaml (single localized source of truth)
+
 # --- Optional heavy backend (Approach 4, the SBERT + PyTorch MLP path) ---
 # sentence-transformers pulls PyTorch (~2 GB); torch also runs the BERT
 # engine's MLP head. Install to enable the BERT engine on the SBERT path:

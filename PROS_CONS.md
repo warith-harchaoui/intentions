@@ -31,7 +31,7 @@
 |---|---|---|---|
 | **Généralisation aux paraphrases** | Faible — colle aux mots exacts¹ | Bonne — capture le sens² | Excellente — comprend le langage³ |
 | **Données requises / intention** | Dizaines d'exemples¹ | 5–10 (few-shot)² | 0–5 (dans le prompt)³ |
-| **Latence d'inférence** | La plus rapide (µs–ms) | Rapide (10–40 ms CPU)² | Lente (s à dizaines de s en local)³ |
+| **Latence d'inférence** | µs (fastText) à ~50 ms (RandomForest) | Rapide (~250 µs–20 ms CPU)² | Lente (s à dizaines de s en local)³ |
 | **Compute / matériel** | CPU, empreinte minuscule | CPU ok, modèle ~100–500 Mo² | GPU/Apple Silicon conseillé³ |
 | **Coût monétaire** | Gratuit, local | Gratuit si auto-hébergé | Gratuit en local / **payant en API**⁴ |
 | **Explicabilité** | Excellente — poids par mot¹ | Moyenne — voisins/kNN² | Faible-moyenne, non déterministe⁵ |
@@ -50,20 +50,20 @@ Chiffres reproductibles : `python -m eval.harness` (exactitude/latence) et
 académiques mais les résultats réels du code, sur un jeu de test **riche en
 paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 
-| # | Moteur (représentation + classifieur) | Exactitude (held-out) | Latence | Slots |
+| # | Moteur (représentation + classifieur) | Exactitude (held-out) | CPU / appel | Slots |
 |---|---|---:|---:|:---:|
-| 1 | **TF-IDF + Random Forest** | 49 % | ~30 ms | ❌ |
-| 2 | **fastText appris** (softmax fastText) | 67 % | ~0 ms | ❌ |
-| 3 | **fastText pré-entraîné** cc.fr.300 (+ régression logistique) | 73 % | ~1 ms | ❌ |
-| 4 | **BERT** SBERT + **MLP PyTorch** | **88 %** | ~15 ms | ❌ |
+| 1 | **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
+| 2 | **fastText appris** (softmax fastText) | 66 % | ~33 µs | ❌ |
+| 3 | **fastText pré-entraîné** cc.fr.300 (+ régression logistique) | 74 % | ~250 µs | ❌ |
+| 4 | **BERT** SBERT + **MLP PyTorch** | **86 %** | ~20 ms | ❌ |
 | 5 | **LLM** gemma3:4b (Ollama, JSON) | 82 % | ~5 s | ✅ (urgence, type de bien…) |
 
-> **La progression, c'est ça la leçon.** 49 → 67 → 73 → **88 %** : chaque marche
+> **La progression, c'est ça la leçon.** 51 → 66 → 74 → **86 %** : chaque marche
 > ajoute de la *sémantique* à la représentation, et l'exactitude suit. Le
 > sac-de-mots mémorise des chaînes ; fastText apprend des sous-mots ; les
 > vecteurs pré-entraînés apportent le sens de milliards de mots ; **BERT y
-> ajoute le contexte et culmine à 88 %.** Le petit LLM `gemma3:4b` (82 %,
-> ~5 s) **reste sous BERT** en exactitude et **~150× plus lent** : son intérêt
+> ajoute le contexte et culmine à 86 %.** Le petit LLM `gemma3:4b` (82 %,
+> ~5 s) **reste sous BERT** en exactitude et **des centaines de fois plus lent** : son intérêt
 > n'est *pas* la précision brute mais l'**extraction de slots**, le **zero-shot**
 > (aucune donnée) et un catalogue qui bouge à la vitesse d'une ligne de prompt.
 > *Plus lourd n'est pas toujours meilleur : on choisit selon le besoin (vitesse ?
@@ -77,11 +77,11 @@ test donne la *distribution* d'exactitude de chaque moteur — et montre que, su
 ce jeu difficile, ils sont **réellement** distincts (TF-IDF et BERT ne se
 chevauchent pas), pas séparés par le hasard :
 
-![Violin plot des distributions d'exactitude](docs/img/violin-accuracy.png)
+![Violin plot des distributions d'exactitude](docs/img/violin-accuracy-fr.png)
 
 ### Deux angles complémentaires (held-out vs validation croisée)
 
-- **Held-out paraphrases** (changement de distribution) : 49 / 67 / 73 / 88 %.
+- **Held-out paraphrases** (changement de distribution) : 51 / 66 / 74 / 86 %.
   L'écart est large — le lexical est fragile.
 - **Validation croisée k-fold** sur les exemples in-distribution de la KB :
   ~72 % (TF-IDF) / 69 % (fastText appris) / 82 % (BERT). Les moteurs sont
@@ -95,17 +95,20 @@ le **travail utile** (`python -m eval.bench`) : le **temps CPU**
 (`time.process_time`, insensible aux autres apps) pour les moteurs locaux, et
 la **durée de calcul rapportée par Ollama** (`eval_duration`) pour le LLM.
 
-| Moteur | wall (ms) | **CPU (ms)** | hors-CPU ≈ GPU (ms) |
+| Moteur | wall | **CPU** | hors-CPU ≈ GPU |
 |---|---:|---:|---:|
-| TF-IDF + RandomForest | ~26 | **~20** | ~6 |
-| fastText appris | ~0,01 | **~0,01** | ~0 |
-| fastText pré-entraîné | ~0,08 | **~0,08** | ~0 |
-| BERT (SBERT + MLP) | ~16 | **~7,5** | **~8 (MPS/GPU)** |
+| TF-IDF + RandomForest | ~50 ms | **~50 ms** | — |
+| fastText appris | ~33 µs | **~33 µs** | — |
+| fastText pré-entraîné | ~250 µs | **~250 µs** | — |
+| BERT (SBERT + MLP) | ~52 ms | **~20 ms** | **~32 ms (MPS/GPU)** |
 
-- **fastText est réellement instantané** (~0,01–0,08 ms CPU) — le wall-clock ne
-  le montrait pas.
-- **BERT** : ~7,5 ms de CPU **plus ~8 ms hors-CPU** = le **GPU Metal (MPS)** fait
-  la moitié du travail. Le split CPU/GPU est directement visible.
+- **fastText est réellement instantané** (~33–250 µs CPU) — jamais « 0 ms » :
+  l'affichage bascule en microsecondes (`format_duration`) pour ne pas mentir.
+- **Surprise** : le *classique* **TF-IDF + RandomForest (~50 ms)** est le moteur
+  **le plus lent hors LLM** — les centaines d'arbres de la forêt coûtent plus que
+  la tête MLP de BERT (~20 ms). « À l'ancienne » ≠ « rapide ».
+- **BERT** : ~20 ms de CPU **plus ~32 ms hors-CPU** = le **GPU Metal (MPS)** fait
+  une bonne moitié du travail. Le split CPU/GPU est directement visible.
 - **LLM** (gemma3:4b) : notre process attend le HTTP (CPU ≈ 0). Ollama rapporte
   le vrai calcul : **prompt + génération ≈ 0,5–1 s** à chaud (hors chargement du
   modèle, ~11 s une seule fois). Les ~5 s de wall-clock sont surtout de
@@ -152,8 +155,8 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 
 - **Pour** : entraîne conjointement les embeddings de sous-mots **et** un
   classifieur softmax, en une commande, en une fraction de seconde. Robuste aux
-  fautes de frappe par construction. 100 % local, minuscule. Ici **67 %** sur
-  les paraphrases — nettement au-dessus du sac-de-mots (49 %).
+  fautes de frappe par construction. 100 % local, minuscule. Ici **66 %** sur
+  les paraphrases — nettement au-dessus du sac-de-mots (51 %).
 - **Contre** : n'apprend que ce que contiennent nos quelques centaines
   d'exemples ; pas de connaissance du monde extérieur. Plafonne vite.
 
@@ -162,7 +165,7 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 - **Pour** : **transfert d'apprentissage** — les vecteurs sont entraînés sur
   Common Crawl + Wikipédia français (des milliards de mots), donc « voiture » et
   « véhicule » sont déjà proches. On moyenne les vecteurs de la phrase et on
-  pose une régression logistique dessus. Ici **73 %**, sans avoir vu nos
+  pose une régression logistique dessus. Ici **74 %**, sans avoir vu nos
   paraphrases. Excellent rapport sens/simplicité.
 - **Contre** : le modèle pèse **~4,5 Go** (téléchargement), quelques Go de RAM.
   Les vecteurs sont **statiques** : « avocat » (fruit vs juriste) a un seul

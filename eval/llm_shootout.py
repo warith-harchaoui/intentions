@@ -2,27 +2,25 @@
 
 Module summary
 --------------
-The LLM *approach* is one row of the five-engine progression, but under it two
-knobs change everything: **which local model** you run, and **which prompt**
-you feed it. This module runs the same intent task through several
-(model, prompt) configurations and collects, per config:
+The LLM *approach* is one row of the five-engine progression, but under it the
+**prompt** changes everything. This module runs a **2×2 prompt-engineering
+experiment** — prompt *quality* (bad → good) × *examples* (zero-shot →
+few-shot) — across several candidate local models, and collects, per config:
 
-* top-1 **accuracy** on a fixed held-out sample, plus a **bootstrap**
-  distribution for the violin plot (via :func:`eval.crossval.bootstrap_accuracy`);
+* the **accuracy** on a fixed held-out sample, plus a bootstrap distribution
+  (via :func:`eval.crossval.bootstrap_accuracy`) for confidence intervals;
 * everything is **cached per config** on disk, written incrementally, so the
   long (~30-40 min) run is resumable and re-runs are free.
 
-Two stories fall out of one table:
-
-* **Model matters** — a light Qwen vs the compact Gemma vs the two bigger
-  Gemma builds, all on the *same* (improved) prompt.
-* **The prompt matters** — the same fast models on a **baseline** vs an
-  **engineered** prompt (few-shot + reason-first), showing the accuracy lift
-  that prompt engineering alone buys.
+The point: find the **single model** whose accuracy climbs the most cleanly
+across the four prompts (:func:`_pick_best_model`), so the docs can tell one
+uncluttered "de mieux en mieux" story instead of a busy multi-model table. The
+lesson that falls out — prompt engineering lifts a *weak* model far more than a
+*strong* one already near its ceiling.
 
 Usage
 -----
-    python -m eval.llm_shootout                 # default config line-up
+    python -m eval.llm_shootout                 # the 2×2 across candidate models
     python -m eval.llm_shootout --sample 30
 
 Author
@@ -56,10 +54,10 @@ logger = logging.getLogger(__name__)
 # each variant compositionally so the ONLY differences are the rules and the
 # examples.
 _PROMPT_SWITCHES: dict[str, tuple[bool, bool]] = {
-    "bad-zs": (False, False),   # bare task + schema, no examples
-    "bad-fs": (False, True),    # + three worked examples
-    "good-zs": (True, False),   # + error-driven disambiguation rules
-    "good-fs": (True, True),    # rules AND examples (the full treatment)
+    "bad-zs": (False, False),  # bare task + schema, no examples
+    "bad-fs": (False, True),  # + three worked examples
+    "good-zs": (True, False),  # + error-driven disambiguation rules
+    "good-fs": (True, True),  # rules AND examples (the full treatment)
 }
 _PROMPTS: dict[str, str] = {
     key: experiment_prompt(good=good, fewshot=fewshot)
@@ -98,7 +96,7 @@ def _config_key(model: str, prompt: str) -> str:
     model : str
         Ollama model tag.
     prompt : str
-        ``"baseline"`` or ``"improved"``.
+        One of the 2×2 prompt keys (``"bad-zs"`` … ``"good-fs"``).
 
     Returns
     -------
@@ -185,9 +183,12 @@ def _correctness(cache: dict[str, str], sample: int) -> np.ndarray:
 def _progression_score(accuracies: list[float]) -> float:
     """Score how cleanly a model's accuracy climbs across the four prompts.
 
-    We want the single model whose accuracy goes *up* from ``bad-zs`` to
-    ``good-fs`` with as few dips as possible and as wide a span as possible —
-    the clearest "de mieux en mieux" story.
+    We want the clearest "de mieux en mieux" story: a **monotone** climb from
+    ``bad-zs`` to ``good-fs``. A big span is worthless if the middle collapses
+    (e.g. 23 → 77 → 40 → 80 has a huge span but is a rollercoaster, the opposite
+    of the lesson). So every backward step is penalised **3×** its size — a
+    single dip sinks a model below any genuinely monotone one. Among monotone
+    progressions, the wider span wins.
 
     Parameters
     ----------
@@ -197,15 +198,14 @@ def _progression_score(accuracies: list[float]) -> float:
     Returns
     -------
     float
-        ``span - dips``: the total climb (last minus first) minus every
-        backward step. Higher is a cleaner, wider progression.
+        ``span - 3·dips``. Higher is a cleaner, wider, more monotone climb.
     """
     span = accuracies[-1] - accuracies[0]
     dips = sum(
-        max(0.0, accuracies[i] - accuracies[i + 1])
-        for i in range(len(accuracies) - 1)
+        max(0.0, accuracies[i] - accuracies[i + 1]) for i in range(len(accuracies) - 1)
     )
-    return span - dips
+    # Weight dips heavily so a monotone climb always beats a high-variance one.
+    return span - 3.0 * dips
 
 
 def _pick_best_model(summary: dict[str, dict]) -> str:

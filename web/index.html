@@ -23,9 +23,23 @@
   <script src="/vendor/tailwindcss.js"></script>
   <script src="/vendor/marked.min.js"></script>
   <script>
-    // Config Tailwind maison. ``darkMode: 'media'`` suit le réglage système.
+    // Thème : appliqué AVANT le rendu pour éviter tout flash. Choix explicite
+    // (bouton clair/sombre) mémorisé dans localStorage ; sinon on suit le
+    // réglage système. ``darkMode: 'class'`` rend le basculement manuel possible.
+    (function () {
+      var saved = localStorage.getItem('theme');
+      var dark = saved ? saved === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+      // Langue mémorisée appliquée tôt sur <html lang> (défaut : le serveur).
+      var lang = localStorage.getItem('lang');
+      if (lang) document.documentElement.lang = lang;
+    })();
+
+    // Config Tailwind maison. ``darkMode: 'class'`` = bascule pilotée par la
+    // classe ``dark`` sur <html> (posée ci-dessus / par le bouton).
     tailwind.config = {
-      darkMode: 'media',
+      darkMode: 'class',
       theme: {
         extend: {
           // Trois familles Roboto ; repli système si le woff2 échoue.
@@ -93,7 +107,8 @@
         <h1 class="text-[17px] font-semibold leading-tight">
           Déraison Assurances
         </h1>
-        <p class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
+        <p data-i18n="header.subtitle"
+           class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
           Aiguilleur d'intentions — 5 approches comparées
         </p>
       </div>
@@ -104,6 +119,24 @@
                    dark:bg-surface-tertiary-dark dark:text-label-secondary-dark">
         …
       </span>
+      <!-- Contrôles haut-droite : bascule clair/sombre + langue (emoji). Ordre
+           = thème puis drapeau, avec zone de clic ≥ 44px (règle a11y). -->
+      <button id="theme-toggle" type="button" data-i18n-aria="controls.theme_label"
+              class="flex h-11 w-11 items-center justify-center rounded text-lg
+                     text-label-secondary hover:bg-surface-tertiary
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-sysblue
+                     dark:text-label-secondary-dark dark:hover:bg-surface-tertiary-dark"
+              aria-label="Basculer le thème clair / sombre">
+        <span id="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+      <button id="lang-toggle" type="button" data-i18n-aria="controls.lang_label"
+              class="flex h-11 min-w-11 items-center justify-center rounded px-1 text-lg
+                     hover:bg-surface-tertiary
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-sysblue
+                     dark:hover:bg-surface-tertiary-dark"
+              aria-label="Passer en anglais">
+        <span id="lang-flag" aria-hidden="true">🇬🇧</span>
+      </button>
     </div>
   </header>
 
@@ -113,31 +146,37 @@
     <!-- La progression des 5 approches : du sac-de-mots creux au LLM
          génératif. Chaque carte porte sa pastille colorée (texte foncé
          WCAG-conforme) et une phrase de vulgarisation. -->
-    <section aria-label="Les cinq approches, du plus simple au plus puissant"
+    <section data-i18n-aria="approaches.aria"
+             aria-label="Les cinq approches, du plus simple au plus puissant"
              class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
         <span class="mb-1 inline-block rounded bg-sysblue/10 px-2 py-0.5
                      text-[12px] font-semibold text-chipblue">1 · TF-IDF</span>
-        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+        <p data-i18n-html="approaches.card1_html"
+           class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
           Sac de n-grammes + <strong>Random Forest</strong> (scikit-learn).
           Instantané. Colle aux mots exacts.
         </p>
       </article>
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
-        <span class="mb-1 inline-block rounded bg-systeal/10 px-2 py-0.5
+        <span data-i18n="approaches.card2_title"
+              class="mb-1 inline-block rounded bg-systeal/10 px-2 py-0.5
                      text-[12px] font-semibold text-chipteal">2 · fastText appris</span>
-        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+        <p data-i18n-html="approaches.card2_html"
+           class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
           fastText <strong>entraîné sur nos exemples</strong> (sous-mots).
           Léger, un cran au-dessus du sac-de-mots.
         </p>
       </article>
       <article class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
-        <span class="mb-1 inline-block rounded bg-sysindigo/10 px-2 py-0.5
+        <span data-i18n="approaches.card3_title"
+              class="mb-1 inline-block rounded bg-sysindigo/10 px-2 py-0.5
                      text-[12px] font-semibold text-chipindigo">3 · fastText pré-entraîné</span>
-        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+        <p data-i18n-html="approaches.card3_html"
+           class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
           Vecteurs <strong>cc.fr.300</strong> (Common Crawl). Sait déjà que
           « voiture » ≈ « véhicule ».
         </p>
@@ -146,7 +185,8 @@
                       dark:bg-surface-secondary-dark">
         <span class="mb-1 inline-block rounded bg-sysgreen/10 px-2 py-0.5
                      text-[12px] font-semibold text-chipgreen">4 · BERT + MLP</span>
-        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+        <p data-i18n-html="approaches.card4_html"
+           class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
           Embeddings contextuels (SBERT) + <strong>MLP PyTorch</strong>.
           Comprend le sens, gagne sur les paraphrases.
         </p>
@@ -155,7 +195,8 @@
                       dark:bg-surface-secondary-dark">
         <span class="mb-1 inline-block rounded bg-sysorange/10 px-2 py-0.5
                      text-[12px] font-semibold text-chiporange">5 · LLM</span>
-        <p class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
+        <p data-i18n-html="approaches.card5_html"
+           class="text-[13px] text-label-secondary dark:text-label-secondary-dark">
           Gemma en local (Ollama), JSON strict. Zéro entraînement, extrait
           les infos utiles. Le plus lent.
         </p>
@@ -163,14 +204,15 @@
     </section>
 
     <!-- ========================= SAISIE ============================= -->
-    <section aria-label="Votre demande"
+    <section data-i18n-aria="form.aria" aria-label="Votre demande"
              class="rounded bg-surface-secondary p-4 shadow-sm
                     dark:bg-surface-secondary-dark">
       <form id="ask-form" class="flex flex-col gap-3">
-        <label for="query" class="text-[14px] font-medium">
+        <label for="query" data-i18n="form.label" class="text-[14px] font-medium">
           Écrivez votre demande, comme un client au téléphone ou à l'écrit
         </label>
         <textarea id="query" name="query" rows="2"
+                  data-i18n-placeholder="form.placeholder"
                   placeholder="Ex : j'ai eu un accident ce matin, ma voiture est cabossée"
                   class="min-h-11 w-full resize-y rounded border border-surface-tertiary
                          bg-canvas px-3 py-2 text-[16px] text-label-primary
@@ -182,7 +224,7 @@
 
         <!-- Sélecteur de moteur : contrôle segmenté (radios stylées). -->
         <fieldset class="flex flex-wrap items-center gap-2">
-          <legend class="sr-only">Choisir le moteur</legend>
+          <legend class="sr-only" data-i18n="form.legend">Choisir le moteur</legend>
           <!-- Contrôle segmenté. Les radios sont ``sr-only`` (masqués
                visuellement) : on rend le focus CLAVIER visible via
                ``peer-focus-visible`` sur le libellé, sinon un utilisateur au
@@ -195,7 +237,8 @@
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
                            peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
-                           dark:peer-checked:bg-surface-primary-dark">Comparer tout</span>
+                           dark:peer-checked:bg-surface-primary-dark"
+                     data-i18n="form.engine_all">Comparer tout</span>
             </label>
             <label class="cursor-pointer">
               <input type="radio" name="engine" value="tfidf" class="peer sr-only">
@@ -209,14 +252,16 @@
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
                            peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
-                           dark:peer-checked:bg-surface-primary-dark">fastText appris</span>
+                           dark:peer-checked:bg-surface-primary-dark"
+                     data-i18n="form.engine_fasttext_custom">fastText appris</span>
             </label>
             <label class="cursor-pointer" id="engine-ftpre-label">
               <input type="radio" name="engine" value="fasttext_pretrained" class="peer sr-only">
               <span class="block rounded px-3 py-1.5 font-medium
                            peer-checked:bg-surface-secondary peer-checked:shadow-sm
                            peer-focus-visible:ring-2 peer-focus-visible:ring-sysblue
-                           dark:peer-checked:bg-surface-primary-dark">fastText pré-entraîné</span>
+                           dark:peer-checked:bg-surface-primary-dark"
+                     data-i18n="form.engine_fasttext_pretrained">fastText pré-entraîné</span>
             </label>
             <label class="cursor-pointer">
               <input type="radio" name="engine" value="bert" class="peer sr-only">
@@ -244,7 +289,8 @@
                        focus-visible:ring-offset-2 focus-visible:ring-offset-surface-secondary
                        motion-reduce:active:scale-100
                        disabled:pointer-events-none disabled:opacity-50
-                       dark:focus-visible:ring-offset-surface-secondary-dark">
+                       dark:focus-visible:ring-offset-surface-secondary-dark"
+                data-i18n="form.submit_idle">
           Analyser l'intention
         </button>
       </form>
@@ -269,8 +315,11 @@
       <details class="rounded bg-surface-secondary p-4 shadow-sm
                       dark:bg-surface-secondary-dark">
         <summary class="cursor-pointer select-none text-[15px] font-semibold">
-          Base de connaissance — <span id="kb-count">…</span> intentions
-          <span class="font-normal text-label-tertiary dark:text-label-tertiary-dark">
+          <span data-i18n="kb.summary_label">Base de connaissance</span> —
+          <span id="kb-count">…</span>
+          <span data-i18n="kb.summary_suffix">intentions</span>
+          <span data-i18n="kb.hint"
+                class="font-normal text-label-tertiary dark:text-label-tertiary-dark">
             (cliquez un exemple pour l'essayer)
           </span>
         </summary>
@@ -280,7 +329,8 @@
     </section>
 
     <!-- Note de bas de page pédagogique. -->
-    <footer class="mt-8 text-center text-[13px] text-label-tertiary
+    <footer data-i18n-html="footer_html"
+            class="mt-8 text-center text-[13px] text-label-tertiary
                    dark:text-label-tertiary-dark">
       Démo pédagogique — les intentions vivent dans des fichiers Markdown
       (<code class="font-mono">knowledge_base/</code>), un titre <code

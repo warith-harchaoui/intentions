@@ -62,34 +62,47 @@ _ENGINE_META: dict[str, dict[str, str]] = {
     "bert": {"fr": "BERT", "en": "BERT", "color": "#28CD41"},
 }
 
-# One hue per LLM family (house palette) for the shootout bars.
-_MODEL_HUE: dict[str, str] = {
-    "qwen2.5:3b": "#007AFF",
-    "gemma3:4b": "#28CD41",
-    "gemma4:e2b-mlx": "#FF9500",
-    "gemma4:e4b-mlx": "#AF52DE",
-}
-
 # Bilingual chart strings (kept tiny — the real explanation is in the docs).
 _TEXT: dict[str, dict[str, str]] = {
     "fr": {
         "cv_title": "Exactitude par moteur (validation croisée 5 blocs)",
         "axis": "Exactitude (plus c'est haut, mieux c'est)",
-        "shoot_title": "Le modèle compte plus que le prompt",
+        "shoot_title": "Prompt engineering : de mieux en mieux",
     },
     "en": {
         "cv_title": "Accuracy by engine (5-fold cross-validation)",
         "axis": "Accuracy (higher is better)",
-        "shoot_title": "The model matters more than the prompt",
+        "shoot_title": "Prompt engineering: better and better",
     },
 }
 
-# Bilingual prompt-variant labels for the shootout bar x-axis. Keys are the
-# internal prompt names stored in the shootout summary ("naive" / "improved").
+# Bilingual, two-line labels for the four prompts of the 2×2 experiment, in
+# progression order. Line 1 = prompt quality (bad → good), line 2 = examples
+# (zero-shot → few-shot). The *bad* prompt is plain but not a strawman (a
+# reasonable task + schema); the *good* prompt adds error-driven disambiguation
+# rules and genuinely scores higher — which is exactly why the shootout presents
+# the model where "good" beats "bad" (:func:`eval.llm_shootout._pick_best_model`).
 _PROMPT_LABEL: dict[str, dict[str, str]] = {
-    "fr": {"naive": "va-vite", "improved": "soigné"},
-    "en": {"naive": "quick", "improved": "polished"},
+    "fr": {
+        "bad-zs": "mauvais\nsans exemple",
+        "bad-fs": "mauvais\navec exemples",
+        "good-zs": "bon\nsans exemple",
+        "good-fs": "bon\navec exemples",
+    },
+    "en": {
+        "bad-zs": "bad\nzero-shot",
+        "bad-fs": "bad\nfew-shot",
+        "good-zs": "good\nzero-shot",
+        "good-fs": "good\nfew-shot",
+    },
 }
+
+# The four prompts in the pedagogical progression order (x-axis order).
+_PROMPT_ORDER: list[str] = ["bad-zs", "bad-fs", "good-zs", "good-fs"]
+
+# A sequential blue ramp (light → deep sysblue) signalling "getting better"
+# across the four prompts — one hue deepening, not four unrelated colours.
+_PROMPT_RAMP: list[str] = ["#CCE4FF", "#7FB5FF", "#3B92FF", "#0055CC"]
 
 # House-style base config shared by every chart (Roboto, no chart-junk).
 _BASE_CONFIG = {
@@ -189,12 +202,14 @@ def build_cv_spec(results: dict, lang: str) -> dict:
 
 
 def build_shootout_spec(results: dict, lang: str) -> dict:
-    """Build the LLM-shootout bar-chart spec in ``lang``.
+    """Build the prompt-engineering progression bar chart in ``lang``.
 
-    A bar chart (not a violin): the LLM is zero-shot, so there is no
-    cross-validation and no honest per-config distribution to show — one clear
-    bar per (model, prompt) configuration is the right picture. Sample size
-    and caveats are explained in the surrounding text.
+    Shows the 2×2 experiment (bad/good prompt × zero/few-shot) for the *single*
+    model whose accuracy climbs the most cleanly across the four prompts (the
+    ``best_model`` chosen by the shootout). One model, four bars, left→right =
+    "de mieux en mieux". A bar chart (not a violin): the LLM is zero-shot, so
+    there is no cross-validation to show — one clear number per prompt is the
+    honest picture; sample size and caveats live in the surrounding text.
 
     Parameters
     ----------
@@ -209,31 +224,40 @@ def build_shootout_spec(results: dict, lang: str) -> dict:
         A Vega-Lite v5 bar-chart specification.
     """
     summary: dict[str, dict] = results.get("summary", {})
+    best_model: str = results.get("best_model", "")
+    # Index the winning model's four prompts by their internal key.
+    by_prompt: dict[str, float] = {
+        s.get("prompt", ""): s.get("point_accuracy", 0.0)
+        for s in summary.values()
+        if s.get("model") == best_model
+    }
     rows: list[dict[str, object]] = []
     order: list[str] = []
     colours: list[str] = []
-    for _key, s in summary.items():
-        model = s.get("model", "")
-        prompt = s.get("prompt", "")
-        # Two-line x label: model (shortened, no "-mlx") on top, the prompt
-        # variant below — split on the newline by the axis ``labelExpr``.
-        model_short = model.replace("-mlx", "")
-        label = f"{model_short}\n{_PROMPT_LABEL[lang].get(prompt, prompt)}"
+    for i, prompt in enumerate(_PROMPT_ORDER):
+        if prompt not in by_prompt:
+            continue
+        label = _PROMPT_LABEL[lang].get(prompt, prompt)
         order.append(label)
-        colours.append(_MODEL_HUE.get(model, "#6E6E73"))
-        rows.append({"config": label, "accuracy": s.get("point_accuracy", 0.0)})
+        colours.append(_PROMPT_RAMP[i % len(_PROMPT_RAMP)])
+        rows.append({"config": label, "accuracy": by_prompt[prompt]})
 
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
             "text": _TEXT[lang]["shoot_title"],
+            # Name the single model shown, so the reader knows this is one
+            # model across four prompts (not four models).
+            "subtitle": best_model.replace("-mlx", ""),
+            "subtitleColor": "#6E6E73",
             "font": "Roboto",
+            "subtitleFont": "Roboto",
             "anchor": "start",
             "fontSize": 16,
         },
         "config": {**_BASE_CONFIG, "axis": {**_BASE_CONFIG["axis"]}},
         "data": {"values": rows},
-        "width": 520,
+        "width": 460,
         "height": 300,
         "layer": [
             {
@@ -247,8 +271,8 @@ def build_shootout_spec(results: dict, lang: str) -> dict:
                         "axis": {
                             "labelAngle": 0,
                             "labelFontSize": 11,
-                            # Split "model\nprompt" into two stacked lines so the
-                            # six labels never overlap.
+                            # Split the two-line prompt label (quality / examples)
+                            # into stacked lines so the four labels never overlap.
                             "labelExpr": "split(datum.value, '\\n')",
                         },
                     },

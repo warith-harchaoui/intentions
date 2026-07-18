@@ -1,0 +1,148 @@
+# =============================================================================
+# Single source of truth for every localized string in the project.
+#
+#   * The WEB GUI reads the `ui:` sections (served as JSON by /api/i18n).
+#   * The LLM ENGINE reads the `prompt:` sections (system prompt + user
+#     template) so the model is instructed in the query's own language.
+#
+# Two locales are kept in lock-step: `fr` (French — the knowledge base is
+# French-first) and `en` (English). Add a language by adding a top-level key
+# with the same shape. Values under `*_html` may contain inline HTML and are
+# injected with innerHTML by the front; all others are plain text.
+# =============================================================================
+
+fr:
+  ui:
+    header:
+      subtitle: "Aiguilleur d'intentions — 5 approches comparées"
+      llm_online: "LLM en ligne"
+      llm_offline: "LLM hors ligne (Ollama absent)"
+      server_unreachable: "Serveur injoignable"
+    controls:
+      theme_label: "Basculer le thème clair / sombre"
+      lang_label: "Passer en anglais"
+    approaches:
+      aria: "Les cinq approches, du plus simple au plus puissant"
+      card2_title: "2 · fastText appris"
+      card3_title: "3 · fastText pré-entraîné"
+      card1_html: "Sac de n-grammes + <strong>Random Forest</strong> (scikit-learn). Instantané. Colle aux mots exacts."
+      card2_html: "fastText <strong>entraîné sur nos exemples</strong> (sous-mots). Léger, un cran au-dessus du sac-de-mots."
+      card3_html: "Vecteurs <strong>cc.fr.300</strong> (Common Crawl). Sait déjà que « voiture » ≈ « véhicule »."
+      card4_html: "Embeddings contextuels (SBERT) + <strong>MLP PyTorch</strong>. Comprend le sens, gagne sur les paraphrases."
+      card5_html: "Gemma en local (Ollama), JSON strict. Zéro entraînement, extrait les infos utiles. Le plus lent."
+    form:
+      aria: "Votre demande"
+      label: "Écrivez votre demande, comme un client au téléphone ou à l'écrit"
+      placeholder: "Ex : j'ai eu un accident ce matin, ma voiture est cabossée"
+      legend: "Choisir le moteur"
+      engine_all: "Comparer tout"
+      engine_fasttext_custom: "fastText appris"
+      engine_fasttext_pretrained: "fastText pré-entraîné"
+      submit_idle: "Analyser l'intention"
+      submit_loading: "Analyse en cours…"
+    results:
+      abstention: "Abstention — intention incertaine, transfert à un conseiller."
+      error: "Erreur : impossible de contacter le serveur."
+    execution:
+      handoff_title: "→ Je ne sais pas — transfert à un conseiller humain"
+      handoff_body: "Je préfère vous passer un conseiller plutôt que de vous orienter au hasard."
+      default_service: "Accueil téléphonique"
+      action_title: "→ Action exécutée"
+      intent_label: "Intention :"
+      service_label: "Service :"
+      action_label: "Action :"
+      slots_label: "Infos :"
+    kb:
+      summary_label: "Base de connaissance"
+      summary_suffix: "intentions"
+      hint: "(cliquez un exemple pour l'essayer)"
+    footer_html: "Démo pédagogique — les intentions vivent dans des fichiers Markdown (<code class=\"font-mono\">knowledge_base/</code>), un titre <code class=\"font-mono\">#&nbsp;h1</code> = une intention."
+  prompt:
+    system: |-
+      Tu es le moteur de routage d'intentions du centre d'appels de « Déraison Assurances ». Ton rôle : lire la phrase d'un client (téléphone ou écrit) et déterminer UNE seule intention parmi le catalogue fourni, puis extraire les informations utiles pour traiter la demande.
+
+      Règles STRICTES :
+      1. Réponds UNIQUEMENT par un objet JSON valide, sans texte autour.
+      2. Le champ "intent" DOIT être un identifiant EXACT du catalogue. Si aucune intention ne correspond, renvoie "intent": "hors_perimetre".
+      3. "confidence" est ta certitude entre 0.0 et 1.0.
+      4. "slots" contient les entités détectées (numéro de contrat, immatriculation, urgence "faible"/"moyenne"/"haute", type de bien, etc.). Objet vide si rien.
+      5. "reformulation" résume la demande du client en une phrase claire.
+      6. N'invente jamais un identifiant d'intention qui n'est pas dans le catalogue.
+
+      Schéma de sortie :
+      {"intent": "<id>", "confidence": <float>, "slots": {<clé>: <valeur>}, "reformulation": "<texte>"}
+    user_template: |-
+      Catalogue des intentions :
+      {catalogue}
+
+      Phrase du client : "{text}"
+
+      Renvoie uniquement le JSON demandé.
+
+en:
+  ui:
+    header:
+      subtitle: "Intent router — 5 approaches compared"
+      llm_online: "LLM online"
+      llm_offline: "LLM offline (Ollama not found)"
+      server_unreachable: "Server unreachable"
+    controls:
+      theme_label: "Toggle light / dark theme"
+      lang_label: "Switch to French"
+    approaches:
+      aria: "The five approaches, from simplest to most powerful"
+      card2_title: "2 · fastText learned"
+      card3_title: "3 · fastText pretrained"
+      card1_html: "Bag of n-grams + <strong>Random Forest</strong> (scikit-learn). Instant. Sticks to exact words."
+      card2_html: "fastText <strong>trained on our examples</strong> (subwords). Light, a notch above bag-of-words."
+      card3_html: "<strong>cc.fr.300</strong> vectors (Common Crawl). Already knows « voiture » ≈ « véhicule »."
+      card4_html: "Contextual embeddings (SBERT) + <strong>PyTorch MLP</strong>. Understands meaning, wins on paraphrases."
+      card5_html: "Local Gemma (Ollama), strict JSON. Zero training, extracts the useful fields. The slowest."
+    form:
+      aria: "Your request"
+      label: "Write your request, like a customer on the phone or in writing"
+      placeholder: "e.g. I had an accident this morning, my car is dented"
+      legend: "Choose the engine"
+      engine_all: "Compare all"
+      engine_fasttext_custom: "fastText learned"
+      engine_fasttext_pretrained: "fastText pretrained"
+      submit_idle: "Analyse the intent"
+      submit_loading: "Analysing…"
+    results:
+      abstention: "Abstained — intent uncertain, handing off to an advisor."
+      error: "Error: could not reach the server."
+    execution:
+      handoff_title: "→ I don't know — handing off to a human advisor"
+      handoff_body: "I'd rather put you through to an advisor than route you at random."
+      default_service: "Phone reception"
+      action_title: "→ Action executed"
+      intent_label: "Intent:"
+      service_label: "Service:"
+      action_label: "Action:"
+      slots_label: "Fields:"
+    kb:
+      summary_label: "Knowledge base"
+      summary_suffix: "intents"
+      hint: "(click an example to try it)"
+    footer_html: "Teaching demo — intents live in Markdown files (<code class=\"font-mono\">knowledge_base/</code>), one <code class=\"font-mono\">#&nbsp;h1</code> heading = one intent."
+  prompt:
+    system: |-
+      You are the intent-routing engine of the « Déraison Assurances » call centre. Your job: read a customer's sentence (phone or written) and determine ONE single intent from the provided catalogue, then extract the information useful to handle the request.
+
+      STRICT rules:
+      1. Answer ONLY with a valid JSON object, no surrounding text.
+      2. The "intent" field MUST be an EXACT identifier from the catalogue. If no intent matches, return "intent": "hors_perimetre".
+      3. "confidence" is your certainty between 0.0 and 1.0.
+      4. "slots" holds the detected entities (contract number, registration plate, urgency "faible"/"moyenne"/"haute", type of property, etc.). Empty object if none.
+      5. "reformulation" summarises the customer's request in one clear sentence.
+      6. Never invent an intent identifier that is not in the catalogue.
+
+      Output schema:
+      {"intent": "<id>", "confidence": <float>, "slots": {<key>: <value>}, "reformulation": "<text>"}
+    user_template: |-
+      Intent catalogue:
+      {catalogue}
+
+      Customer sentence: "{text}"
+
+      Return only the requested JSON.

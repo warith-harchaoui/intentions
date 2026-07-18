@@ -54,7 +54,7 @@ domaine :
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>sac-de-mots<br/>49 %"] --> B["2 · fastText<br/>sous-mots appris<br/>67 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>87 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
+    A["1 · TF-IDF<br/>sac-de-mots<br/>51 %"] --> B["2 · fastText<br/>sous-mots appris<br/>66 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>74 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>86 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
@@ -64,7 +64,7 @@ flowchart LR
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
 des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
-**49 % → 67 % → 73 % → 88 %** des moteurs 1→4, et le LLM ajoute l'extraction de
+**51 % → 66 % → 74 % → 86 %** des moteurs 1→4, et le LLM ajoute l'extraction de
 slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un·e
 praticien·ne : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
 variance train/test (**validation croisée** k-fold), la mauvaise calibration
@@ -167,14 +167,18 @@ python -m intent_engine execute "il me faut une prise en charge pour l'hôpital"
 Exemple de sortie de `compare` (sur une paraphrase — voyez les moteurs lexicaux
 s'abstenir tandis que les sémantiques trouvent) :
 
-```text
-tfidf               | (abstention)                 — 28 ms
-fasttext_custom     | declarer_sinistre_auto [0.33] — 0 ms
-fasttext_pretrained | (abstention)                 — 0 ms
-bert                | declarer_sinistre_auto [0.98] — 18 ms
-llm                 | declarer_sinistre_auto [0.95] — 4725 ms
-        slots: {'type_bien': 'auto', 'urgence': 'haute'}
-```
+| Moteur | Prédiction | Confiance | CPU / appel |
+|--------|-----------|:---------:|------------:|
+| `tfidf` | *(s'abstient)* | — | ~50 ms |
+| `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
+| `fasttext_pretrained` | *(s'abstient)* | — | ~250 µs |
+| `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
+| `llm` | `declarer_sinistre_auto` | **0.95** | ~4,7 s |
+
+Le LLM extrait en plus des **slots** — `type_bien: auto`, `urgence: haute` — ce
+qu'aucun classifieur ne fait. Les deux moteurs lexicaux s'abstiennent ou passent
+tout juste la barre sur cette paraphrase ; les sémantiques sont confiants. *Voilà*
+la leçon en une requête.
 
 ---
 
@@ -187,26 +191,37 @@ Le jeu de test est volontairement **riche en paraphrases** (faible recouvrement
 lexical avec l'entraînement) : il mesure la **généralisation**, pas la
 mémorisation du vocabulaire — c'est là que la représentation prouve sa valeur.
 
-| # | Moteur | Exactitude (held-out) | Latence moyenne | Slots |
-|---|--------|----------------------:|----------------:|:-----:|
-| 1 | **TF-IDF + RandomForest** | 49 % | ~30 ms | ❌ |
-| 2 | **fastText (appris)** | 67 % | ~0 ms | ❌ |
-| 3 | **fastText (pré-entraîné cc.fr.300)** | 73 % | ~1 ms | ❌ |
-| 4 | **BERT (SBERT + MLP)** | **88 %** | ~15 ms | ❌ |
+| # | Moteur | Exactitude (held-out) | CPU / appel | Slots |
+|---|--------|----------------------:|------------:|:-----:|
+| 1 | **TF-IDF + RandomForest** | 51 % | ~50 ms | ❌ |
+| 2 | **fastText (appris)** | 66 % | ~33 µs | ❌ |
+| 3 | **fastText (pré-entraîné cc.fr.300)** | 74 % | ~250 µs | ❌ |
+| 4 | **BERT (SBERT + MLP)** | **86 %** | ~20 ms | ❌ |
 | 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
 
-**Les distributions, pas juste les points** — le rééchantillonnage bootstrap
-(2000×) du jeu de test montre que les moteurs sont *réellement* différents sur
-ce jeu difficile (TF-IDF et BERT ne se chevauchent même pas) :
+> **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
+> (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
+> de la forêt coûtent plus cher que la tête MLP de BERT à deux produits matriciels
+> (~20 ms) ou la recherche de vecteurs de fastText (~33 µs). « À l'ancienne » ne
+> veut pas dire « rapide », et « neuronal » ne veut pas dire « lent » : on mesure,
+> on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps —
+> voir `eval/bench.py` ; le chiffre du LLM est le calcul propre d'Ollama.)
 
-![Distribution d'exactitude par moteur (violin plot)](docs/img/violin-accuracy.png)
+**Les distributions, pas juste les points** — chaque violon ci-dessous est une
+**validation croisée répétée 5 blocs** : 5 blocs × 5 mélanges = **25 mesures
+réelles** par moteur (apprendre sur 4/5 des K = 21 intentions / N = 500
+exemples, tester sur le 1/5 restant). Chaque point est un vrai score de
+généralisation — aucun artifice de rééchantillonnage — et les densités se
+chevauchent à peine : les moteurs sont *réellement* différents, pas du bruit :
+
+![Distribution d'exactitude par moteur (violin plot)](docs/img/violin-accuracy-fr.png)
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
-> l'exactitude monte 49 → 67 → 73 → 88 %. Mais en **validation croisée** k-fold
-> sur les exemples in-distribution de la KB, les moteurs sont *plus proches*
-> (~72 / 69 / — / 82 %) : le lexical s'en sort quand le test ressemble à
-> l'entraînement, et s'effondre sous le changement de distribution (paraphrases)
-> — la raison d'être des représentations sémantiques.
+> l'exactitude monte 51 → 66 → 74 → 86 %. Mais en **validation croisée** sur les
+> exemples in-distribution de la KB, les moteurs sont *plus proches* : le lexical
+> s'en sort quand le test ressemble à l'entraînement, et s'effondre sous le
+> changement de distribution (paraphrases) — la raison d'être des représentations
+> sémantiques.
 >
 > Filet hors-périmètre : sur 15 phrases hors sujet, TF-IDF s'abstient ~93 % du
 > temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) —
@@ -219,6 +234,29 @@ ce jeu difficile (TF-IDF et BERT ne se chevauchent même pas) :
 > zero-shot**, pas la précision brute. Le plus gros `gemma4:e4b` monte à ~93 %
 > mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
 > on choisit selon le besoin.
+
+### L'ingénierie de prompt, ça sert vraiment ? Une expérience 2×2
+
+La leçon *représentation* ci-dessus parle du **modèle**. Celle-ci parle du
+**prompt**. On croise deux réglages indépendants — la **qualité** du prompt (un
+prompt *mauvais* : une tâche + un schéma simples mais raisonnables, pas un
+épouvantail — vs un prompt *bon* qui ajoute des règles de désambiguïsation issues
+de l'analyse d'erreurs) et les **exemples** (zéro-shot vs trois exemples few-shot,
+sur des phrases **fraîches** hors jeu de test, donc sans tricher) — soit quatre
+prompts sur un seul axe. On lance le 2×2 complet sur plusieurs modèles locaux et
+on ne montre **que** celui où le prompt *bon* gagne vraiment, avec la montée la
+plus nette :
+
+![Ingénierie de prompt : de mieux en mieux](docs/img/shootout-fr.png)
+
+> **Soigner le prompt paie surtout quand le modèle est faible.** Sur le petit
+> `qwen2.5:3b`, les quatre prompts grimpent **60 → 60 → 67 → 77 %** — +17 points
+> par les mots et les exemples seuls. Sur `gemma3:4b`, déjà à ~90 %, le même
+> effort ne bouge presque rien (il est proche de son plafond). La morale qu'un·e
+> praticien·ne reconnaît : *avant de sortir un modèle plus gros, corrige le
+> prompt — mais n'attends pas de miracle quand le modèle est déjà fort.*
+> (Échantillon tenu à l'écart de 30 ; prédictions mises en cache par config dans
+> `eval/.llm_shootout/`.)
 
 ---
 
@@ -292,12 +330,4 @@ le plus. Ici, elle reste sur la machine.
 
 Détails et discussion RGPD dans [`PROS_CONS.md`](PROS_CONS.md#le-point-qui-décide-en-assurance--rgpd--données-de-santé).
 
----
 
-## Remerciements
-
-Remerciements chaleureux aux contributrices, contributeurs, relectrices,
-relecteurs et utilisateurs qui ont aidé à améliorer ce projet.
-
-Des outils d'IA ont pu être utilisés pendant le développement, mais la
-paternité et la responsabilité restent aux mainteneurs humains.

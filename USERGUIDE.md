@@ -6,8 +6,9 @@ A hands-on walkthrough of the demo: the web app, the CLI, and how to read the
 results. For install and architecture, see
 [`README.md`](README.md); for the approach comparison, [`PROS_CONS.md`](PROS_CONS.md).
 
-> The UI is in French (it is a French insurance assistant). This guide explains
-> every screen in English.
+> The UI is **bilingual EN/FR** — flip it with the 🇬🇧/🇫🇷 flag, top-right, next
+> to the ☀️/🌙 light-dark toggle. This guide shows the English screens. (The
+> *knowledge base itself* stays in French — it is a French insurer's content.)
 
 ---
 
@@ -19,41 +20,46 @@ results. For install and architecture, see
 
 Open <http://localhost:8000>. You land on the home screen:
 
-![Home screen](docs/img/01-accueil.png)
+![Home screen](docs/img/01-accueil-en.png)
 
 Top to bottom:
-- **Header** — the brand, and a badge that honestly reports the LLM engine
-  state: green *"LLM en ligne · gemma3:4b"* when Ollama answers, grey
-  *"LLM hors ligne"* otherwise (the LLM button is then disabled).
+- **Header** — the brand; a badge that honestly reports the LLM engine state
+  (green *"LLM online · gemma3:4b"* when Ollama answers, grey *"LLM offline"*
+  otherwise, the LLM button then disabled); and the two top-right controls —
+  the **theme toggle** (☀️/🌙) and the **language flag** (🇬🇧/🇫🇷). Both choices
+  are remembered across visits.
 - **Five cards** — a one-line reminder of each approach (TF-IDF, fastText×2, BERT, LLM).
-- **Input area** — a text box, an engine selector, and the **Analyser
-  l'intention** button.
+- **Input area** — a text box, an engine selector, and the **Analyse the
+  intent** button.
 
 ---
 
 ## 2. Ask something
 
 Type a customer sentence — as if heard on the phone — e.g.
-*"j'ai eu un accident ce matin, ma voiture est cabossée"*.
+*"I had an accident this morning, my car is dented"* (or in French). The query's
+language is **auto-detected** (langdetect), so the LLM is prompted in the same
+language you wrote in.
 
 Pick a mode with the segmented control:
-- **Comparer tout** (default) — run all engines side by side.
+- **Compare all** (default) — run all engines side by side.
 - **TF-IDF** / **BERT** / **LLM** — run a single engine.
 
-Press **Analyser l'intention**.
+Press **Analyse the intent**.
 
 ### Reading the comparator
 
-![Five-engine comparator](docs/img/02-comparateur-5-moteurs.png)
+![Five-engine comparator](docs/img/02-comparateur-5-moteurs-en.png)
 
 Each engine gets a card showing:
 - its **coloured chip** (blue, teal, indigo, green, orange) and its
-  **latency** (top-right) — note TF-IDF in ~1 ms vs the LLM in ~5 s (gemma3:4b);
+  **latency** (top-right) — note the fast engines in microseconds-to-milliseconds
+  vs the LLM in ~5 s (gemma3:4b);
 - **confidence bars** for the top intents (the id + a percentage);
 - the **scripted answer** for the winning intent, in serif;
 - for the LLM, the **extracted slots** (e.g. `urgence: haute`) as small badges.
 
-Below the cards, the **Action exécutée** box shows the concrete routing a
+Below the cards, the **Action executed** box shows the concrete routing a
 downstream system (CRM, phone system) would receive: intent, department,
 machine action, and slots.
 
@@ -64,30 +70,31 @@ machine action, and slots.
 If no engine is confident enough, the assistant **does not guess**. It says so
 plainly and escalates to a **human agent** (not the AI). You will see:
 
-> → Je ne sais pas — transfert à un conseiller humain
+> → I don't know — handing off to a human advisor
 
 This is intentional: in insurance, a confident wrong answer is worse than an
-honest handoff. Customers can also trigger it directly by saying *"je ne sais
-pas"*, *"je suis perdu"*, or *"aucune de vos options ne me convient"* — these
-map to the dedicated `escalade_humain` intent.
+honest handoff. Customers can also trigger it directly by saying *"I don't
+know"*, *"I'm lost"*, or *"none of your options fit"* — these map to the
+dedicated `escalade_humain` intent.
 
 ---
 
-## 4. Dark mode
+## 4. Light & dark theme
 
-The UI follows your system appearance automatically (light or dark):
+Toggle the theme yourself with the ☀️/🌙 button (top-right); the choice is
+remembered. First visit follows your system appearance:
 
-![Dark mode](docs/img/03-mode-sombre.png)
+![Dark mode](docs/img/03-mode-sombre-en.png)
 
 ---
 
 ## 5. Browse the knowledge base
 
-At the bottom, expand **Base de connaissance** to see every intent, its target
+At the bottom, expand **Knowledge base** to see every intent, its target
 department, and example phrases. **Click any example** to drop it into the input
 box and try it instantly.
 
-![Knowledge base browser](docs/img/04-base-connaissance.png)
+![Knowledge base browser](docs/img/04-base-connaissance-en.png)
 
 Remember: this list is generated from the Markdown files in `knowledge_base/`.
 Add a `# h1` heading there and it appears here — no code change.

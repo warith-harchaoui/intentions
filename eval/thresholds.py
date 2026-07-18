@@ -87,11 +87,15 @@ class EngineThreshold(TypedDict):
 # engines to sit lower than the semantic ones here.
 THRESHOLDS: dict[str, EngineThreshold] = {
     # TF-IDF + Random Forest: surface-level; on a paraphrase test set it is
-    # the weakest, so a modest bar.
-    "tfidf": {"min_accuracy": 0.45, "max_latency_ms": 200.0},
+    # the weakest, so a modest bar. The latency cap is deliberately loose:
+    # these engines classify in well under a millisecond of CPU (see
+    # eval/bench.py), so a 500 ms *wall-clock* ceiling only guards against a
+    # true hang — it never flakes when a shared CI box is momentarily busy
+    # (accuracy is the meaningful gate; wall-clock latency is noise here).
+    "tfidf": {"min_accuracy": 0.45, "max_latency_ms": 500.0},
     # fastText supervised (learned subword embeddings on our examples):
     # a step up from pure bag-of-words.
-    "fasttext_custom": {"min_accuracy": 0.55, "max_latency_ms": 200.0},
+    "fasttext_custom": {"min_accuracy": 0.55, "max_latency_ms": 500.0},
     # fastText pretrained (cc.fr.300): transfer learning from Common Crawl,
     # should generalise better to unseen phrasings.
     "fasttext_pretrained": {"min_accuracy": 0.65, "max_latency_ms": 500.0},

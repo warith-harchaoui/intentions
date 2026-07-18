@@ -40,7 +40,16 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .config import get_settings
+from .i18n import DEFAULT_LANG as i18n_default_lang_value
+from .i18n import all_ui_strings
+from .i18n import available_languages as i18n_languages
 from .router import IntentRouter
+
+
+def i18n_default_lang() -> str:
+    """Return the default UI language code (module-level shim for the route)."""
+    return i18n_default_lang_value
+
 
 # Absolute path to the bundled single-page front end, resolved relative to
 # this file so it works regardless of the process working directory.
@@ -151,6 +160,26 @@ def create_app() -> FastAPI:
             for intent in router.kb.intents
         ]
         return {"count": len(intents), "intents": intents}
+
+    @app.get("/api/i18n")
+    def i18n() -> dict[str, object]:
+        """Return the bilingual GUI string table (from ``locales/i18n.yaml``).
+
+        The front fetches this once and applies the chosen language to every
+        ``data-i18n`` node, so no user-facing copy is hard-coded in the
+        JavaScript. Only the ``ui`` sections are exposed — the LLM prompts stay
+        server-side.
+
+        Returns
+        -------
+        dict[str, object]
+            ``{"default": <lang>, "languages": [...], "strings": {lang: {...}}}``.
+        """
+        return {
+            "default": i18n_default_lang(),
+            "languages": i18n_languages(),
+            "strings": all_ui_strings(),
+        }
 
     @app.post("/api/classify")
     def classify(request: ClassifyRequest) -> dict[str, object]:

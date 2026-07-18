@@ -47,6 +47,8 @@ from typing import Any
 
 from .base import IntentEngine, IntentPrediction, IntentResult
 from .config import get_settings
+from .i18n import system_prompt as i18n_system_prompt
+from .i18n import user_template as i18n_user_template
 from .kb import KnowledgeBase
 from .lang import detect_language
 from .ollama_client import OllamaClient, OllamaError
@@ -58,67 +60,12 @@ logger = logging.getLogger(__name__)
 # task, the exact JSON schema, and the anti-hallucination rules. Everything
 # that makes the "brute force" approach reliable lives in this string, which
 # is why it is heavily commented at the point of use below.
-_SYSTEM_PROMPT = """\
-Tu es le moteur de routage d'intentions du centre d'appels de « Déraison \
-Assurances ». Ton rôle : lire la phrase d'un client (téléphone ou écrit) et \
-déterminer UNE seule intention parmi le catalogue fourni, puis extraire les \
-informations utiles pour traiter la demande.
-
-Règles STRICTES :
-1. Réponds UNIQUEMENT par un objet JSON valide, sans texte autour.
-2. Le champ "intent" DOIT être un identifiant EXACT du catalogue. Si aucune \
-intention ne correspond, renvoie "intent": "hors_perimetre".
-3. "confidence" est ta certitude entre 0.0 et 1.0.
-4. "slots" contient les entités détectées (numéro de contrat, immatriculation, \
-urgence "faible"/"moyenne"/"haute", type de bien, etc.). Objet vide si rien.
-5. "reformulation" résume la demande du client en une phrase claire.
-6. N'invente jamais un identifiant d'intention qui n'est pas dans le catalogue.
-
-Schéma de sortie :
-{"intent": "<id>", "confidence": <float>, "slots": {<clé>: <valeur>}, \
-"reformulation": "<texte>"}\
-"""
-
-# English mirror of the default system prompt. When a customer writes in
-# English (detected with langdetect), the LLM engine swaps to this prompt so
-# the instructions match the query language — the intent ids stay identical
-# (they are language-neutral snake_case), only the wording changes.
-_SYSTEM_PROMPT_EN = """\
-You are the intent-routing engine of the « Déraison Assurances » call centre. \
-Your job: read a customer's sentence (phone or written) and determine ONE \
-single intent from the provided catalogue, then extract the information useful \
-to handle the request.
-
-STRICT rules:
-1. Answer ONLY with a valid JSON object, no surrounding text.
-2. The "intent" field MUST be an EXACT identifier from the catalogue. If no \
-intent matches, return "intent": "hors_perimetre".
-3. "confidence" is your certainty between 0.0 and 1.0.
-4. "slots" holds the detected entities (contract number, registration plate, \
-urgency "faible"/"moyenne"/"haute", type of property, etc.). Empty object if \
-none.
-5. "reformulation" summarises the customer's request in one clear sentence.
-6. Never invent an intent identifier that is not in the catalogue.
-
-Output schema:
-{"intent": "<id>", "confidence": <float>, "slots": {<key>: <value>}, \
-"reformulation": "<text>"}\
-"""
-
-# Default system prompts and user-message templates, keyed by query language.
-_SYSTEM_PROMPTS: dict[str, str] = {"fr": _SYSTEM_PROMPT, "en": _SYSTEM_PROMPT_EN}
-_USER_TEMPLATES: dict[str, str] = {
-    "fr": (
-        "Catalogue des intentions :\n{catalogue}\n\n"
-        'Phrase du client : "{text}"\n\n'
-        "Renvoie uniquement le JSON demandé."
-    ),
-    "en": (
-        "Intent catalogue:\n{catalogue}\n\n"
-        'Customer sentence: "{text}"\n\n'
-        "Return only the requested JSON."
-    ),
-}
+# The default system prompt (French) and its English mirror now live in the
+# single localized source of truth, ``locales/i18n.yaml``, alongside the GUI
+# copy. They are fetched per query via :func:`i18n_system_prompt` /
+# :func:`i18n_user_template` so a translator edits one file, and the model is
+# instructed in the query's own language. The intent ids stay identical across
+# languages (they are language-neutral snake_case) — only the wording changes.
 
 # --- Prompt-engineering experiment (2×2) ---------------------------------
 # Four prompts built from two INDEPENDENT switches, so the shootout can
@@ -164,7 +111,7 @@ _EXP_RULES = (
 # test set — that would be leakage), each showing the exact JSON to produce.
 _EXP_FEWSHOT = (
     "Exemples :\n"
-    'Phrase : "un camion m\'a accroché en reculant, l\'aile est enfoncée" → '
+    "Phrase : \"un camion m'a accroché en reculant, l'aile est enfoncée\" → "
     '{"intent":"declarer_sinistre_auto","confidence":0.95,'
     '"slots":{"type_bien":"auto"},"reformulation":"Accident matériel auto."}\n'
     'Phrase : "je viens de prendre un scooter, il me faut une assurance" → '
@@ -393,10 +340,8 @@ class LlmIntentEngine(IntentEngine):
         # system prompt and user-message template. An explicit override (the
         # prompt-engineering eval) short-circuits the system-prompt choice.
         lang = detect_language(text)
-        system = self._system_prompt_override or _SYSTEM_PROMPTS.get(
-            lang, _SYSTEM_PROMPT
-        )
-        template = _USER_TEMPLATES.get(lang, _USER_TEMPLATES["fr"])
+        system = self._system_prompt_override or i18n_system_prompt(lang)
+        template = i18n_user_template(lang)
 
         # Assemble the two-message chat: the system prompt, then a user message
         # carrying the catalogue and the sentence to classify.
@@ -404,9 +349,7 @@ class LlmIntentEngine(IntentEngine):
             {"role": "system", "content": system},
             {
                 "role": "user",
-                "content": template.format(
-                    catalogue=self._catalogue_block, text=text
-                ),
+                "content": template.format(catalogue=self._catalogue_block, text=text),
             },
         ]
 

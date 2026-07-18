@@ -64,6 +64,8 @@ const ENGINE_ORDER = [
 const state = {
   engines: [],
   busy: false,
+  // Langue courante de l'interface (posée par loadI18n au démarrage).
+  lang: 'fr',
 };
 
 /**
@@ -75,6 +77,130 @@ const state = {
 const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ---------------------------------------------------------------------------
+// i18n : le tableau des chaînes vient de /api/i18n (source de vérité =
+// locales/i18n.yaml, parsé côté serveur). AUCUNE chaîne visible n'est codée en
+// dur ici ; on applique la langue courante à tout nœud data-i18n*. Le choix est
+// mémorisé dans localStorage et reflété sur <html lang>.
+// ---------------------------------------------------------------------------
+const I18N = { default: 'fr', languages: ['fr'], strings: {} };
+
+/**
+ * Lit une valeur par chemin pointé ("form.submit_idle") dans un objet.
+ * @param {object} obj Dictionnaire source.
+ * @param {string} path Chemin pointé.
+ * @returns {*} La valeur, ou undefined si absente.
+ */
+const getPath = (obj, path) =>
+  path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+
+/**
+ * Traduit une clé dans la langue courante ; repli sur la langue par défaut
+ * puis, en dernier ressort, sur la clé elle-même.
+ * @param {string} path Clé pointée.
+ * @returns {string} Chaîne traduite.
+ */
+function t(path) {
+  const cur = getPath(I18N.strings[state.lang], path);
+  if (cur != null) return cur;
+  const def = getPath(I18N.strings[I18N.default], path);
+  return def != null ? def : path;
+}
+
+/**
+ * Applique la langue courante à tous les nœuds data-i18n* du document
+ * (texte, HTML inline, placeholder, aria-label) + le bouton langue.
+ * @returns {void}
+ */
+function applyI18n() {
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  // Valeurs *_html : balises inline volontaires (<strong>, <code>…).
+  document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    el.setAttribute('placeholder', t(el.dataset.i18nPlaceholder));
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+    el.setAttribute('aria-label', t(el.dataset.i18nAria));
+  });
+  updateLangToggle();
+}
+
+/**
+ * Met à jour le drapeau du bouton langue : on montre la langue CIBLE (celle
+ * vers laquelle un clic basculera).
+ * @returns {void}
+ */
+function updateLangToggle() {
+  const flag = $('lang-flag');
+  if (flag) flag.textContent = state.lang === 'fr' ? '🇬🇧' : '🇫🇷';
+}
+
+/**
+ * Bascule vers la langue suivante disponible et ré-applique les traductions.
+ * @returns {void}
+ */
+function toggleLang() {
+  const langs = I18N.languages.length ? I18N.languages : ['fr', 'en'];
+  const idx = langs.indexOf(state.lang);
+  state.lang = langs[(idx + 1) % langs.length];
+  localStorage.setItem('lang', state.lang);
+  applyI18n();
+  // Le badge d'état LLM est rendu dynamiquement : on le régénère traduit.
+  loadHealth();
+}
+
+/**
+ * Charge le tableau i18n depuis l'API et applique la langue initiale (choix
+ * mémorisé s'il est supporté, sinon la langue par défaut du serveur).
+ * @returns {Promise<void>}
+ */
+async function loadI18n() {
+  try {
+    const res = await fetch('/api/i18n');
+    const data = await res.json();
+    I18N.default = data.default || 'fr';
+    I18N.languages = data.languages || ['fr'];
+    I18N.strings = data.strings || {};
+  } catch (err) {
+    // Échec réseau : on garde le HTML servi tel quel (déjà en français).
+  }
+  const saved = localStorage.getItem('lang');
+  state.lang = saved && I18N.languages.includes(saved) ? saved : I18N.default;
+  applyI18n();
+}
+
+/**
+ * Indique si le mode sombre est actif (classe ``dark`` sur <html>).
+ * @returns {boolean}
+ */
+const isDark = () => document.documentElement.classList.contains('dark');
+
+/**
+ * Applique le thème clair/sombre : classe sur <html>, persistance, icône.
+ * @param {boolean} dark Vrai pour le mode sombre.
+ * @returns {void}
+ */
+function setTheme(dark) {
+  document.documentElement.classList.toggle('dark', dark);
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  updateThemeIcon();
+}
+
+/**
+ * Aligne l'icône du bouton thème sur l'état courant : en sombre on propose le
+ * soleil (revenir au clair), en clair la lune.
+ * @returns {void}
+ */
+function updateThemeIcon() {
+  const icon = $('theme-icon');
+  if (icon) icon.textContent = isDark() ? '☀️' : '🌙';
+}
 
 /**
  * Récupère l'état du serveur et met à jour le badge LLM + la dispo du
@@ -96,18 +222,18 @@ async function loadHealth() {
     const llmUp = state.engines.includes('llm');
     if (llmUp) {
       // Vert : on affiche le tag du modèle local qui sert le moteur LLM.
-      badge.textContent = `LLM en ligne · ${data.llm_model}`;
+      badge.textContent = `${t('header.llm_online')} · ${data.llm_model}`;
       badge.className =
         'rounded px-2.5 py-1 text-[12px] font-medium bg-sysgreen/15 text-chipgreen';
     } else {
-      badge.textContent = 'LLM hors ligne (Ollama absent)';
+      badge.textContent = t('header.llm_offline');
       badge.className =
         'rounded px-2.5 py-1 text-[12px] font-medium bg-surface-tertiary ' +
         'text-label-tertiary dark:bg-surface-tertiary-dark';
     }
   } catch (err) {
     // API injoignable : on le dit clairement plutôt que de laisser "…".
-    badge.textContent = 'Serveur injoignable';
+    badge.textContent = t('header.server_unreachable');
     badge.className =
       'rounded px-2.5 py-1 text-[12px] font-medium bg-sysorange/15 text-sysorange';
   }
@@ -219,7 +345,7 @@ function renderEngineCard(engine, result) {
                        dark:text-label-tertiary-dark">${latency}</span>
         </div>
         <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
-          Abstention — intention incertaine, transfert à un conseiller.
+          ${escapeHtml(t('results.abstention'))}
         </p>
       </article>`;
   }
@@ -301,7 +427,7 @@ async function onSubmit(event) {
   // État occupé : on désactive le bouton et on affiche des squelettes.
   state.busy = true;
   $('submit-btn').disabled = true;
-  $('submit-btn').textContent = 'Analyse en cours…';
+  $('submit-btn').textContent = t('form.submit_loading');
   execution.classList.add('hidden');
   // Squelettes de chargement (règle front-ui : feedback > 300 ms).
   results.innerHTML = skeletonCards(engine);
@@ -344,13 +470,14 @@ async function onSubmit(event) {
     await renderExecution(text, execEngine);
   } catch (err) {
     // Erreur réseau : message clair dans la zone de résultats.
-    results.innerHTML =
-      '<p class="text-sysorange">Erreur : impossible de contacter le serveur.</p>';
+    results.innerHTML = `<p class="text-sysorange">${escapeHtml(
+      t('results.error'),
+    )}</p>`;
   } finally {
     // Retour à l'état interactif quoi qu'il arrive.
     state.busy = false;
     $('submit-btn').disabled = false;
-    $('submit-btn').textContent = "Analyser l'intention";
+    $('submit-btn').textContent = t('form.submit_idle');
   }
 }
 
@@ -396,16 +523,18 @@ async function renderExecution(text, engine) {
   // On affiche le message d'aveu d'incertitude renvoyé par le serveur, plus
   // le service d'escalade, pour que le repli soit explicite et rassurant.
   if (exec.handoff) {
-    const msg =
-      exec.message ||
-      "Je préfère vous passer un conseiller plutôt que de vous orienter au hasard.";
+    const msg = exec.message || t('execution.handoff_body');
     box.innerHTML = `
-      <p class="mb-1 text-[15px] font-semibold">→ Je ne sais pas — transfert à un conseiller humain</p>
+      <p class="mb-1 text-[15px] font-semibold">${escapeHtml(
+        t('execution.handoff_title'),
+      )}</p>
       <p class="mb-2 font-serif text-[14px] leading-relaxed
                 text-label-secondary dark:text-label-secondary-dark">
         ${escapeHtml(msg)}</p>
       <p class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
-        Service : ${escapeHtml(exec.service || "Accueil téléphonique")}</p>`;
+        ${escapeHtml(t('execution.service_label'))} ${escapeHtml(
+          exec.service || t('execution.default_service'),
+        )}</p>`;
     return;
   }
 
@@ -414,15 +543,25 @@ async function renderExecution(text, engine) {
     .map(([k, v]) => `${escapeHtml(k)}=${escapeHtml(v)}`)
     .join(', ');
   box.innerHTML = `
-    <p class="mb-1 text-[15px] font-semibold">→ Action exécutée</p>
+    <p class="mb-1 text-[15px] font-semibold">${escapeHtml(
+      t('execution.action_title'),
+    )}</p>
     <dl class="grid gap-1 text-[14px] sm:grid-cols-2">
-      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">Intention :</dt>
+      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
+        t('execution.intent_label'),
+      )}</dt>
         <dd class="inline font-medium">${escapeHtml(exec.title)}</dd></div>
-      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">Service :</dt>
+      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
+        t('execution.service_label'),
+      )}</dt>
         <dd class="inline">${escapeHtml(exec.service)}</dd></div>
-      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">Action :</dt>
+      <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
+        t('execution.action_label'),
+      )}</dt>
         <dd class="inline font-mono">${escapeHtml(exec.action)}</dd></div>
-      ${slots ? `<div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">Infos :</dt>
+      ${slots ? `<div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
+        t('execution.slots_label'),
+      )}</dt>
         <dd class="inline font-mono">${slots}</dd></div>` : ''}
     </dl>`;
 }
@@ -431,10 +570,17 @@ async function renderExecution(text, engine) {
  * Point d'entrée : câble les événements et charge l'état initial.
  * @returns {void}
  */
-function init() {
+async function init() {
   // Formulaire principal (texte uniquement).
   $('ask-form').addEventListener('submit', onSubmit);
-  // Chargements réseau en parallèle : état serveur + base de connaissance.
+  // Contrôles haut-droite : thème clair/sombre + bascule de langue.
+  $('theme-toggle').addEventListener('click', () => setTheme(!isDark()));
+  $('lang-toggle').addEventListener('click', toggleLang);
+  // L'icône du thème suit l'état posé par le script inline (avant rendu).
+  updateThemeIcon();
+  // i18n d'abord (await) pour que le badge d'état soit rendu dans la bonne
+  // langue, puis les chargements réseau.
+  await loadI18n();
   loadHealth();
   loadKnowledgeBase();
 }

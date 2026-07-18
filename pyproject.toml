@@ -29,6 +29,8 @@ dependencies = [
     "fasttext-wheel>=0.9.2",
     # Detect a query's language (EN/FR) so the LLM prompt matches it.
     "langdetect>=1.0.9",
+    # Parse locales/i18n.yaml (single source of truth for GUI copy + prompts).
+    "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]
