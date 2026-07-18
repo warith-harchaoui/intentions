@@ -1,0 +1,43 @@
+# Continuous integration for the intent engine (coding standard rules 13 & 15).
+#
+# Two gates, both blocking on the main branch:
+#   * lint  — Ruff enforces PEP 8 + docstrings + import order (rule 15).
+#   * test  — the fast pytest lane (rule 13); ``slow`` tests that need Ollama
+#             or a downloaded SBERT model are skipped in CI (no model server
+#             on the runner). The eval harness runs the always-available
+#             TF-IDF gate so a metric regression is caught.
+name: ci
+
+# Run on every push and pull request, as the standard requires.
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    # Style review is automatic; humans review logic, tools review style.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Ruff is the single PEP 8 + pydocstyle + isort gate.
+      - run: pip install ruff
+      - run: ruff check intent_engine/ tests/ eval/
+      - run: ruff format --check intent_engine/ tests/ eval/
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Runtime deps only; the heavy SBERT/eval extras are not needed for the
+      # fast lane (BERT/LLM tests are ``slow`` and skipped here).
+      - run: pip install -r requirements.txt pytest
+      # Fast, deterministic, network-free tests.
+      - run: pytest -m "not slow"
+      # Always-available metric gate: TF-IDF accuracy/latency thresholds.
+      - run: pytest -m "not slow" eval/

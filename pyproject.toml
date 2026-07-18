@@ -1,0 +1,74 @@
+# pyproject.toml — packaging + tooling for the intent engine demo.
+# Source of truth for dependencies (requirements.txt mirrors [dependencies]).
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deraison-intent-engine"
+version = "0.1.0"
+description = "Teaching intent engine, three ways (TF-IDF, BERT, LLM) for an insurance chatbot."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+# Runtime deps — mirrored in requirements.txt. sentence-transformers is an
+# optional extra (see [project.optional-dependencies]) because it drags in
+# PyTorch; the BERT engine falls back to Ollama embeddings without it.
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "python-multipart>=0.0.20",
+    "scikit-learn>=1.5.0",
+    "numpy>=1.26.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+# The "proper" SBERT path for the BERT engine (Approach 2). Optional so the
+# demo runs on a machine without PyTorch.
+sbert = ["sentence-transformers>=3.0.0"]
+# Evaluation stack (coding standard rule 14): DeepEval for the LLM engine,
+# Giskard for the ML classifiers.
+eval = ["deepeval>=1.0.0", "giskard>=2.14.0"]
+# Test + lint tooling.
+dev = ["pytest>=8.0.0", "ruff>=0.6.0"]
+
+[project.scripts]
+# ``intent-engine compare "..."`` after ``pip install -e .``.
+intent-engine = "intent_engine.cli:main"
+
+[tool.setuptools]
+# Explicit package list keeps setuptools from scanning the KB/web folders.
+packages = ["intent_engine"]
+
+# --- Ruff: PEP 8 enforcement (coding standard rule 15) -------------------
+[tool.ruff]
+# 88 is Black's default; pinned here so every contributor and CI agree
+# (the standard allows diverging from PEP 8's 79 as long as it is written
+# down in one place — this is that place).
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+# pycodestyle (E/W), pyflakes (F), isort (I), pydocstyle (D).
+select = ["E", "W", "F", "I", "D"]
+# D203/D213 conflict with D211/D212; pick the ones matching NumPy style.
+# D107 is relaxed because __init__ docstrings are covered by the class.
+ignore = ["D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests may skip module/function docstrings on tiny helpers.
+"tests/*" = ["D100", "D103"]
+
+[tool.pytest.ini_options]
+# ``slow`` marks integration tests that hit Ollama or download SBERT; the
+# fast suite (default) skips them via ``-m "not slow"`` in CI.
+markers = [
+    "slow: integration tests needing Ollama or a downloaded SBERT model",
+]

@@ -1,0 +1,34 @@
+# --- Real config (keep the .example tracked) -----------------------------
+# The committed template is .env.example; the real .env is machine-specific
+# and may hold local paths/keys, so it stays out of version control.
+.env
+*config.json
+!*config.json.example
+
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env/
+
+# --- Tooling caches ------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.deepeval/
+.coverage
+htmlcov/
+
+# --- ML / model artefacts ------------------------------------------------
+# Cached SBERT weights and any pickled classifiers we might dump locally.
+*.joblib
+*.pkl
+models/
+
+# --- OS noise ------------------------------------------------------------
+.DS_Store

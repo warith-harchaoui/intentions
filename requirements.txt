@@ -1,0 +1,23 @@
+# Runtime dependencies for the Déraison Assurances intent engine.
+# pip-installable mirror of [project.dependencies] in pyproject.toml.
+# pyproject.toml is the source of truth; keep both in sync.
+
+# --- Core web + config ---------------------------------------------------
+fastapi>=0.115.0            # HTTP API serving the three engines
+uvicorn[standard]>=0.32.0   # ASGI server for the API
+pydantic>=2.10.0            # request/response models
+pydantic-settings>=2.6.0    # environment-backed Settings
+python-multipart>=0.0.20    # form parsing (future file uploads)
+
+# --- Classic ML (Approach 1 TF-IDF, Approach 2 classifier) ---------------
+scikit-learn>=1.5.0         # TfidfVectorizer + LogisticRegression
+numpy>=1.26.0               # array math shared by both classifiers
+
+# --- LLM + embeddings backends (Approach 3, and BERT via Ollama) ---------
+httpx>=0.27.0               # synchronous Ollama REST client
+
+# --- Optional heavy backend (Approach 2, the "proper" SBERT path) --------
+# sentence-transformers pulls PyTorch (~2 GB). The BERT engine falls back to
+# the Ollama embedding model when this is absent, so it is intentionally
+# NOT required here. Install it explicitly to use the SBERT path:
+#     pip install "sentence-transformers>=3.0.0"

@@ -1,0 +1,277 @@
+<!doctype html>
+<!--
+  Déraison Assurances — comparateur d'intent engines (3 approches).
+  Front vanilla JS + Tailwind, sans build (Tailwind vendorisé pour le mode
+  hors-ligne). Style maison : sysblue, surfaces Apple HIG, three-Roboto,
+  rayon 10px, mode sombre. Toute la logique vit dans app.js.
+-->
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Couleur de barre système alignée sur le fond clair/sombre. -->
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
+  <title>Déraison Assurances — Aiguilleur d'intentions</title>
+
+  <!-- Polices self-hostées (règle three-Roboto : Roboto / Roboto Serif / Roboto Mono). -->
+  <link rel="stylesheet" href="/vendor/fonts/roboto/fonts.css">
+  <link rel="stylesheet" href="/vendor/fonts/roboto-serif/fonts.css">
+  <link rel="stylesheet" href="/vendor/fonts/roboto-mono/fonts.css">
+
+  <!-- Assets vendorisés : pas de CDN tiers, le démo tourne hors-ligne. -->
+  <script src="/vendor/tailwindcss.js"></script>
+  <script src="/vendor/marked.min.js"></script>
+  <script>
+    // Config Tailwind maison. ``darkMode: 'media'`` suit le réglage système.
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          // Trois familles Roboto ; repli système si le woff2 échoue.
+          fontFamily: {
+            sans: ['Roboto', 'system-ui', 'sans-serif'],
+            serif: ['"Roboto Serif"', 'ui-serif', 'Georgia', 'serif'],
+            mono: ['"Roboto Mono"', 'ui-monospace', 'Menlo', 'monospace'],
+          },
+          // Palette : bleu système + surfaces/labels Apple HIG (clair + sombre).
+          colors: {
+            sysblue: '#007AFF',
+            sysblueHover: '#0062CC',
+            'surface-primary': '#F8F8F8',
+            'surface-primary-dark': '#1C1C1E',
+            'surface-secondary': '#FFFFFF',
+            'surface-secondary-dark': '#2C2C2E',
+            'surface-tertiary': '#EAEAEA',
+            'surface-tertiary-dark': '#3A3A3C',
+            'label-primary': '#1C1C1E',
+            'label-primary-dark': '#F2F2F7',
+            'label-secondary': '#3C3C43',
+            'label-secondary-dark': '#EBEBF5',
+            'label-tertiary': '#6E6E73',
+            'label-tertiary-dark': '#8E8E93',
+            sysgreen: '#34C759',
+            sysorange: '#FF9500',
+            canvas: '#FBFBFD',
+          },
+          // Directive maison : tout rayon vaut 10px (y compris rounded-full).
+          borderRadius: {
+            DEFAULT: '10px', sm: '10px', md: '10px', lg: '10px',
+            xl: '10px', '2xl': '10px', '3xl': '10px', full: '10px',
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<!-- Fond canvas clair / gris très sombre en dark ; texte label primaire. -->
+<body class="min-h-full bg-canvas font-sans text-label-primary
+             dark:bg-surface-primary-dark dark:text-label-primary-dark">
+
+  <!-- ============================ EN-TÊTE ============================ -->
+  <header class="sticky top-0 z-10 border-b border-surface-tertiary
+                 bg-canvas/80 backdrop-blur dark:border-surface-tertiary-dark
+                 dark:bg-surface-primary-dark/80">
+    <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+      <!-- Pastille logo décorative (marque fictive). -->
+      <span aria-hidden="true"
+            class="flex h-9 w-9 items-center justify-center rounded bg-sysblue
+                   text-lg font-bold text-white">D</span>
+      <div class="mr-auto">
+        <h1 class="text-[17px] font-semibold leading-tight">
+          Déraison Assurances
+        </h1>
+        <p class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
+          Aiguilleur d'intentions — 3 approches comparées
+        </p>
+      </div>
+      <!-- Badge d'état du moteur LLM (peuplé par app.js après /api/health). -->
+      <span id="llm-status"
+            class="rounded px-2.5 py-1 text-[12px] font-medium
+                   bg-surface-tertiary text-label-secondary
+                   dark:bg-surface-tertiary-dark dark:text-label-secondary-dark">
+        …
+      </span>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-6">
+
+    <!-- ===================== BANDEAU PÉDAGOGIQUE ===================== -->
+    <!-- Résume les 3 approches pour un public qui découvre le sujet. -->
+    <section aria-label="Les trois approches" class="mb-6 grid gap-3 sm:grid-cols-3">
+      <article class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <div class="mb-1 flex items-center gap-2">
+          <span class="rounded bg-sysblue/10 px-2 py-0.5 text-[12px] font-semibold
+                       text-sysblue">1 · TF-IDF</span>
+        </div>
+        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
+          Sac de n-grammes pondérés + régression logistique (scikit-learn).
+          Instantané, minuscule, hors-ligne. Colle aux mots exacts.
+        </p>
+      </article>
+      <article class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <div class="mb-1 flex items-center gap-2">
+          <span class="rounded bg-sysgreen/10 px-2 py-0.5 text-[12px] font-semibold
+                       text-sysgreen">2 · BERT</span>
+        </div>
+        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
+          Embeddings de phrases (type BERT) + classifieur. Comprend le sens,
+          généralise aux paraphrases. Plus lourd, toujours local.
+        </p>
+      </article>
+      <article class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <div class="mb-1 flex items-center gap-2">
+          <span class="rounded bg-sysorange/10 px-2 py-0.5 text-[12px] font-semibold
+                       text-sysorange">3 · LLM</span>
+        </div>
+        <p class="text-[14px] text-label-secondary dark:text-label-secondary-dark">
+          Gemma en local (Ollama), prompt + JSON strict. Zéro entraînement,
+          extrait les infos utiles. Le plus lent, le plus malin.
+        </p>
+      </article>
+    </section>
+
+    <!-- ========================= SAISIE ============================= -->
+    <section aria-label="Votre demande"
+             class="rounded bg-surface-secondary p-4 shadow-sm
+                    dark:bg-surface-secondary-dark">
+      <form id="ask-form" class="flex flex-col gap-3">
+        <label for="query" class="text-[14px] font-medium">
+          Écrivez (ou dictez) votre demande, comme au téléphone
+        </label>
+        <div class="flex items-end gap-2">
+          <textarea id="query" name="query" rows="2"
+                    placeholder="Ex : j'ai eu un accident ce matin, ma voiture est cabossée"
+                    class="min-h-11 flex-1 resize-y rounded border border-surface-tertiary
+                           bg-canvas px-3 py-2 text-[16px] text-label-primary
+                           placeholder:text-label-tertiary
+                           focus:border-sysblue focus:outline-none focus-visible:ring-2
+                           focus-visible:ring-sysblue
+                           dark:border-surface-tertiary-dark dark:bg-surface-primary-dark
+                           dark:text-label-primary-dark"></textarea>
+          <!-- Micro : reconnaissance vocale navigateur (vocal-helper). -->
+          <button type="button" id="mic-btn" aria-label="Dicter à la voix"
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded
+                         bg-surface-tertiary text-label-primary transition-transform
+                         hover:opacity-90 active:scale-95 focus:outline-none
+                         focus-visible:ring-2 focus-visible:ring-sysblue
+                         motion-reduce:active:scale-100
+                         dark:bg-surface-tertiary-dark dark:text-label-primary-dark">
+            <span aria-hidden="true">🎙️</span>
+          </button>
+        </div>
+
+        <!-- Sélecteur de moteur : contrôle segmenté (radios stylées). -->
+        <fieldset class="flex flex-wrap items-center gap-2">
+          <legend class="sr-only">Choisir le moteur</legend>
+          <div id="engine-seg"
+               class="inline-flex rounded bg-surface-tertiary p-0.5 text-[14px]
+                      dark:bg-surface-tertiary-dark">
+            <!-- Les boutons sont générés/gérés par app.js selon la dispo LLM. -->
+            <label class="cursor-pointer">
+              <input type="radio" name="engine" value="all" class="peer sr-only" checked>
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           dark:peer-checked:bg-surface-primary-dark">Comparer les 3</span>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="engine" value="tfidf" class="peer sr-only">
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           dark:peer-checked:bg-surface-primary-dark">TF-IDF</span>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="engine" value="bert" class="peer sr-only">
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           dark:peer-checked:bg-surface-primary-dark">BERT</span>
+            </label>
+            <label class="cursor-pointer" id="engine-llm-label">
+              <input type="radio" name="engine" value="llm" class="peer sr-only">
+              <span class="block rounded px-3 py-1.5 font-medium
+                           peer-checked:bg-surface-secondary peer-checked:shadow-sm
+                           dark:peer-checked:bg-surface-primary-dark">LLM</span>
+            </label>
+          </div>
+
+          <!-- Lecture vocale de la réponse (speech-helper). -->
+          <label class="ml-auto flex items-center gap-2 text-[14px]
+                        text-label-secondary dark:text-label-secondary-dark">
+            <input type="checkbox" id="speak-toggle" role="switch"
+                   class="h-5 w-5 rounded accent-sysblue">
+            Lire la réponse à voix haute
+          </label>
+        </fieldset>
+
+        <!-- Avertissement honnête : la reconnaissance vocale du navigateur
+             (Web Speech) peut envoyer l'audio à un service cloud (Chrome →
+             Google). Le NLU, lui, reste 100% local. Pour une voix vraiment
+             locale, brancher whisper.cpp (vocal-helper) côté serveur. -->
+        <p class="text-[12px] text-label-tertiary dark:text-label-tertiary-dark">
+          ⚠️ La voix utilise l'API Web Speech du navigateur : sous Chrome,
+          l'audio peut transiter par le cloud. Le moteur d'intention, lui,
+          reste 100&nbsp;% local. Pour une voix locale, voir <code
+          class="font-mono">vocal-helper</code> (whisper.cpp).
+        </p>
+
+        <!-- Bouton principal (CTA sysblue). -->
+        <button type="submit" id="submit-btn"
+                class="inline-flex min-h-11 items-center justify-center gap-2 rounded
+                       bg-sysblue px-5 py-3 text-[16px] font-semibold text-white
+                       transition-transform hover:bg-sysblueHover active:scale-[0.98]
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-sysblue
+                       focus-visible:ring-offset-2 focus-visible:ring-offset-surface-secondary
+                       motion-reduce:active:scale-100
+                       disabled:pointer-events-none disabled:opacity-50
+                       dark:focus-visible:ring-offset-surface-secondary-dark">
+          Analyser l'intention
+        </button>
+      </form>
+    </section>
+
+    <!-- ======================== RÉSULTATS =========================== -->
+    <!-- Peuplé par app.js : une carte par moteur, en colonnes. -->
+    <section id="results" aria-live="polite" class="mt-6 grid gap-4 md:grid-cols-3">
+      <!-- Vide au départ ; app.js injecte les cartes moteur ici. -->
+    </section>
+
+    <!-- ===================== EXÉCUTION (ACTION) ===================== -->
+    <!-- Montre l'action concrète d'aiguillage quand on "exécute" la demande. -->
+    <section id="execution" class="mt-6 hidden rounded border border-sysblue/30
+             bg-sysblue/5 p-4 dark:border-sysblue/40">
+      <!-- Rempli par app.js. -->
+    </section>
+
+    <!-- ================= NAVIGATEUR DE CONNAISSANCE ================= -->
+    <section aria-label="Base de connaissance" class="mt-8">
+      <details class="rounded bg-surface-secondary p-4 shadow-sm
+                      dark:bg-surface-secondary-dark">
+        <summary class="cursor-pointer select-none text-[15px] font-semibold">
+          Base de connaissance — <span id="kb-count">…</span> intentions
+          <span class="font-normal text-label-tertiary dark:text-label-tertiary-dark">
+            (cliquez un exemple pour l'essayer)
+          </span>
+        </summary>
+        <!-- Liste d'intentions injectée par app.js. -->
+        <div id="kb-list" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+      </details>
+    </section>
+
+    <!-- Note de bas de page pédagogique. -->
+    <footer class="mt-8 text-center text-[13px] text-label-tertiary
+                   dark:text-label-tertiary-dark">
+      Démo pédagogique — les intentions vivent dans des fichiers Markdown
+      (<code class="font-mono">knowledge_base/</code>), un titre <code
+      class="font-mono">#&nbsp;h1</code> = une intention.
+    </footer>
+  </main>
+
+  <!-- Logique de l'application (modules ES, aucun framework). -->
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
