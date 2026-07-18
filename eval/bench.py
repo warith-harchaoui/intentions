@@ -35,6 +35,7 @@ Project maintainers.
 from __future__ import annotations
 
 import logging
+import math
 import time
 
 import httpx
@@ -48,6 +49,50 @@ logger = logging.getLogger(__name__)
 
 # The purely-local engines whose compute we can time with process_time.
 _LOCAL_ENGINES = ("tfidf", "fasttext_custom", "fasttext_pretrained", "bert")
+
+
+def format_duration(ms: float) -> str:
+    """Format a millisecond duration without ever collapsing to a bare ``0``.
+
+    Picks the largest time unit (s / ms / µs / ns) in which the value is at
+    least 1, then prints ~3 significant figures. A tiny-but-nonzero measurement
+    — fastText classifying in ~8 microseconds — then shows as ``8.00 µs``
+    instead of a misleading ``0.00 ms``. A genuine zero (e.g. no off-CPU/GPU
+    work for a CPU-only engine) prints as ``—``, never ``0``.
+
+    Parameters
+    ----------
+    ms : float
+        A duration in milliseconds.
+
+    Returns
+    -------
+    str
+        e.g. ``"1.20 s"``, ``"500 ms"``, ``"8.00 µs"``, ``"—"``.
+
+    Examples
+    --------
+    >>> format_duration(0.008)
+    '8.00 µs'
+    >>> format_duration(500.0)
+    '500 ms'
+    >>> format_duration(0.0)
+    '—'
+    """
+    if not math.isfinite(ms) or ms <= 0:
+        return "—"
+    # (unit label, multiplier from ms to that unit), largest first.
+    for name, factor in (("s", 1e-3), ("ms", 1.0), ("µs", 1e3), ("ns", 1e6)):
+        value = ms * factor
+        if value >= 1.0:
+            # ~3 significant figures: fewer decimals as the value grows.
+            if value >= 100:
+                return f"{value:.0f} {name}"
+            if value >= 10:
+                return f"{value:.1f} {name}"
+            return f"{value:.2f} {name}"
+    # Sub-nanosecond but still positive: show it rather than rounding to zero.
+    return f"{ms * 1e6:.2f} ns"
 
 
 def bench_local_engine(
@@ -180,17 +225,19 @@ def main(argv: list[str] | None = None) -> int:
     # A small, fixed sample of held-out utterances to time on.
     texts = [c["text"] for c in load_dataset()[:8]]
 
-    print("moteur              | wall (ms) | CPU (ms) | hors-CPU≈GPU (ms)")
-    print("--------------------|-----------|----------|------------------")
-    # Local engines: CPU time is the robust headline.
+    print("moteur              |      wall |       CPU | hors-CPU≈GPU")
+    print("--------------------|-----------|-----------|-------------")
+    # Local engines: CPU time is the robust headline. Units are adaptive so a
+    # microsecond-scale engine never prints a misleading "0.00 ms".
     for engine in _LOCAL_ENGINES:
         if engine not in available:
             print(f"{engine:19} | (indisponible)")
             continue
         t = bench_local_engine(router, engine, texts, args.repeats)
         print(
-            f"{engine:19} | {t['wall_ms']:9.2f} | {t['cpu_ms']:8.2f} | "
-            f"{t['off_cpu_ms']:8.2f}"
+            f"{engine:19} | {format_duration(t['wall_ms']):>9} | "
+            f"{format_duration(t['cpu_ms']):>9} | "
+            f"{format_duration(t['off_cpu_ms']):>12}"
         )
 
     # LLM: report Ollama's server-side compute (prompt + generation).
@@ -200,8 +247,9 @@ def main(argv: list[str] | None = None) -> int:
             f"\nllm ({get_settings().llm_model}) — compute Ollama (hors chargement) :"
         )
         print(
-            f"  wall aller-retour {t['wall_ms']:.0f} ms | "
-            f"prompt {t['prompt_ms']:.0f} ms | génération {t['gen_ms']:.0f} ms"
+            f"  wall aller-retour {format_duration(t['wall_ms'])} | "
+            f"prompt {format_duration(t['prompt_ms'])} | "
+            f"génération {format_duration(t['gen_ms'])}"
         )
         print(
             "  (le wall-clock inclut l'attente/HTTP ; le calcul GPU utile "

@@ -1,21 +1,30 @@
-"""Render violin plots of the engines' accuracy distributions (Vega-Lite).
+"""Render the evaluation figures (Vega-Lite → PNG), bilingual and clean.
 
 Module summary
 --------------
-Turns ``eval/crossval_results.json`` (produced by :mod:`eval.crossval`) into
-a **violin plot** comparing the five engines' bootstrap accuracy
-distributions on the held-out paraphrase test set, and exports it to PNG via
-``vl-convert``. A violin (a mirrored density) is the right picture for the
-question the reader actually has — *"are these engines really different, or
-are the scores just noise apart?"* — because it shows the whole spread and
-overlap, not a single bar.
+Two figures, each produced in **French and English** (``-fr`` / ``-en``) so
+each README variant shows a chart in its own language:
 
-House style: Roboto, rounded, no chart-junk spines, engine colours matching
-the web UI's chips.
+* **Cross-validation violins** (``violin-accuracy-{lang}.png``) — for the four
+  *trainable* engines (TF-IDF, the two fastText engines, BERT), one violin
+  per engine built from the **real** accuracies of a repeated 5-fold
+  cross-validation (5 folds × 5 shuffles = 25 measurements). No resampling
+  tricks: every point in the density is a genuine train-on-4/5, test-on-1/5
+  score. The LLM is zero-shot (it never trains), so it has no cross-validation
+  and is discussed in the text, not shown here.
+
+* **LLM shootout bars** (``shootout-{lang}.png``) — a plain bar chart of each
+  (model, prompt) configuration's accuracy on the held-out sample. The LLM
+  cannot be cross-validated either, so a clean bar (one number per bar) is the
+  honest picture; the sample size and caveats live in the surrounding text.
+
+The charts are deliberately **minimal** (title + axis, house palette). All the
+methodology — how many intents, how many training examples, what the test set
+is — is explained in the prose around the figures, not crammed into them.
 
 Usage
 -----
-    python -m eval.violin        # writes docs/img/violin-accuracy.png
+    python -m eval.violin        # writes the -fr and -en PNGs to docs/img/
 
 Author
 ------
@@ -30,96 +39,108 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Paths: read the stats, write the figure next to the other doc images.
-_RESULTS_PATH = Path(__file__).resolve().parent / "crossval_results.json"
-_OUT_PATH = (
-    Path(__file__).resolve().parent.parent / "docs" / "img" / "violin-accuracy.png"
-)
+# Result files produced by the eval, and where the figures land.
+_CV_RESULTS = Path(__file__).resolve().parent / "crossval_results.json"
+_SHOOTOUT_RESULTS = Path(__file__).resolve().parent / "llm_shootout_results.json"
+_IMG_DIR = Path(__file__).resolve().parent.parent / "docs" / "img"
 
-# Display order (the pedagogical progression) + human labels + colours from
-# the house palette (https://harchaoui.org/warith/colors/), matching the
-# Mermaid progression diagram: blue → turquoise → purple → green → orange.
+# The four *trainable* engines shown in the cross-validation violins, in the
+# pedagogical progression order, with house-palette colours (matching the
+# Mermaid progression) and bilingual labels.
 _ENGINE_META: dict[str, dict[str, str]] = {
-    "tfidf": {"label": "TF-IDF\n+RandomForest", "color": "#007AFF"},
-    "fasttext_custom": {"label": "fastText\n(appris)", "color": "#79DBDC"},
-    "fasttext_pretrained": {"label": "fastText\n(pré-entraîné)", "color": "#AF52DE"},
-    "bert": {"label": "BERT\n+MLP", "color": "#28CD41"},
-    "llm": {"label": "LLM\n(Gemma)", "color": "#FF9500"},
+    "tfidf": {"fr": "TF-IDF", "en": "TF-IDF", "color": "#007AFF"},
+    "fasttext_custom": {
+        "fr": "fastText\n(appris)",
+        "en": "fastText\n(learned)",
+        "color": "#79DBDC",
+    },
+    "fasttext_pretrained": {
+        "fr": "fastText\n(pré-entraîné)",
+        "en": "fastText\n(pretrained)",
+        "color": "#AF52DE",
+    },
+    "bert": {"fr": "BERT", "en": "BERT", "color": "#28CD41"},
+}
+
+# One hue per LLM family (house palette) for the shootout bars.
+_MODEL_HUE: dict[str, str] = {
+    "qwen2.5:3b": "#007AFF",
+    "gemma3:4b": "#28CD41",
+    "gemma4:e2b-mlx": "#FF9500",
+    "gemma4:e4b-mlx": "#AF52DE",
+}
+
+# Bilingual chart strings (kept tiny — the real explanation is in the docs).
+_TEXT: dict[str, dict[str, str]] = {
+    "fr": {
+        "cv_title": "Exactitude par moteur (validation croisée 5 blocs)",
+        "axis": "Exactitude (plus c'est haut, mieux c'est)",
+        "shoot_title": "Le modèle compte plus que le prompt",
+    },
+    "en": {
+        "cv_title": "Accuracy by engine (5-fold cross-validation)",
+        "axis": "Accuracy (higher is better)",
+        "shoot_title": "The model matters more than the prompt",
+    },
+}
+
+# Bilingual prompt-variant labels for the shootout bar x-axis. Keys are the
+# internal prompt names stored in the shootout summary ("naive" / "improved").
+_PROMPT_LABEL: dict[str, dict[str, str]] = {
+    "fr": {"naive": "va-vite", "improved": "soigné"},
+    "en": {"naive": "quick", "improved": "polished"},
+}
+
+# House-style base config shared by every chart (Roboto, no chart-junk).
+_BASE_CONFIG = {
+    "font": "Roboto",
+    "view": {"stroke": None},
+    "axis": {"labelFont": "Roboto", "titleFont": "Roboto", "grid": False},
+    "header": {"labelFont": "Roboto", "titleFont": "Roboto"},
 }
 
 
-def _long_rows(results: dict) -> list[dict[str, object]]:
-    """Flatten the per-engine bootstrap samples into long-format rows.
+def build_cv_spec(results: dict, lang: str) -> dict:
+    """Build the cross-validation violin spec in ``lang``.
 
     Parameters
     ----------
     results : dict
-        The parsed ``crossval_results.json``.
-
-    Returns
-    -------
-    list[dict[str, object]]
-        One ``{"engine": label, "accuracy": value}`` row per bootstrap draw,
-        for every engine present in the results.
-    """
-    rows: list[dict[str, object]] = []
-    bootstrap: dict[str, list[float]] = results.get("bootstrap", {})
-    # Emit rows in the fixed progression order so the violins line up left→right
-    # from the simplest to the most powerful engine.
-    for engine, meta in _ENGINE_META.items():
-        for value in bootstrap.get(engine, []):
-            rows.append({"engine": meta["label"], "accuracy": value})
-    return rows
-
-
-def build_spec(results: dict) -> dict:
-    """Build a Vega-Lite violin-plot spec from the crossval results.
-
-    Parameters
-    ----------
-    results : dict
-        The parsed ``crossval_results.json``.
+        Parsed ``crossval_results.json`` (uses the ``cv`` field: a list of
+        real fold accuracies per trainable engine).
+    lang : str
+        ``"fr"`` or ``"en"``.
 
     Returns
     -------
     dict
-        A Vega-Lite v5 specification (faceted density areas == violins).
+        A Vega-Lite v5 faceted-density (violin) specification.
     """
-    rows = _long_rows(results)
-    # Preserve progression order and keep colours aligned with the labels
-    # actually present in the data.
-    present = [
-        m["label"] for e, m in _ENGINE_META.items() if e in results.get("bootstrap", {})
-    ]
-    colours = [
-        m["color"] for e, m in _ENGINE_META.items() if e in results.get("bootstrap", {})
-    ]
+    cv: dict[str, list[float]] = results.get("cv", {})
+    # Long-format rows: one per (engine, fold accuracy). Only engines present
+    # in the CV results are drawn, in progression order.
+    rows: list[dict[str, object]] = []
+    present: list[str] = []
+    colours: list[str] = []
+    for engine, meta in _ENGINE_META.items():
+        if engine not in cv:
+            continue
+        present.append(meta[lang])
+        colours.append(meta["color"])
+        for value in cv[engine]:
+            rows.append({"engine": meta[lang], "accuracy": value})
 
-    # The canonical Vega-Lite violin: a horizontal density area per engine,
-    # faceted into one narrow column each, stacked to centre so it mirrors.
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
-            "text": "Distribution d'exactitude par moteur (bootstrap, n=88)",
-            "subtitle": "Jeu de test paraphrases · 2000 rééchantillonnages",
+            "text": _TEXT[lang]["cv_title"],
             "font": "Roboto",
-            "subtitleFont": "Roboto",
             "anchor": "start",
-            "fontSize": 15,
-            "subtitleFontSize": 11,
-            "subtitleColor": "#6E6E73",
+            "fontSize": 16,
         },
-        # House style: Roboto everywhere, no view border (no chart-junk box).
-        "config": {
-            "font": "Roboto",
-            "view": {"stroke": None},
-            "axis": {"labelFont": "Roboto", "titleFont": "Roboto", "grid": False},
-            "header": {"labelFont": "Roboto", "titleFont": "Roboto"},
-        },
+        "config": _BASE_CONFIG,
         "data": {"values": rows},
         "transform": [
-            # Kernel-density-estimate the accuracy within each engine, over the
-            # full [0,1] range so the violins are directly comparable.
             {
                 "density": "accuracy",
                 "groupby": ["engine"],
@@ -128,19 +149,16 @@ def build_spec(results: dict) -> dict:
             }
         ],
         "mark": {"type": "area", "orient": "horizontal"},
-        "width": 90,
+        "width": 95,
         "height": 420,
         "encoding": {
-            # Vertical axis: the accuracy (shared across facets for comparison).
             "y": {
                 "field": "accuracy",
                 "type": "quantitative",
-                "title": "Exactitude (top-1)",
+                "title": _TEXT[lang]["axis"],
                 "axis": {"format": "%"},
                 "scale": {"domain": [0, 1]},
             },
-            # Horizontal within a facet: the mirrored density (no axis — the
-            # width is just the shape of the distribution).
             "x": {
                 "field": "density",
                 "type": "quantitative",
@@ -149,7 +167,6 @@ def build_spec(results: dict) -> dict:
                 "title": None,
                 "axis": {"labels": False, "ticks": False, "grid": False, "values": []},
             },
-            # One narrow column per engine, in progression order.
             "column": {
                 "field": "engine",
                 "type": "nominal",
@@ -171,189 +188,157 @@ def build_spec(results: dict) -> dict:
     }
 
 
-# --- LLM shootout violin (models × prompts) ------------------------------
-_SHOOTOUT_RESULTS = Path(__file__).resolve().parent / "llm_shootout_results.json"
-_SHOOTOUT_OUT = (
-    Path(__file__).resolve().parent.parent / "docs" / "img" / "violin-llm-shootout.png"
-)
-# One hue per model family (harchaoui palette); baseline vs improved share the
-# model colour and are told apart by the x-axis label.
-_MODEL_HUE: dict[str, str] = {
-    "qwen2.5:3b": "#007AFF",
-    "gemma3:4b": "#28CD41",
-    "gemma4:e2b-mlx": "#FF9500",
-    "gemma4:e4b-mlx": "#AF52DE",
-}
+def build_shootout_spec(results: dict, lang: str) -> dict:
+    """Build the LLM-shootout bar-chart spec in ``lang``.
 
-
-def build_shootout_spec(results: dict) -> dict:
-    """Build a Vega-Lite violin spec for the LLM shootout results.
+    A bar chart (not a violin): the LLM is zero-shot, so there is no
+    cross-validation and no honest per-config distribution to show — one clear
+    bar per (model, prompt) configuration is the right picture. Sample size
+    and caveats are explained in the surrounding text.
 
     Parameters
     ----------
     results : dict
-        Parsed ``llm_shootout_results.json`` (``bootstrap`` keyed by
-        ``"model · prompt"``, plus ``summary`` carrying the model tag).
+        Parsed ``llm_shootout_results.json``.
+    lang : str
+        ``"fr"`` or ``"en"``.
 
     Returns
     -------
     dict
-        A Vega-Lite v5 faceted-density (violin) specification.
+        A Vega-Lite v5 bar-chart specification.
     """
-    bootstrap: dict[str, list[float]] = results.get("bootstrap", {})
     summary: dict[str, dict] = results.get("summary", {})
-    sample = results.get("sample", 0)
-    # Long-format rows + per-config colour (by the config's model family).
     rows: list[dict[str, object]] = []
     order: list[str] = []
     colours: list[str] = []
-    for key, samples in bootstrap.items():
-        order.append(key)
-        model = summary.get(key, {}).get("model", "")
+    for _key, s in summary.items():
+        model = s.get("model", "")
+        prompt = s.get("prompt", "")
+        # Two-line x label: model (shortened, no "-mlx") on top, the prompt
+        # variant below — split on the newline by the axis ``labelExpr``.
+        model_short = model.replace("-mlx", "")
+        label = f"{model_short}\n{_PROMPT_LABEL[lang].get(prompt, prompt)}"
+        order.append(label)
         colours.append(_MODEL_HUE.get(model, "#6E6E73"))
-        for value in samples:
-            rows.append({"config": key, "accuracy": value})
+        rows.append({"config": label, "accuracy": s.get("point_accuracy", 0.0)})
 
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
-            "text": "LLM shootout — modèle × prompt (bootstrap)",
-            "subtitle": f"paraphrases · n={sample} · baseline vs prompt amélioré",
+            "text": _TEXT[lang]["shoot_title"],
             "font": "Roboto",
-            "subtitleFont": "Roboto",
             "anchor": "start",
-            "fontSize": 15,
-            "subtitleFontSize": 11,
-            "subtitleColor": "#6E6E73",
+            "fontSize": 16,
         },
-        "config": {
-            "font": "Roboto",
-            "view": {"stroke": None},
-            "axis": {"labelFont": "Roboto", "titleFont": "Roboto", "grid": False},
-            "header": {"labelFont": "Roboto", "titleFont": "Roboto"},
-        },
+        "config": {**_BASE_CONFIG, "axis": {**_BASE_CONFIG["axis"]}},
         "data": {"values": rows},
-        "transform": [
+        "width": 520,
+        "height": 300,
+        "layer": [
             {
-                "density": "accuracy",
-                "groupby": ["config"],
-                "extent": [0, 1],
-                "as": ["accuracy", "density"],
-            }
-        ],
-        "mark": {"type": "area", "orient": "horizontal"},
-        "width": 80,
-        "height": 400,
-        "encoding": {
-            "y": {
-                "field": "accuracy",
-                "type": "quantitative",
-                "title": "Exactitude (top-1)",
-                "axis": {"format": "%"},
-                "scale": {"domain": [0, 1]},
-            },
-            "x": {
-                "field": "density",
-                "type": "quantitative",
-                "stack": "center",
-                "impute": None,
-                "title": None,
-                "axis": {"labels": False, "ticks": False, "grid": False, "values": []},
-            },
-            "column": {
-                "field": "config",
-                "type": "nominal",
-                "sort": order,
-                "header": {
-                    "titleOrient": "bottom",
-                    "labelOrient": "bottom",
-                    "labelAngle": -35,
-                    "labelPadding": 6,
+                "mark": {"type": "bar", "cornerRadiusEnd": 3},
+                "encoding": {
+                    "x": {
+                        "field": "config",
+                        "type": "nominal",
+                        "sort": order,
+                        "title": None,
+                        "axis": {
+                            "labelAngle": 0,
+                            "labelFontSize": 11,
+                            # Split "model\nprompt" into two stacked lines so the
+                            # six labels never overlap.
+                            "labelExpr": "split(datum.value, '\\n')",
+                        },
+                    },
+                    "y": {
+                        "field": "accuracy",
+                        "type": "quantitative",
+                        "title": _TEXT[lang]["axis"],
+                        "axis": {"format": "%"},
+                        "scale": {"domain": [0, 1]},
+                    },
+                    "color": {
+                        "field": "config",
+                        "type": "nominal",
+                        "scale": {"domain": order, "range": colours},
+                        "legend": None,
+                    },
                 },
-                "title": None,
             },
-            "color": {
-                "field": "config",
-                "type": "nominal",
-                "scale": {"domain": order, "range": colours},
-                "legend": None,
+            {
+                # The exact % printed above each bar — no guessing from the axis.
+                "mark": {"type": "text", "dy": -6, "font": "Roboto", "fontSize": 11},
+                "encoding": {
+                    "x": {"field": "config", "type": "nominal", "sort": order},
+                    "y": {"field": "accuracy", "type": "quantitative"},
+                    "text": {
+                        "field": "accuracy",
+                        "type": "quantitative",
+                        "format": ".0%",
+                    },
+                },
             },
-        },
+        ],
     }
 
 
-def render_shootout(results: dict | None = None) -> Path:
-    """Render the LLM-shootout violin plot to PNG and return its path.
+def _render(spec: dict, out: Path) -> Path:
+    """Render a Vega-Lite spec to a 2× PNG at ``out``.
 
     Parameters
     ----------
-    results : dict | None, optional
-        Pre-loaded shootout results; loaded from disk when ``None``.
+    spec : dict
+        A Vega-Lite specification.
+    out : Path
+        Destination PNG path.
 
     Returns
     -------
     Path
-        The written PNG path.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the shootout results file is missing.
+        ``out``.
     """
     import vl_convert as vlc
 
-    if results is None:
-        if not _SHOOTOUT_RESULTS.is_file():
-            raise FileNotFoundError(
-                f"{_SHOOTOUT_RESULTS} manquant — lancez `python -m eval.llm_shootout`."
-            )
-        results = json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
-    png = vlc.vegalite_to_png(
-        vl_spec=json.dumps(build_shootout_spec(results)), scale=2.0
-    )
-    _SHOOTOUT_OUT.parent.mkdir(parents=True, exist_ok=True)
-    _SHOOTOUT_OUT.write_bytes(png)
-    return _SHOOTOUT_OUT
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(vlc.vegalite_to_png(vl_spec=json.dumps(spec), scale=2.0))
+    return out
 
 
-def render(results: dict | None = None) -> Path:
-    """Render the violin plot to PNG and return its path.
-
-    Parameters
-    ----------
-    results : dict | None, optional
-        Pre-loaded results; loaded from disk when ``None``.
+def render_all() -> list[Path]:
+    """Render every figure in both languages and return the written paths.
 
     Returns
     -------
-    Path
-        The written PNG path.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the results file is missing and none were passed.
+    list[Path]
+        Paths of the PNGs written (CV violins, plus shootout bars if the
+        shootout results are present).
     """
-    import vl_convert as vlc
-
-    # Load the stats if not supplied.
-    if results is None:
-        if not _RESULTS_PATH.is_file():
-            raise FileNotFoundError(
-                f"{_RESULTS_PATH} introuvable — lancez `python -m eval.crossval`."
+    written: list[Path] = []
+    # Cross-validation violins (require the crossval results).
+    if _CV_RESULTS.is_file():
+        cv = json.loads(_CV_RESULTS.read_text(encoding="utf-8"))
+        for lang in ("fr", "en"):
+            written.append(
+                _render(
+                    build_cv_spec(cv, lang), _IMG_DIR / f"violin-accuracy-{lang}.png"
+                )
             )
-        results = json.loads(_RESULTS_PATH.read_text(encoding="utf-8"))
-
-    spec = build_spec(results)
-    # 2× scale for a crisp retina PNG in the docs.
-    png = vlc.vegalite_to_png(vl_spec=json.dumps(spec), scale=2.0)
-    _OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    _OUT_PATH.write_bytes(png)
-    return _OUT_PATH
+    # Shootout bars (only when the shootout has been run).
+    if _SHOOTOUT_RESULTS.is_file():
+        shoot = json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
+        for lang in ("fr", "en"):
+            written.append(
+                _render(
+                    build_shootout_spec(shoot, lang), _IMG_DIR / f"shootout-{lang}.png"
+                )
+            )
+    return written
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI: render the violin plot and print where it landed.
+    """CLI: render all figures (both languages) and print the paths.
 
     Parameters
     ----------
@@ -366,11 +351,8 @@ def main(argv: list[str] | None = None) -> int:
         Process exit code.
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    path = render()
-    print(f"Violin plot (5 moteurs) écrit : {path}")
-    # Also render the LLM shootout violin when its results are present.
-    if _SHOOTOUT_RESULTS.is_file():
-        print(f"Violin plot (LLM shootout) écrit : {render_shootout()}")
+    for path in render_all():
+        print(f"Figure écrite : {path}")
     return 0
 
 

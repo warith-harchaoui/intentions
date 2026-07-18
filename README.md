@@ -2,10 +2,8 @@
 
 [🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md) — 📖 User guide: [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
-> "My colleagues keep asking me **how you build** an intent-detection engine."
-> — This repo answers by showing **five ways** to do it, side by side, on a
-> concrete case: the routing chatbot of a (fictional) insurance company that
-> helps its customers on the **phone** and in **writing**.
+> **How do you build** an intent-detection engine.
+>This repo answers by showing **five ways** to do it, side by side, on a concrete case: the routing chatbot of a (fictional) insurance company that helps its customers on the chatbox.
 
 ![Five-engine comparator](docs/img/02-comparateur-5-moteurs.png)
 
@@ -233,22 +231,22 @@ The Markdown knowledge base feeds every engine; all five implement the same
 identically. Only the **representation + classifier** changes.
 
 ```mermaid
-flowchart TB
-    KB["📄 knowledge_base/ — Markdown, h1 = intent"] --> Engines
+flowchart LR
+    KB["📄 knowledge_base/<br/>Markdown, h1 = intent"] --> Engines
 
     subgraph Engines["Five engines — same IntentEngine contract"]
-        direction LR
-        E1["1 · TF-IDF<br/>+ Random Forest"]
-        E2["2 · fastText<br/>learned"]
-        E3["3 · fastText<br/>pretrained"]
-        E4["4 · BERT<br/>SBERT + MLP"]
-        E5["5 · LLM<br/>Gemma · JSON"]
+        direction TB
+        E1["1 · TF-IDF · Random Forest"]
+        E2["2 · fastText · learned"]
+        E3["3 · fastText · pretrained"]
+        E4["4 · BERT · SBERT + MLP"]
+        E5["5 · LLM · Gemma · JSON"]
     end
 
-    Engines --> R["router.py — registry · compare · execute"]
+    Engines --> R["router.py<br/>registry · compare · execute"]
     R --> API["api.py · FastAPI"]
     R --> CLI["cli.py · terminal"]
-    API --> WEB["web/ — vanilla JS + Tailwind · comparator (text)"]
+    API --> WEB["web/ — vanilla JS + Tailwind"]
 
     style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E

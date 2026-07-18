@@ -40,11 +40,7 @@ from pathlib import Path
 import numpy as np
 
 from intent_engine.config import get_settings
-from intent_engine.llm_engine import (
-    _IMPROVED_SYSTEM_PROMPT,
-    _NAIVE_SYSTEM_PROMPT,
-    LlmIntentEngine,
-)
+from intent_engine.llm_engine import LlmIntentEngine, experiment_prompt
 from intent_engine.router import IntentRouter
 
 from .crossval import bootstrap_accuracy
@@ -52,28 +48,36 @@ from .thresholds import load_dataset
 
 logger = logging.getLogger(__name__)
 
-# Prompt variants along the prompt-quality axis. Internal keys are stable (they
-# name the on-disk caches); ``_PROMPT_LABEL`` maps them to the human wording.
-# ``naive`` is the quick-and-dirty prompt ("à la va-vite"); ``improved`` is the
-# engineered one (few-shot + reason-first). ``None`` = the engine's default.
-_PROMPTS: dict[str, str | None] = {
-    "naive": _NAIVE_SYSTEM_PROMPT,
-    "improved": _IMPROVED_SYSTEM_PROMPT,
+# --- The 2×2 prompt-engineering experiment --------------------------------
+# Two INDEPENDENT switches — prompt *quality* (bad → good) and *examples*
+# (zero-shot → few-shot) — give four prompts along one "de mieux en mieux"
+# axis. Internal keys are stable (they name the on-disk caches); the human
+# wording lives in ``eval/violin.py`` (bilingual). ``experiment_prompt`` builds
+# each variant compositionally so the ONLY differences are the rules and the
+# examples.
+_PROMPT_SWITCHES: dict[str, tuple[bool, bool]] = {
+    "bad-zs": (False, False),   # bare task + schema, no examples
+    "bad-fs": (False, True),    # + three worked examples
+    "good-zs": (True, False),   # + error-driven disambiguation rules
+    "good-fs": (True, True),    # rules AND examples (the full treatment)
 }
-_PROMPT_LABEL: dict[str, str] = {"naive": "va-vite", "improved": "soigné"}
+_PROMPTS: dict[str, str] = {
+    key: experiment_prompt(good=good, fewshot=fewshot)
+    for key, (good, fewshot) in _PROMPT_SWITCHES.items()
+}
+# The pedagogical progression order (the figure's x-axis).
+_PROMPT_ORDER: list[str] = ["bad-zs", "bad-fs", "good-zs", "good-fs"]
 
-# The configurations, in display order. Every model runs the **improved**
-# (soigné) prompt (the model comparison); the two *fast* models also run the
-# **naive** (va-vite) prompt (the prompt-engineering comparison), so the slow
-# Gemma builds are queried once. Two takeaways from one table: what the *model*
-# buys, and what a *good prompt* buys.
+# We run the FULL 2×2 on several candidate models to *find* the one whose
+# accuracy climbs the most cleanly (monotone, wide span) across the four
+# prompts — the user asked for the single model that best shows the progression
+# ("prend un LLM qui fait le mieux la différence de progrès … sinon c'est
+# touffu"). The docs then present only that winner; the rest is diagnostic.
+_CANDIDATE_MODELS: list[str] = ["qwen2.5:3b", "gemma3:4b", "gemma4:e2b-mlx"]
 _CONFIGS: list[dict[str, str]] = [
-    {"model": "qwen2.5:3b", "prompt": "naive"},
-    {"model": "qwen2.5:3b", "prompt": "improved"},
-    {"model": "gemma3:4b", "prompt": "naive"},
-    {"model": "gemma3:4b", "prompt": "improved"},
-    {"model": "gemma4:e2b-mlx", "prompt": "improved"},
-    {"model": "gemma4:e4b-mlx", "prompt": "improved"},
+    {"model": model, "prompt": prompt}
+    for model in _CANDIDATE_MODELS
+    for prompt in _PROMPT_ORDER
 ]
 
 # Held-out sample size (a fixed prefix of the paraphrase test set). Smaller
@@ -99,11 +103,12 @@ def _config_key(model: str, prompt: str) -> str:
     Returns
     -------
     str
-        e.g. ``"gemma3:4b · improved"``.
+        e.g. ``"gemma3:4b · good-fs"``.
     """
-    # Space-dot-space separator reads well in the table and as a violin label;
-    # show the human wording (va-vite / soigné) rather than the internal key.
-    return f"{model} · {_PROMPT_LABEL.get(prompt, prompt)}"
+    # Space-dot-space separator reads well in the table and as a violin label.
+    # The internal prompt key (bad-zs … good-fs) is stable; the bilingual human
+    # wording is applied later, in the figure renderer.
+    return f"{model} · {prompt}"
 
 
 def _cache_path(model: str, prompt: str) -> Path:
@@ -121,7 +126,7 @@ def classify_sample(model: str, prompt: str, kb, sample: int) -> dict[str, str]:
     model : str
         Ollama model tag.
     prompt : str
-        ``"baseline"`` or ``"improved"``.
+        One of the 2×2 prompt keys (``"bad-zs"`` … ``"good-fs"``).
     kb : KnowledgeBase
         The knowledge base grounding the prompt.
     sample : int
@@ -137,9 +142,8 @@ def classify_sample(model: str, prompt: str, kb, sample: int) -> dict[str, str]:
     cache: dict[str, str] = (
         json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     )
-    # Pick the prompt variant (va-vite / soigné); ``None`` → engine default.
-    system_prompt = _PROMPTS.get(prompt)
-    engine = LlmIntentEngine(model=model, system_prompt=system_prompt).fit(kb)
+    # Pick the 2×2 prompt variant (bad-zs … good-fs).
+    engine = LlmIntentEngine(model=model, system_prompt=_PROMPTS[prompt]).fit(kb)
 
     for case in load_dataset()[:sample]:
         text = case["text"]
@@ -176,6 +180,60 @@ def _correctness(cache: dict[str, str], sample: int) -> np.ndarray:
         ],
         dtype=float,
     )
+
+
+def _progression_score(accuracies: list[float]) -> float:
+    """Score how cleanly a model's accuracy climbs across the four prompts.
+
+    We want the single model whose accuracy goes *up* from ``bad-zs`` to
+    ``good-fs`` with as few dips as possible and as wide a span as possible —
+    the clearest "de mieux en mieux" story.
+
+    Parameters
+    ----------
+    accuracies : list[float]
+        The four accuracies in :data:`_PROMPT_ORDER`.
+
+    Returns
+    -------
+    float
+        ``span - dips``: the total climb (last minus first) minus every
+        backward step. Higher is a cleaner, wider progression.
+    """
+    span = accuracies[-1] - accuracies[0]
+    dips = sum(
+        max(0.0, accuracies[i] - accuracies[i + 1])
+        for i in range(len(accuracies) - 1)
+    )
+    return span - dips
+
+
+def _pick_best_model(summary: dict[str, dict]) -> str:
+    """Return the candidate model with the cleanest prompt progression.
+
+    Parameters
+    ----------
+    summary : dict[str, dict]
+        The per-config summary produced by :func:`run`.
+
+    Returns
+    -------
+    str
+        The winning model tag (the one the docs will present).
+    """
+    by_model: dict[str, dict[str, float]] = {}
+    for s in summary.values():
+        by_model.setdefault(s["model"], {})[s["prompt"]] = s["point_accuracy"]
+    best_model, best_score = "", float("-inf")
+    for model, accs in by_model.items():
+        # Only models that ran the full 2×2 are eligible for the headline chart.
+        if not all(p in accs for p in _PROMPT_ORDER):
+            continue
+        score = _progression_score([accs[p] for p in _PROMPT_ORDER])
+        logger.info("Progression %-16s score=%+.3f", model, score)
+        if score > best_score:
+            best_model, best_score = model, score
+    return best_model
 
 
 def run(sample: int = _DEFAULT_SAMPLE) -> dict[str, object]:
@@ -219,6 +277,9 @@ def run(sample: int = _DEFAULT_SAMPLE) -> dict[str, object]:
         "sample": sample,
         "bootstrap": bootstrap,
         "summary": summary,
+        # The model whose accuracy climbs the most cleanly across the four
+        # prompts — the one the headline figure presents.
+        "best_model": _pick_best_model(summary),
     }
     _RESULTS_PATH.write_text(
         json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -262,7 +323,9 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"{key:24} | {s['boot_mean']:9.0%}  | {s['ci_low']:.0%}–{s['ci_high']:.0%}"
         )
-    print(f"\n({elapsed / 60:.1f} min ; prédictions mises en cache par config)")
+    best = results.get("best_model", "")  # type: ignore[union-attr]
+    print(f"\nMeilleure progression : {best} (présenté dans les figures)")
+    print(f"({elapsed / 60:.1f} min ; prédictions mises en cache par config)")
     return 0
 
 

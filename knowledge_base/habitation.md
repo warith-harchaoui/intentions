@@ -69,6 +69,7 @@ la signature.
 - Canalisation percée, tout est trempé, je déclare
 - Il y a eu une infiltration après les fortes pluies dans ma cave
 - Le radiateur a coulé et endommagé mon plancher
+- Un joint de douche a lâché et l'eau s'est infiltrée dans la cloison
 ## Réponse
 Coupez l'arrivée d'eau si vous le pouvez et protégez ce qui peut l'être.
 Je transmets votre déclaration au service sinistres habitation. Remplissez
@@ -146,6 +147,7 @@ dossier au service sinistres habitation.
 - Après l'incendie, mes meubles sont détruits, je déclare
 - Le feu a pris dans le tableau électrique, gros dégâts
 - Ma maison a été touchée par un incendie, comment procéder ?
+- Un barbecue a enflammé la terrasse et le mur du salon
 ## Réponse
 Votre sécurité d'abord : assurez-vous que tout le monde est hors de danger
 et que les secours sont passés. Je transmets votre déclaration au service

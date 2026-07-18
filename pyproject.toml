@@ -27,6 +27,8 @@ dependencies = [
     # fastText engine (Approach 2, always available — trains on our examples).
     # fasttext-wheel ships prebuilt binaries (no compiler needed).
     "fasttext-wheel>=0.9.2",
+    # Detect a query's language (EN/FR) so the LLM prompt matches it.
+    "langdetect>=1.0.9",
 ]
 
 [project.optional-dependencies]

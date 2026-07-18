@@ -70,6 +70,7 @@ situation. Un instant, je vous transfère.
 - je voudrai parler a un vrai conseiller humain
 - Je préfère échanger avec une personne du support
 - Est-ce possible d'avoir quelqu'un en ligne ?
+- Arrêtez le menu automatique, je veux un conseiller en direct
 ## Réponse
 Bien sûr, je vous mets en relation avec un conseiller. Merci de patienter
 quelques instants ; pour gagner du temps, gardez votre numéro de contrat à
@@ -186,6 +187,7 @@ Médiateur de l'Assurance.
 - vos bureaux sont ouverts le midi ?
 - Par quel moyen puis-je vous contacter ?
 - Où se trouve votre agence la plus proche ?
+- Avez-vous une ligne joignable les jours fériés ?
 ## Réponse
 Nos conseillers sont disponibles du lundi au vendredi de 8h à 19h et le
 samedi de 9h à 13h. L'assistance et les sinistres urgents sont joignables

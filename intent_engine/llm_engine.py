@@ -48,6 +48,7 @@ from typing import Any
 from .base import IntentEngine, IntentPrediction, IntentResult
 from .config import get_settings
 from .kb import KnowledgeBase
+from .lang import detect_language
 from .ollama_client import OllamaClient, OllamaError
 
 # Module logger — no bare prints in library code (coding standard rule 6).
@@ -78,68 +79,134 @@ Schéma de sortie :
 "reformulation": "<texte>"}\
 """
 
-# A **naive / quick-and-dirty** prompt ("à la va-vite"): the kind you dash off
-# in thirty seconds. It names the task and the JSON fields and nothing else —
-# no few-shot examples, no reasoning step, no anti-hallucination rule, no
-# out-of-scope escape hatch. It is the *low* end of the prompt-quality axis, so
-# the shootout can show how much a careful prompt buys over a careless one.
-_NAIVE_SYSTEM_PROMPT = """\
-Tu classes des phrases de clients d'assurance. Choisis UNE intention parmi le \
-catalogue fourni et réponds en JSON.
-Format : {"intent": "<id du catalogue>", "confidence": <nombre entre 0 et 1>}\
+# English mirror of the default system prompt. When a customer writes in
+# English (detected with langdetect), the LLM engine swaps to this prompt so
+# the instructions match the query language — the intent ids stay identical
+# (they are language-neutral snake_case), only the wording changes.
+_SYSTEM_PROMPT_EN = """\
+You are the intent-routing engine of the « Déraison Assurances » call centre. \
+Your job: read a customer's sentence (phone or written) and determine ONE \
+single intent from the provided catalogue, then extract the information useful \
+to handle the request.
+
+STRICT rules:
+1. Answer ONLY with a valid JSON object, no surrounding text.
+2. The "intent" field MUST be an EXACT identifier from the catalogue. If no \
+intent matches, return "intent": "hors_perimetre".
+3. "confidence" is your certainty between 0.0 and 1.0.
+4. "slots" holds the detected entities (contract number, registration plate, \
+urgency "faible"/"moyenne"/"haute", type of property, etc.). Empty object if \
+none.
+5. "reformulation" summarises the customer's request in one clear sentence.
+6. Never invent an intent identifier that is not in the catalogue.
+
+Output schema:
+{"intent": "<id>", "confidence": <float>, "slots": {<key>: <value>}, \
+"reformulation": "<text>"}\
 """
 
-# An **improved** prompt used to demonstrate the value of prompt engineering:
-# same task, same JSON contract, but (1) a short reasoning field *before* the
-# decision ("think then answer" lifts accuracy on small models), (2) three
-# worked few-shot examples that anchor the input→JSON mapping, and (3) a
-# sharper anti-hallucination + normalisation rule set. Compared head-to-head
-# against ``_SYSTEM_PROMPT`` in ``eval/llm_shootout.py``.
-_IMPROVED_SYSTEM_PROMPT = """\
-Tu es l'aiguilleur d'intentions du centre d'appels de « Déraison Assurances ». \
-Un client écrit ou dit une phrase ; tu dois choisir UNE intention du catalogue \
-fourni et extraire les informations utiles.
+# Default system prompts and user-message templates, keyed by query language.
+_SYSTEM_PROMPTS: dict[str, str] = {"fr": _SYSTEM_PROMPT, "en": _SYSTEM_PROMPT_EN}
+_USER_TEMPLATES: dict[str, str] = {
+    "fr": (
+        "Catalogue des intentions :\n{catalogue}\n\n"
+        'Phrase du client : "{text}"\n\n'
+        "Renvoie uniquement le JSON demandé."
+    ),
+    "en": (
+        "Intent catalogue:\n{catalogue}\n\n"
+        'Customer sentence: "{text}"\n\n'
+        "Return only the requested JSON."
+    ),
+}
 
-Méthode (réfléchis puis réponds) :
-- Lis la phrase, repère le VERBE d'action et l'OBJET (voiture, logement, santé, \
-contrat, paiement…).
-- Compare au catalogue et choisis l'identifiant EXACT le plus proche.
-- Si vraiment aucune intention ne colle, choisis "hors_perimetre".
-- Ne confonds pas des intentions voisines : « déclarer un accident » (sinistre) \
-≠ « souscrire » (nouveau contrat) ≠ « vol » (on m'a pris le bien).
+# --- Prompt-engineering experiment (2×2) ---------------------------------
+# Four prompts built from two INDEPENDENT switches, so the shootout can
+# isolate what each buys:
+#   * quality:  a **bad** prompt (task + schema, nothing else) vs a **good**
+#     prompt that adds error-driven disambiguation rules (below);
+#   * examples: **zero-shot** vs **few-shot** (three worked examples).
+# The few-shot examples use *fresh* utterances that are NOT in the test set —
+# using test queries as examples would be cheating (leakage).
 
-Règles de sortie :
-1. Réponds UNIQUEMENT par un objet JSON valide, sans texte ni balises autour.
-2. "raison" : une courte phrase expliquant ton choix (verbe + objet repérés).
-3. "intent" : un identifiant EXACT du catalogue (ou "hors_perimetre"). Jamais \
-un identifiant inventé.
-4. "confidence" : ta certitude entre 0.0 et 1.0 (sois honnête : bas si tu hésites).
-5. "slots" : entités utiles — "urgence" ∈ {faible, moyenne, haute}, "type_bien", \
-numéro de contrat, etc. Objet vide si rien.
-6. "reformulation" : la demande résumée en une phrase.
+# Shared task + output schema (constant across all four, so the only
+# differences are the rules and the examples).
+_EXP_TASK = (
+    "Tu es l'aiguilleur d'intentions de « Déraison Assurances ». Pour la "
+    "phrase du client, choisis UNE intention du catalogue fourni et réponds "
+    "en JSON."
+)
+_EXP_SCHEMA = (
+    'Format de sortie : {"intent": "<id du catalogue>", "confidence": '
+    '<nombre entre 0 et 1>, "slots": {<clé>: <valeur>}, "reformulation": '
+    '"<phrase>"}'
+)
 
-Exemples :
-Phrase : "on s'est rentrés dedans à un carrefour, tôle froissée"
-{"raison":"choc entre véhicules, dégâts matériels → sinistre auto",\
-"intent":"declarer_sinistre_auto","confidence":0.95,"slots":\
-{"type_bien":"auto","urgence":"moyenne"},"reformulation":\
-"Le client déclare un accident matériel de voiture."}
+# The **good** half: explicit disambiguation of the exact intent pairs an
+# error analysis showed the model confuses (souscrire vs modifier vs
+# probleme_paiement; theft vs accident). This is prompt engineering *driven
+# by the mistakes*, and it is what actually moves the accuracy.
+_EXP_RULES = (
+    "Distinctions à NE PAS confondre (les erreurs viennent de là) :\n"
+    "- souscrire_* = NOUVEAU contrat pour un bien pas encore assuré "
+    '("je viens d\'acheter", "il me faut une assurance pour…").\n'
+    "- modifier_contrat = changer un contrat DÉJÀ existant (véhicule, "
+    "conducteur, adresse, garantie). Changer de voiture sur son contrat = "
+    "modifier, PAS souscrire.\n"
+    "- probleme_paiement = paiement / prélèvement / RIB / banque, y compris "
+    '"j\'ai changé de banque, mettez à jour mes coordonnées".\n'
+    "- vol_vehicule = on a DÉROBÉ le véhicule ou des objets dedans. "
+    "declarer_sinistre_auto = DÉGÂTS par accident / choc, sans vol.\n"
+    "- resilier_contrat = arrêter / ne pas reconduire un contrat."
+)
 
-Phrase : "je viens d'acheter une voiture, il me faut une couverture"
-{"raison":"nouveau véhicule à assurer → souscription",\
-"intent":"souscrire_assurance_auto","confidence":0.94,\
-"slots":{"type_bien":"auto"},"reformulation":\
-"Le client veut assurer une voiture qu'il vient d'acheter."}
+# The **few-shot** half: three worked examples on FRESH queries (never in the
+# test set — that would be leakage), each showing the exact JSON to produce.
+_EXP_FEWSHOT = (
+    "Exemples :\n"
+    'Phrase : "un camion m\'a accroché en reculant, l\'aile est enfoncée" → '
+    '{"intent":"declarer_sinistre_auto","confidence":0.95,'
+    '"slots":{"type_bien":"auto"},"reformulation":"Accident matériel auto."}\n'
+    'Phrase : "je viens de prendre un scooter, il me faut une assurance" → '
+    '{"intent":"souscrire_assurance_auto","confidence":0.93,'
+    '"slots":{"type_bien":"deux-roues"},"reformulation":"Assurer un scooter '
+    'neuf."}\n'
+    'Phrase : "on a forcé mon coffre et volé mes outils dans la voiture" → '
+    '{"intent":"vol_vehicule","confidence":0.9,"slots":{"urgence":"haute"},'
+    '"reformulation":"Vol d\'objets dans la voiture."}'
+)
 
-Phrase : "on a fracturé ma portière et pris mon sac dans la voiture"
-{"raison":"effraction et vol d'objets dans le véhicule → vol",\
-"intent":"vol_vehicule","confidence":0.9,"slots":\
-{"type_bien":"auto","urgence":"haute"},"reformulation":\
-"Le client signale un vol dans sa voiture."}
 
-Schéma de sortie :
-{"raison":"<texte>","intent":"<id>","confidence":<float>,"slots":{<clé>:<valeur>},"reformulation":"<texte>"}\
-"""
+def experiment_prompt(good: bool, fewshot: bool) -> str:
+    """Assemble one of the four experiment prompts from two switches.
+
+    Parameters
+    ----------
+    good : bool
+        Include the error-driven disambiguation rules (the "good" half).
+    fewshot : bool
+        Include the three worked few-shot examples.
+
+    Returns
+    -------
+    str
+        The assembled system prompt.
+
+    Examples
+    --------
+    >>> "Distinctions" in experiment_prompt(good=True, fewshot=False)
+    True
+    >>> "Distinctions" in experiment_prompt(good=False, fewshot=False)
+    False
+    """
+    # Order: task → (rules if good) → (examples if few-shot) → schema.
+    parts = [_EXP_TASK]
+    if good:
+        parts.append(_EXP_RULES)
+    if fewshot:
+        parts.append(_EXP_FEWSHOT)
+    parts.append(_EXP_SCHEMA)
+    return "\n\n".join(parts)
 
 
 def _extract_json(raw: str) -> str:
@@ -234,9 +301,10 @@ class LlmIntentEngine(IntentEngine):
         )
         # Model tag: explicit override wins, else the host-aware default.
         self._model: str = model or settings.llm_model
-        # System prompt: lets the eval swap the baseline for the improved,
-        # prompt-engineered variant to measure the accuracy lift.
-        self._system_prompt: str = system_prompt or _SYSTEM_PROMPT
+        # System-prompt override: when set (e.g. the prompt-engineering eval),
+        # it wins for every query. When ``None`` (the product default), the
+        # prompt is picked per query to match the *detected* language.
+        self._system_prompt_override: str | None = system_prompt
         # Retained for answer/routing lookup and to build the catalogue.
         self._kb: KnowledgeBase | None = None
         # The pre-rendered catalogue block injected into every prompt. Built
@@ -321,16 +389,23 @@ class LlmIntentEngine(IntentEngine):
         if self._kb is None:
             raise RuntimeError("LlmIntentEngine.classify called before fit().")
 
-        # Assemble the two-message chat: the fixed system prompt, then a user
-        # message carrying the catalogue and the sentence to classify.
+        # Match the prompt to the query's language: detect it, then pick the
+        # system prompt and user-message template. An explicit override (the
+        # prompt-engineering eval) short-circuits the system-prompt choice.
+        lang = detect_language(text)
+        system = self._system_prompt_override or _SYSTEM_PROMPTS.get(
+            lang, _SYSTEM_PROMPT
+        )
+        template = _USER_TEMPLATES.get(lang, _USER_TEMPLATES["fr"])
+
+        # Assemble the two-message chat: the system prompt, then a user message
+        # carrying the catalogue and the sentence to classify.
         messages = [
-            {"role": "system", "content": self._system_prompt},
+            {"role": "system", "content": system},
             {
                 "role": "user",
-                "content": (
-                    f"Catalogue des intentions :\n{self._catalogue_block}\n\n"
-                    f'Phrase du client : "{text}"\n\n'
-                    "Renvoie uniquement le JSON demandé."
+                "content": template.format(
+                    catalogue=self._catalogue_block, text=text
                 ),
             },
         ]

@@ -108,6 +108,7 @@ envoyez le décompte de la Sécu et je transmets au service santé.
 - besoin dune prise en charge pour la clinique
 - Pouvez-vous transmettre le tiers payant au laboratoire d'analyses ?
 - Je veux éviter d'avancer les frais chez l'opticien
+- Le kiné me demande si le tiers payant s'applique pour mes séances
 ## Réponse
 Je m'en occupe. Indiquez-moi l'établissement, la date et la nature des
 soins. Je fais établir la prise en charge et je l'envoie directement à
