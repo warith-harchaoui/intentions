@@ -245,7 +245,7 @@ the larger `gemma3:4b`) and the **examples** (zero-shot vs three worked few-shot
 examples, on *fresh* sentences never in the test set, so no leakage) — at a
 fixed, engineered prompt:
 
-![Model and few-shots: better and better](docs/img/shootout-en.png)
+![Model and few shots: better and better](docs/img/shootout-en.png)
 
 > **The model buys the big jump; few-shot adds a little on top.** Accuracy
 > climbs **67 → 77 → 87 → 93 %**: going from the small model to the larger one is

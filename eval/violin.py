@@ -67,12 +67,12 @@ _TEXT: dict[str, dict[str, str]] = {
     "fr": {
         "cv_title": "Exactitude par moteur (validation croisée 5 blocs)",
         "axis": "Exactitude (plus c'est haut, mieux c'est)",
-        "shoot_title": "Modèle et few-shot : de mieux en mieux",
+        "shoot_title": "Modèle et few shots : de mieux en mieux",
     },
     "en": {
         "cv_title": "Accuracy by engine (5-fold cross-validation)",
         "axis": "Accuracy (higher is better)",
-        "shoot_title": "Model and few-shot: better and better",
+        "shoot_title": "Model and few shots: better and better",
     },
 }
 

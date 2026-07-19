@@ -50,7 +50,7 @@ domaine :
 4. **Embeddings contextuels (BERT/SBERT) + réseau de neurones** — du sens qui
    dépend du contexte, plus un classifieur non-linéaire.
 5. **LLM génératif (Gemma)** — aucun entraînement ; du raisonnement à partir
-   d'un prompt, et — c'est unique — l'extraction de *slots* structurés.
+   d'un prompt et — c'est unique — l'extraction de *slots* structurés.
 
 ```mermaid
 flowchart LR
@@ -64,7 +64,7 @@ flowchart LR
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
 des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
-**51 % → 66 % → 74 % → 86 %** des moteurs 1→4, et le LLM ajoute l'extraction de
+**51 % → 66 % → 74 % → 86 %** des moteurs 1→4 et le LLM ajoute l'extraction de
 slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un(e)
 praticien(ne) : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
 variance train/test (**validation croisée** k-fold), la mauvaise calibration
@@ -150,7 +150,7 @@ pip install ".[eval]"
 # puis ouvrez http://localhost:8000
 ```
 
-Écrivez une demande, choisissez un moteur (ou **Comparer tout**), et voyez les
+Écrivez une demande, choisissez un moteur (ou **Comparer tout**) et voyez les
 prédictions des 5 moteurs côte à côte : barres de confiance, latences, slots
 extraits et action d'aiguillage. Parcourez la base de connaissance pour essayer
 des exemples.
@@ -203,7 +203,7 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 > (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
 > de la forêt coûtent plus cher que la tête MLP de BERT à deux produits matriciels
 > (~20 ms) ou la recherche de vecteurs de fastText (~33 µs). « À l'ancienne » ne
-> veut pas dire « rapide », et « neuronal » ne veut pas dire « lent » : on mesure,
+> veut pas dire « rapide » et « neuronal » ne veut pas dire « lent » : on mesure,
 > on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps —
 > voir `eval/bench.py` ; le chiffre du LLM est le calcul propre d'Ollama.)
 
@@ -219,7 +219,7 @@ chevauchent à peine : les moteurs sont *réellement* différents, pas du bruit 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
 > l'exactitude monte 51 → 66 → 74 → 86 %. Mais en **validation croisée** sur les
 > exemples in-distribution de la KB, les moteurs sont *plus proches* : le lexical
-> s'en sort quand le test ressemble à l'entraînement, et s'effondre sous le
+> s'en sort quand le test ressemble à l'entraînement et s'effondre sous le
 > changement de distribution (paraphrases) — la raison d'être des représentations
 > sémantiques.
 >
@@ -230,12 +230,12 @@ chevauchent à peine : les moteurs sont *réellement* différents, pas du bruit 
 >
 > **Sur le choix du LLM.** Le défaut est le compact `gemma3:4b` (~5 s à chaud) :
 > il atteint **82 %**, *sous* BERT — un petit LLM local troque de l'exactitude
-> contre de la vitesse, et son vrai atout est l'**extraction de slots + le
+> contre de la vitesse et son vrai atout est l'**extraction de slots + le
 > zero-shot**, pas la précision brute. Le plus gros `gemma4:e4b` monte à ~93 %
 > mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
 > on choisit selon le besoin.
 
-### Un modèle plus gros, ou quelques exemples ? Un 2×2 sur le LLM
+### Un modèle plus gros ou quelques exemples ? Un 2×2 sur le LLM
 
 La leçon *représentation* ci-dessus parle du classifieur. Celle-ci parle du
 **LLM**, selon deux réglages indépendants — le **modèle** (un petit `qwen2.5:3b`
@@ -243,7 +243,7 @@ vs le plus gros `gemma3:4b`) et les **exemples** (zéro-shot vs trois exemples
 few-shot, sur des phrases **fraîches** hors jeu de test, donc sans tricher) — à
 prompt (soigné) constant :
 
-![Modèle et "few shots" : de mieux en mieux](docs/img/shootout-fr.png)
+![Modèle et few shots : de mieux en mieux](docs/img/shootout-fr.png)
 
 > **Le modèle fait le grand saut ; le few-shot ajoute un petit plus.**
 > L'exactitude grimpe **67 → 77 → 87 → 93 %** : passer du petit modèle au plus
