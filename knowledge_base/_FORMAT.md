@@ -9,7 +9,7 @@ intention. Toute la connaissance vit dans les autres fichiers *.md.
 > **Ceci n'est pas une intention** — fichier de documentation, ignoré par le moteur.
 
 La règle d'or : **chaque titre de niveau 1 (`# ...`) est UNE intention.**
-Un·e expert·e métier ajoute une intention en écrivant du Markdown, sans
+Un(e) expert(e) métier ajoute une intention en écrivant du Markdown, sans
 jamais toucher au code Python.
 
 ## Anatomie d'une intention

@@ -65,18 +65,18 @@ flowchart LR
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
 des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
 **51 % → 66 % → 74 % → 86 %** des moteurs 1→4, et le LLM ajoute l'extraction de
-slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un·e
-praticien·ne : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
+slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un(e)
+praticien(ne) : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
 variance train/test (**validation croisée** k-fold), la mauvaise calibration
 des réseaux de neurones (trop sûrs d'eux hors-périmètre) et la confidentialité
-(pourquoi tout tourne en local). But : qu'un·e collègue non-ML reparte en
+(pourquoi tout tourne en local). But : qu'un(e) collègue non-ML reparte en
 comprenant *pourquoi* choisir une approche plutôt qu'une autre.
 
 ---
 
 ## Le principe : la connaissance vit dans du Markdown
 
-**Un titre `# h1` = une intention.** Un·e expert·e métier ajoute une intention
+**Un titre `# h1` = une intention.** Un(e) expert(e) métier ajoute une intention
 en écrivant du Markdown dans `knowledge_base/`, **sans toucher au code** :
 
 ```markdown
@@ -252,8 +252,8 @@ plus nette :
 > **Soigner le prompt paie surtout quand le modèle est faible.** Sur le petit
 > `qwen2.5:3b`, les quatre prompts grimpent **60 → 60 → 67 → 77 %** — +17 points
 > par les mots et les exemples seuls. Sur `gemma3:4b`, déjà à ~90 %, le même
-> effort ne bouge presque rien (il est proche de son plafond). La morale qu'un·e
-> praticien·ne reconnaît : *avant de sortir un modèle plus gros, corrige le
+> effort ne bouge presque rien (il est proche de son plafond). La morale qu'un(e)
+> praticien(ne) reconnaît : *avant de sortir un modèle plus gros, corrige le
 > prompt — mais n'attends pas de miracle quand le modèle est déjà fort.*
 > (Échantillon tenu à l'écart de 30 ; prédictions mises en cache par config dans
 > `eval/.llm_shootout/`.)
