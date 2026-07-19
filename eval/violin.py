@@ -246,12 +246,7 @@ def build_shootout_spec(results: dict, lang: str) -> dict:
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
             "text": _TEXT[lang]["shoot_title"],
-            # Name the single model shown, so the reader knows this is one
-            # model across four prompts (not four models).
-            "subtitle": best_model.replace("-mlx", ""),
-            "subtitleColor": "#6E6E73",
             "font": "Roboto",
-            "subtitleFont": "Roboto",
             "anchor": "start",
             "fontSize": 16,
         },
