@@ -69,10 +69,10 @@ ENGINES: list[dict[str, str]] = [
         "key": "fasttext_pretrained",
         "fr": "fastText\n(pré-entraîné)",
         "en": "fastText\n(pretrained)",
-        "color": "#AF52DE",  # Purple
+        "color": "#28CD41",  # Green
         "kind": "cv",
     },
-    {"key": "bert", "fr": "BERT", "en": "BERT", "color": "#28CD41", "kind": "cv"},
+    {"key": "bert", "fr": "BERT", "en": "BERT", "color": "#AF52DE", "kind": "cv"},
     {
         "key": "qwen-zs",
         "fr": "qwen2.5:3b\nzero shot",
@@ -249,17 +249,16 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
                 "title": None,
             }
         },
+        "spacing": 0,
         "spec": {
-            "width": 70,
+            "width": 62,
             "height": 420,
             "layer": [
                 {
-                    # A straight x-axis baseline under each column, at 0 %.
-                    "mark": {"type": "rule", "size": 1, "color": "#8E8E93"},
-                    "encoding": {"y": {"datum": 0}},
-                },
-                {
-                    # Violins: the trainable engines, smoothed by KDE.
+                    # Violins: the trainable engines, smoothed by KDE. The
+                    # density x-axis is hidden except its bottom *domain* line —
+                    # with facet spacing 0 (below), those per-column lines join
+                    # into ONE straight baseline running left→right at 0 %.
                     "transform": [
                         {"filter": "datum.kind === 'cv'"},
                         {
@@ -283,6 +282,8 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
                                 "ticks": False,
                                 "grid": False,
                                 "values": [],
+                                "domain": True,
+                                "domainColor": "#8E8E93",
                             },
                         },
                         "color": color_enc,
