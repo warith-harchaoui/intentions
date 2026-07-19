@@ -56,7 +56,7 @@ domaine :
 flowchart LR
     A["1 · TF-IDF<br/>sac-de-mots<br/>51 %"] --> B["2 · fastText<br/>sous-mots appris<br/>66 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>74 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>86 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
+    style B fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
@@ -223,7 +223,7 @@ huit moteurs partagent une couleur, la même dans **toutes** les figures du dép
 | Moteur | Couleur | | Moteur | Couleur |
 |---|---|---|---|---|
 | ⬤ TF-IDF | Bleu `#007AFF` | | ⬤ qwen2.5:3b · zero shot | Jaune `#FFCC00` |
-| ⬤ fastText (appris) | Turquoise `#79DBDC` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
+| ⬤ fastText (appris) | Turquoise `#1D8C8D` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
 | ⬤ fastText (pré-entraîné) | Violet `#AF52DE` | | ⬤ gemma3:4b · zero shot | Rose `#FF2D55` |
 | ⬤ BERT | Vert `#28CD41` | | ⬤ gemma3:4b · few shots | Rouge `#FF3B30` |
 
@@ -295,7 +295,7 @@ flowchart LR
     style KB fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
     style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
-    style E2 fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
+    style E2 fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
     style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
     style E5 fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E

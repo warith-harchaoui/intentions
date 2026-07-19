@@ -62,7 +62,7 @@ ENGINES: list[dict[str, str]] = [
         "key": "fasttext_custom",
         "fr": "fastText\n(appris)",
         "en": "fastText\n(learned)",
-        "color": "#79DBDC",  # Turquoise
+        "color": "#1D8C8D",  # Turquoise, darkened for legibility
         "kind": "cv",
     },
     {
