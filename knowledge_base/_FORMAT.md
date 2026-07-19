@@ -36,12 +36,12 @@ sinistres auto. Munissez-vous de votre numéro de contrat et du constat.
 
 | Élément | Rôle |
 |---|---|
-| `# identifiant` | **Id machine** de l'intention (snake_case, sans accent). C'est la classe apprise par les moteurs TF-IDF et BERT, et l'id que le LLM doit renvoyer. |
+| `# identifiant` | **Id machine** de l'intention (snake_case, sans accent). C'est la classe apprise par les moteurs TF-IDF et BERT et l'id que le LLM doit renvoyer. |
 | `> **Titre**` | Libellé lisible affiché dans l'interface. |
 | `> **Service**` | Service vers lequel aiguiller l'appel. |
 | `> **Action**` | Action machine exécutée : `route:<service>` (transfert) ou `form:<formulaire>` (ouverture d'un formulaire). |
 | `> **Urgence**` | Métadonnée libre (`faible` / `moyenne` / `haute`). |
-| `## Exemples` | Phrases d'entraînement (une par puce). **Le carburant des moteurs TF-IDF et BERT**, et exemples few-shot du prompt LLM. Plus il y en a, mieux c'est. |
+| `## Exemples` | Phrases d'entraînement (une par puce). **Le carburant des moteurs TF-IDF et BERT** et exemples few-shot du prompt LLM. Plus il y en a, mieux c'est. |
 | `## Réponse` | Le script lu/affiché au client quand l'intention est détectée avec confiance. |
 
 ## Bonnes pratiques pour les exemples

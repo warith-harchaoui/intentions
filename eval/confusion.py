@@ -38,7 +38,6 @@ from .violin import _IMG_DIR, ENGINES, _render
 logger = logging.getLogger(__name__)
 
 _SHOOT_CACHE = Path(__file__).resolve().parent / ".llm_shootout"
-_SHOOT_SAMPLE = 30  # the prompt experiment's held-out sample size
 
 # Per-word French spelling with the right accents (lowercase). French uses
 # *sentence case*: an intent id like ``vol_vehicule`` reads ``Vol véhicule``
@@ -79,9 +78,11 @@ def _pretty(intent_id: str, lang: str) -> str:
     """
     if intent_id == _ABSTAIN_KEY:
         return _ABSTAIN_LABEL[lang]
-    words = [_ACCENT.get(w, w.capitalize()) for w in intent_id.split("_")]
+    # Sentence case: accents restored, words lowercase, only the FIRST word
+    # capitalised ("faire_reclamation" → "Faire réclamation").
+    words = [_ACCENT.get(w, w) for w in intent_id.split("_")]
     label = " ".join(words)
-    return label[:1].upper() + label[1:]  # ensure the first word is capitalised
+    return label[:1].upper() + label[1:]
 
 
 def _confusion_cv(engine: str, router: IntentRouter) -> dict:
@@ -103,8 +104,12 @@ def _confusion_llm(engine: dict, intents: list[str]) -> dict:
         return {}
     cache: dict[str, str] = json.loads(path.read_text(encoding="utf-8"))
     counts: dict[tuple[str, str], int] = {}
-    for case in load_dataset()[:_SHOOT_SAMPLE]:
-        pred = cache.get(case["text"], "")
+    # Only the examples the LLM actually classified (the cached ones) — the LLM
+    # runs on a smaller sample than the classifiers (it is far slower).
+    for case in load_dataset():
+        if case["text"] not in cache:
+            continue
+        pred = cache[case["text"]]
         if pred not in intents:  # empty, hors_perimetre or unknown → abstain
             pred = _ABSTAIN_KEY
         counts[(case["expected"], pred)] = counts.get((case["expected"], pred), 0) + 1
@@ -164,11 +169,19 @@ def build_heatmap_spec(
         "axis": {"labelFontSize": 9},
     }
 
+    total = sum(counts.values())
+    sub = {
+        "fr": f"jeu tenu à l'écart · {total} phrases · {len(intents)} intentions",
+        "en": f"held-out test · {total} utterances · {len(intents)} intents",
+    }[lang]
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
             "text": f"{_TEXT[lang]['title']} — {label}",
+            "subtitle": sub,
+            "subtitleColor": "#6E6E73",
             "font": "Roboto",
+            "subtitleFont": "Roboto",
             "anchor": "start",
             "fontSize": 16,
         },

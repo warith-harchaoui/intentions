@@ -1,6 +1,8 @@
 # Déraison Assurances — un *intent engine*, en 5 approches
 
-[🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md) — 📖 Mode d'emploi : [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
+[🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md)
+
+📖 Mode d'emploi : [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
 > « Mes collègues me demandent **comment on fait** un moteur de détection
 > d'intention. » — Ce dépôt répond, en montrant **cinq façons** de le faire,
@@ -18,11 +20,11 @@ volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 
 | # | Moteur | Représentation | Classifieur | Le compromis |
 |---|--------|----------------|-------------|--------------|
-| 1 | **TF-IDF** | n-grammes creux (car./mots) | **Random Forest** | Instantané, minuscule. Mémorise les formes de surface. |
-| 2 | **fastText (appris)** | sous-mots **appris sur nos exemples** | softmax fastText | Léger ; un cran au-dessus du sac-de-mots. |
-| 3 | **fastText (pré-entraîné)** | vecteurs **cc.fr.300** (Common Crawl) | régression logistique | Transfert : sait déjà que *voiture* ≈ *véhicule*. |
-| 4 | **BERT** | embeddings contextuels (**SBERT**) | **MLP PyTorch** | Comprend le sens ; gagne sur les paraphrases. Local. |
-| 5 | **LLM** | — (prompt) | **Gemma** via Ollama, **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent, le plus malin. |
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF** | n-grammes creux (car./mots) | **Random Forest** | Instantané, minuscule. Mémorise les formes de surface. |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | sous-mots **appris sur nos exemples** | softmax fastText | Léger ; un cran au-dessus du sac-de-mots. |
+| 3 | <span style="color:#28CD41">■</span> **fastText (pré-entraîné)** | vecteurs **cc.fr.300** (Common Crawl) | régression logistique | Transfert : sait déjà que *voiture* ≈ *véhicule*. |
+| 4 | <span style="color:#AF52DE">■</span> **BERT** | embeddings contextuels (**SBERT**) | **MLP PyTorch** | Comprend le sens ; gagne sur les paraphrases. Local. |
+| 5 | <span style="color:#FF3B30">■</span> **LLM** | (prompt) | **Gemma / qwen** via Ollama, **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent, le plus malin. |
 
 📊 Le comparatif détaillé et sourcé (benchmarks, RGPD, coûts) : **[`PROS_CONS.md`](PROS_CONS.md)**.
 📖 Le mode d'emploi pas à pas (avec captures) : **[`MODEDEMPLOI.md`](MODEDEMPLOI.md)**.
@@ -202,7 +204,7 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 | 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
 | 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
 
-<sup>¹ Les quatre configs LLM sont mesurées sur l'échantillon de 30 exemples de l'expérience de prompt ; les quatre classifieurs sur les 88 paraphrases tenues à l'écart. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
+<sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval — seul le LLM génératif le fait. ¹ Les quatre configs LLM sont mesurées sur l'échantillon de 30 exemples de l'expérience de prompt ; les quatre classifieurs sur les 88 paraphrases tenues à l'écart. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
 
 > **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
 > (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
@@ -241,6 +243,26 @@ ci-dessus et dans toutes les autres figures du dépôt :
 > zero-shot**, pas la précision brute. Le plus gros `gemma4:e4b` monte à ~93 %
 > mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
 > on choisit selon le besoin.
+
+### Où chaque moteur se trompe ? Matrices de confusion
+
+Un chiffre d'exactitude cache *comment* un moteur échoue. Chaque carte de
+chaleur compte, pour chaque intention réelle (lignes), l'intention prédite
+(colonnes), plus une colonne `Abstention` pour les cas « transfert humain ». La
+diagonale, c'est là où le moteur a raison ; le hors-diagonale, ses confusions.
+Chaque matrice porte la couleur de son moteur (blanc vers couleur). Dans l'ordre,
+la diagonale se resserre : les moteurs lexicaux s'éparpillent et s'appuient
+beaucoup sur `Abstention`, BERT décroche une diagonale quasi nette, et les
+configs LLM se resserrent encore avec un meilleur modèle et des exemples few-shot.
+
+| | |
+|---|---|
+| ![Matrice de confusion TF-IDF + Random Forest](docs/img/confusion-tfidf-fr.png) | ![Matrice de confusion fastText (appris)](docs/img/confusion-fasttext_custom-fr.png) |
+| ![Matrice de confusion fastText (pré-entraîné)](docs/img/confusion-fasttext_pretrained-fr.png) | ![Matrice de confusion BERT + MLP](docs/img/confusion-bert-fr.png) |
+| ![Matrice de confusion qwen2.5:3b zero shot](docs/img/confusion-qwen-zs-fr.png) | ![Matrice de confusion qwen2.5:3b few shots](docs/img/confusion-qwen-fs-fr.png) |
+| ![Matrice de confusion gemma3:4b zero shot](docs/img/confusion-gemma-zs-fr.png) | ![Matrice de confusion gemma3:4b few shots](docs/img/confusion-gemma-fs-fr.png) |
+
+On régénère les huit avec `python -m eval.confusion`.
 
 ### Un modèle plus gros ou quelques exemples ? Un 2×2 sur le LLM
 

@@ -33,6 +33,28 @@
 - Je passe mon permis bientôt, je voudrais préparer l'assurance de ma première voiture
 - Est-ce que je peux souscrire une assurance auto en ligne ?
 - Je voudrais un contrat au tiers pour ma petite citadine
+- Je cherche une assurance auto, vous m'aidez ?
+- J’aimerais comparer les prix des assurances auto.
+- Est-ce que vous faites des offres spéciales pour les jeunes conducteurs ?
+- J'ai besoin d'une assurance auto, c'est urgent !
+- Pouvez-vous me montrer les différentes formules d'assurance auto ?
+- Je voudrais connaître le coût mensuel d’une assurance auto.
+- J'hésite à changer d'assurance, dites-moi ce qu’il faut vérifier.
+- Ma vieille voiture a besoin d’une assurance, mais je veux pas payer trop cher.
+- Est-ce que votre assurance couvre bien les tiers ?
+- J’en ai marre de galérer avec l’assurance, aidez-moi !
+- Je suis étudiant et j'ai besoin d'une assurance auto à petit prix.
+- Quel est le délai pour obtenir un devis ?
+- J'ai déjà une assurance auto, mais je voudrais changer de compagnie.
+- Pouvez-vous me guider dans le choix d’une assurance auto ?
+- J'aimerais une assurance auto avec assistance dépannage.
+- Je suis novice en matière d'assurance auto, c’est compliqué !
+- J’ai un véhicule électrique, est-ce que ça influence le prix de l’assurance ?
+- Est-ce qu’il y a des réductions si je souscris plusieurs assurances ?
+- Ma voiture a été volée, j’ai besoin d’une assurance auto immédiatement.
+- Je veux une assurance auto pour une courte durée, par exemple 6 mois.
+- Pouvez-vous me donner un plan tarifaire des assurances auto ?
+- J'ai un bon conducteur, est-ce que ça peut jouer en ma faveur sur l'assurance ?
 ## Réponse
 Avec plaisir. Pour établir un devis d'assurance auto, j'ai besoin de la
 carte grise du véhicule, de votre permis et de votre relevé d'information.
@@ -76,6 +98,27 @@ la formule (au tiers, intermédiaire ou tous risques).
 - Ma portière a été enfoncée, je fais comment pour la déclaration ?
 - Je dois vous transmettre le constat amiable qu'on a rempli
 - Un automobiliste m'a percuté au feu rouge, je déclare le sinistre
+- J'ai eu une collision ce matin au feu rouge.
+- Je veux faire une déclaration suite à un choc.
+- Quelqu’un m’a rayé la voiture en stationnement, c'est pas croyable !
+- Mon capot est tombé, je suis dégoûté.
+- J'ai été heurté par une grosse camionnette.
+- Je déclare un sinistre, j'ai des dégâts importants.
+- Ma voiture a été tamponnée hier soir.
+- Il y avait un impact, je dois faire une déclaration.
+- J’ai un préjudice suite à un accident de la route.
+- Mon pare-choc est plié, ça ne ressemble plus à rien.
+- Je voudrais signaler un dommage, j'ai besoin d'aide.
+- J'ai été percuté par un cycliste, c'est le bazar.
+- Ma voiture est abîmée, je déclare le sinistre.
+- J’ai fait une grêle, ça m'inquiète.
+- Je veux signaler un accident de roulage.
+- Mon pare-brise est craquelé, j'ai besoin d'une prise en charge.
+- J'ai un choc sur la portière, je suis venu faire constater les dégâts.
+- Il y a eu un hecate, je suis perplexe.
+- Je déclare ma voiture endommagée.
+- Mon arrière-garde est cassé, je ne sais pas comment faire.
+- J'ai été victime d'un tamponnage.
 ## Réponse
 Je suis navré pour cet incident. Je vous mets en relation avec le service
 sinistres auto. Préparez votre numéro de contrat, le constat amiable rempli
@@ -115,6 +158,31 @@ déclarer un sinistre matériel.
 - Plus de voiture ce matin, elle a été dérobée pendant la nuit
 - Cambriolage de mon véhicule, la roue de secours a été prise
 - Ils ont volé ma valise laissée dans le coffre de la voiture
+- On m'a carrément pris ma Clio !
+- Ma voiture a disparu, je sais pas comment c'est possible.
+- Il y a eu un vol sur mon parking, c’est horrible.
+- J’ai fait une déclaration de vol, ma Fiesta a evaporé.
+- Vol de ma Polo, ça doit être l'œuvre d'un voyou.
+- Ma voiture est partie en sucette, je suis scandalisé.
+- Je n’arrive pas à croire, on m’a volé la Golf !
+- Un truc de fou, ma voiture a été dérobée.
+- On me dit que c'est un vol, je ne comprends pas comment ça s'est passé.
+- Ma voiture a disparu ce matin, je suis sans voix.
+- J’ai eu une surprise : mon véhicule a été volé !
+- Je pense qu’ils ont forcé la vitre et pris ma voiture.
+- Ils ont volé tout de dedans, c'est un carnage dans ma voiture.
+- Mon Peugeot a disparu, j'espère qu'on la retrouve vite.
+- La police doit enquêter sur ce vol de véhicule.
+- J’ai fait une constatation, ma voiture a été dérapée !
+- On m'a volé les clés et la voiture, c'est inadmissible.
+- Ma voiture est partie en flème, je suis au bout du rouleau.
+- C'est l'enfer, mon véhicule a été volé cette nuit !
+- J’ai un trou béant dans ma poche, et ma voiture aussi.
+- Je crois que quelqu’un m'a fait une jambée, ma voiture est partie.
+- Ils ont arraché la portière et pris ma voiture, c’est violent.
+- Ma voiture a disparu sans laisser de trace, ça me déconne.
+- Il faut absolument qu'ils retrouvent ma voiture, elle vaut cher !
+- J’ai un sentiment étrange, ma voiture est bien volée.
 ## Réponse
 C'est une situation stressante, je vais vous aider. Déposez d'abord plainte
 au commissariat : le récépissé est indispensable. Ensuite je transmets votre
@@ -155,6 +223,30 @@ contrat.
 - Besoin d'assistance, je suis immobilisé au bord de la route
 - Mon véhicule ne redémarre pas ce matin, panne totale
 - Roue à plat sur le périphérique, il me faut de l'aide
+- J’ai un blocage moteur, ça ne démarre plus du tout !
+- Ma voiture est calée au bord de la route, je suis bloqué.
+- Je suis tombé en rade sur le parking, vous pouvez venir ?
+- La batterie est mort, j'ai besoin d'une dépanneuse urgente.
+- J’ai un problème avec l’allumage, ça ne tourne plus.
+- Ma voiture a perdu de la puissance, je suis inquiet.
+- Je suis coincé dans le stationnement, une dépanneuse s’il vous plaît.
+- Une dépanneuse pour moi, vite ! J'ai vraiment besoin d'aide.
+- J’ai un problème avec le démarreur, ça ne tourne pas.
+- Ma voiture est bloquée dans la neige, aidez-moi s’il vous plaît.
+- Je suis tombé en panne sèche, je perds de la chaleur.
+- J’ai besoin d’une assistance pour ma voiture, c'est urgent.
+- Ma voiture ne démarre plus, pouvez-vous me dépanner ?
+- La direction assistée a lâché, impossible de manœuvrer.
+- J'ai un problème avec le filtre à air, ça ne fonctionne pas.
+- Je suis bloqué dans une ruelle étroite, aidez !
+- Une dépanneuse pour aller chez moi, s’il vous plaît.
+- Ma voiture est tombée en panne près de la gare, pouvez-vous venir ?
+- J'ai un souci au niveau du carburateur, ça ne démarre pas.
+- Je suis coincé sur le bord de la route, j'ai besoin d'une assistance.
+- Ma batterie est faible, je crains que ça ne tombe à plat.
+- J’ai un problème avec l’alternateur, ça risque de tomber en panne.
+- Une dépanneuse rapide, s'il vous plaît ! J'ai peur pour ma voiture.
+- Je suis tombé en panne sur le chemin du retour, aidez-moi !
 ## Réponse
 Je déclenche l'assistance routière immédiatement. Restez en sécurité, hors
 de la chaussée si vous êtes sur autoroute. Un dépanneur va vous rappeler

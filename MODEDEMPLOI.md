@@ -30,7 +30,7 @@ De haut en bas :
   en haut à droite — le **thème** (☀️/🌙) et le **drapeau de langue** (🇫🇷/🇬🇧).
   Les deux choix sont mémorisés d'une visite à l'autre.
 - **Cinq cartes** — un rappel en une ligne de chaque approche (TF-IDF, fastText×2, BERT, LLM).
-- **Zone de saisie** — un champ texte, un sélecteur de moteur, et le bouton
+- **Zone de saisie** — un champ texte, un sélecteur de moteur et le bouton
   **Analyser l'intention**.
 
 ---
@@ -39,7 +39,7 @@ De haut en bas :
 
 Tapez une phrase de client — comme entendue au téléphone — par ex.
 *« j'ai eu un accident ce matin, ma voiture est cabossée »* (ou en anglais). La
-langue de la requête est **détectée automatiquement** (langdetect), et le LLM est
+langue de la requête est **détectée automatiquement** (langdetect) et le LLM est
 alors instruit dans cette langue.
 
 Choisissez un mode avec le contrôle segmenté :

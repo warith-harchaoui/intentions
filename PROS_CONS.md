@@ -2,7 +2,7 @@
 
 > Grand tableau comparatif pour choisir **comment détecter l'intention** d'un
 > client d'assurance : à l'ancienne (TF-IDF), avec une représentation type
-> BERT, ou en « bourrin » avec un LLM. Chiffres issus de benchmarks publiés
+> BERT ou en « bourrin » avec un LLM. Chiffres issus de benchmarks publiés
 > **et** de nos propres mesures sur ce dépôt. Sources en bas de page.
 
 ---
@@ -50,16 +50,21 @@ Chiffres reproductibles : `python -m eval.harness` (exactitude/latence) et
 académiques mais les résultats réels du code, sur un jeu de test **riche en
 paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 
-| # | Moteur (représentation + classifieur) | Exactitude (held-out) | CPU / appel | Slots |
-|---|---|---:|---:|:---:|
-| 1 | **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
-| 2 | **fastText appris** (softmax fastText) | 66 % | ~33 µs | ❌ |
-| 3 | **fastText pré-entraîné** cc.fr.300 (+ régression logistique) | 74 % | ~250 µs | ❌ |
-| 4 | **BERT** SBERT + **MLP PyTorch** | **86 %** | ~20 ms | ❌ |
-| 5 | **LLM** gemma3:4b (Ollama, JSON) | 82 % | ~5 s | ✅ (urgence, type de bien…) |
+| # | Moteur | Exactitude | CPU / appel | Slots |
+|---|--------|-----------:|------------:|:-----:|
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 66 % | ~33 µs | ❌ |
+| 3 | <span style="color:#AF52DE">■</span> **fastText (pré-entraîné)** | 74 % | ~250 µs | ❌ |
+| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+
+<sup>¹ Configs LLM sur l'échantillon de 30 exemples (expérience de prompt) ; classifieurs sur les 88 paraphrases tenues à l'écart.</sup>
 
 > **La progression, c'est ça la leçon.** 51 → 66 → 74 → **86 %** : chaque marche
-> ajoute de la *sémantique* à la représentation, et l'exactitude suit. Le
+> ajoute de la *sémantique* à la représentation et l'exactitude suit. Le
 > sac-de-mots mémorise des chaînes ; fastText apprend des sous-mots ; les
 > vecteurs pré-entraînés apportent le sens de milliards de mots ; **BERT y
 > ajoute le contexte et culmine à 86 %.** Le petit LLM `gemma3:4b` (82 %,

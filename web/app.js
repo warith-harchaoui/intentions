@@ -90,7 +90,7 @@ const I18N = { default: 'fr', languages: ['fr'], strings: {} };
  * Lit une valeur par chemin pointé ("form.submit_idle") dans un objet.
  * @param {object} obj Dictionnaire source.
  * @param {string} path Chemin pointé.
- * @returns {*} La valeur, ou undefined si absente.
+ * @returns {*} La valeur ou undefined si absente.
  */
 const getPath = (obj, path) =>
   path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -276,7 +276,7 @@ async function loadKnowledgeBase() {
   $('kb-count').textContent = data.count;
 
   const container = $('kb-list');
-  // Une tuile par intention : titre, service, et 3 exemples cliquables.
+  // Une tuile par intention : titre, service et 3 exemples cliquables.
   container.innerHTML = data.intents
     .map((intent) => {
       // On limite à 3 exemples pour garder les tuiles compactes.
@@ -374,14 +374,14 @@ function renderEngineCard(engine, result) {
   const slots = slotsEntries.length
     ? `<div class="mt-3 flex flex-wrap gap-1.5">
          ${slotsEntries
-           .map(
-             ([k, v]) =>
-               `<span class="rounded bg-surface-tertiary px-2 py-0.5 text-[12px]
+      .map(
+        ([k, v]) =>
+          `<span class="rounded bg-surface-tertiary px-2 py-0.5 text-[12px]
                   dark:bg-surface-tertiary-dark">
                   <span class="text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(k)}:</span>
                   ${escapeHtml(v)}</span>`,
-           )
-           .join('')}
+      )
+      .join('')}
        </div>`
     : '';
 
@@ -506,7 +506,7 @@ function skeletonCards(engine) {
  * Appelle /api/execute et affiche l'action d'aiguillage (service, action,
  * slots) ou le transfert vers un humain.
  * @param {string} text Demande de l'utilisateur.
- * @param {string|null} engine Moteur à utiliser, ou null pour le défaut.
+ * @param {string|null} engine Moteur à utiliser ou null pour le défaut.
  * @returns {Promise<void>}
  */
 async function renderExecution(text, engine) {
@@ -526,15 +526,15 @@ async function renderExecution(text, engine) {
     const msg = exec.message || t('execution.handoff_body');
     box.innerHTML = `
       <p class="mb-1 text-[15px] font-semibold">${escapeHtml(
-        t('execution.handoff_title'),
-      )}</p>
+      t('execution.handoff_title'),
+    )}</p>
       <p class="mb-2 font-serif text-[14px] leading-relaxed
                 text-label-secondary dark:text-label-secondary-dark">
         ${escapeHtml(msg)}</p>
       <p class="text-[13px] text-label-tertiary dark:text-label-tertiary-dark">
         ${escapeHtml(t('execution.service_label'))} ${escapeHtml(
-          exec.service || t('execution.default_service'),
-        )}</p>`;
+      exec.service || t('execution.default_service'),
+    )}</p>`;
     return;
   }
 
@@ -544,24 +544,24 @@ async function renderExecution(text, engine) {
     .join(', ');
   box.innerHTML = `
     <p class="mb-1 text-[15px] font-semibold">${escapeHtml(
-      t('execution.action_title'),
-    )}</p>
+    t('execution.action_title'),
+  )}</p>
     <dl class="grid gap-1 text-[14px] sm:grid-cols-2">
       <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
-        t('execution.intent_label'),
-      )}</dt>
+    t('execution.intent_label'),
+  )}</dt>
         <dd class="inline font-medium">${escapeHtml(exec.title)}</dd></div>
       <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
-        t('execution.service_label'),
-      )}</dt>
+    t('execution.service_label'),
+  )}</dt>
         <dd class="inline">${escapeHtml(exec.service)}</dd></div>
       <div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
-        t('execution.action_label'),
-      )}</dt>
+    t('execution.action_label'),
+  )}</dt>
         <dd class="inline font-mono">${escapeHtml(exec.action)}</dd></div>
       ${slots ? `<div><dt class="inline text-label-tertiary dark:text-label-tertiary-dark">${escapeHtml(
-        t('execution.slots_label'),
-      )}</dt>
+    t('execution.slots_label'),
+  )}</dt>
         <dd class="inline font-mono">${slots}</dd></div>` : ''}
     </dl>`;
 }

@@ -70,7 +70,7 @@ _ENGINE_FACTORIES: dict[str, Callable[[], IntentEngine]] = {
 # admitting uncertainty and handing over to a person is safer than a confident
 # wrong guess — the whole point of the safety net the user asked for.
 _HANDOFF_MESSAGE = (
-    "Je ne suis pas sûr d'avoir bien compris votre demande, et je préfère "
+    "Je ne suis pas sûr d'avoir bien compris votre demande et je préfère "
     "ne pas vous orienter au hasard. Je vous passe un conseiller — une vraie "
     "personne — qui va prendre le relais. Un instant, je vous transfère."
 )

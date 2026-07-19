@@ -108,7 +108,7 @@ def run(per_train: int, per_test: int) -> dict:
     model = settings.llm_model
 
     train_new: dict[str, list[str]] = {}
-    eval_by: dict[str, list[str]] = {}
+    eval_rows: list[dict[str, str]] = []
 
     for intent in router.kb.intents:
         existing = {_norm(e) for e in intent.examples}
@@ -127,21 +127,22 @@ def run(per_train: int, per_test: int) -> dict:
             if len(pool) >= need_train + per_test:
                 break
         train_new[intent.intent_id] = pool[:need_train]
-        eval_by[intent.intent_id] = pool[need_train : need_train + per_test]
+        test = pool[need_train : need_train + per_test]
+        eval_rows.extend({"text": t, "expected": intent.intent_id} for t in test)
         got_t = len(intent.examples) + len(train_new[intent.intent_id])
-        got_e = len(eval_by[intent.intent_id])
-        print(f"{intent.intent_id:32} train={got_t:3d} test={got_e:2d}", flush=True)
+        print(f"{intent.intent_id:32} train={got_t:3d} test={len(test):2d}", flush=True)
 
     # Preserve the existing out-of-scope set (rewritten verbatim by integrate).
     oos = [json.loads(line)["text"] for line in _OOS.read_text().splitlines() if line]
-    data = {"train": train_new, "eval": eval_by, "oos": oos}
+    # ``eval`` is a flat list of {text, expected} — the shape integrate expects.
+    data = {"train": train_new, "eval": eval_rows, "oos": oos}
     _GENERATED.write_text(
         json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     total_train = sum(len(i.examples) for i in router.kb.intents) + sum(
         len(v) for v in train_new.values()
     )
-    total_test = sum(len(v) for v in eval_by.values())
+    total_test = len(eval_rows)
     print(f"\nTOTAL after integrate: train~{total_train}  test~{total_test}")
     return data
 

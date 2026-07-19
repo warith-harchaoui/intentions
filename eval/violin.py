@@ -57,7 +57,13 @@ _IMG_DIR = Path(__file__).resolve().parent.parent / "docs" / "img"
 #     accuracy figure) and as a bar (in the shootout figure). ``model``/``prompt``
 #     locate its number in ``llm_shootout_results.json``.
 ENGINES: list[dict[str, str]] = [
-    {"key": "tfidf", "fr": "TF-IDF", "en": "TF-IDF", "color": "#007AFF", "kind": "cv"},
+    {
+        "key": "tfidf",
+        "fr": "TF-IDF\n+ Random Forest",
+        "en": "TF-IDF\n+ Random Forest",
+        "color": "#007AFF",
+        "kind": "cv",
+    },
     {
         "key": "fasttext_custom",
         "fr": "fastText\n(appris)",
@@ -72,7 +78,13 @@ ENGINES: list[dict[str, str]] = [
         "color": "#28CD41",  # Green
         "kind": "cv",
     },
-    {"key": "bert", "fr": "BERT", "en": "BERT", "color": "#AF52DE", "kind": "cv"},
+    {
+        "key": "bert",
+        "fr": "BERT + MLP",
+        "en": "BERT + MLP",
+        "color": "#AF52DE",
+        "kind": "cv",
+    },
     {
         "key": "qwen-zs",
         "fr": "qwen2.5:3b\nzero shot",

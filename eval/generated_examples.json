@@ -1,472 +1,1397 @@
 {
   "train": {
     "souscrire_assurance_auto": [
-      "Bonjour, je voudrais assurer ma nouvelle voiture s'il vous plaît",
-      "Je viens d'acheter une voiture et il me faut une assurance",
-      "Comment je fais pour prendre une assurance auto chez vous ?",
-      "J'aimerais avoir un devis pour assurer mon véhicule",
-      "je veux souscrire une assurance pour ma bagnole",
-      "Pouvez-vous m'établir un contrat d'assurance automobile ?",
-      "Il me faut une couverture pour ma voiture, comment ça marche ?",
-      "Je cherche à assurer une deuxième voiture dans le foyer",
-      "bonjour jaimerais assuré ma caisse svp",
-      "On m'a livré ma voiture, je dois l'assurer avant de rouler",
-      "Quelles formules d'assurance auto proposez-vous ?",
-      "Je souhaite mettre en place une assurance tous risques pour mon auto",
-      "assurance voiture combien ça coute chez vous ?",
-      "Je passe mon permis bientôt, je voudrais préparer l'assurance de ma première voiture",
-      "Est-ce que je peux souscrire une assurance auto en ligne ?",
-      "Je voudrais un contrat au tiers pour ma petite citadine"
+      "Je cherche une assurance auto, vous m'aidez ?",
+      "J’aimerais comparer les prix des assurances auto.",
+      "Est-ce que vous faites des offres spéciales pour les jeunes conducteurs ?",
+      "J'ai besoin d'une assurance auto, c'est urgent !",
+      "Pouvez-vous me montrer les différentes formules d'assurance auto ?",
+      "Je voudrais connaître le coût mensuel d’une assurance auto.",
+      "J'hésite à changer d'assurance, dites-moi ce qu’il faut vérifier.",
+      "Ma vieille voiture a besoin d’une assurance, mais je veux pas payer trop cher.",
+      "Est-ce que votre assurance couvre bien les tiers ?",
+      "J’en ai marre de galérer avec l’assurance, aidez-moi !",
+      "Je suis étudiant et j'ai besoin d'une assurance auto à petit prix.",
+      "Quel est le délai pour obtenir un devis ?",
+      "J'ai déjà une assurance auto, mais je voudrais changer de compagnie.",
+      "Pouvez-vous me guider dans le choix d’une assurance auto ?",
+      "J'aimerais une assurance auto avec assistance dépannage.",
+      "Je suis novice en matière d'assurance auto, c’est compliqué !",
+      "J’ai un véhicule électrique, est-ce que ça influence le prix de l’assurance ?",
+      "Est-ce qu’il y a des réductions si je souscris plusieurs assurances ?",
+      "Ma voiture a été volée, j’ai besoin d’une assurance auto immédiatement.",
+      "Je veux une assurance auto pour une courte durée, par exemple 6 mois.",
+      "Pouvez-vous me donner un plan tarifaire des assurances auto ?",
+      "J'ai un bon conducteur, est-ce que ça peut jouer en ma faveur sur l'assurance ?"
     ],
     "declarer_sinistre_auto": [
-      "Bonjour j'ai eu un accident avec ma voiture, je dois le déclarer",
-      "Je viens d'avoir un accrochage sur le parking",
-      "Comment je déclare un sinistre auto ?",
-      "J'ai embouti une autre voiture ce matin",
-      "je me suis fais rentré dedans par derrière",
-      "Ma voiture a été abîmée, je veux ouvrir un dossier",
-      "On a eu un choc en sortant du garage, que dois-je faire ?",
-      "j'ai un constat à envoyer suite à un accident",
-      "Bonjour, tôle froissée après un léger accident, je déclare ?",
-      "Mon pare-choc est cassé après une collision, comment procéder ?",
-      "je voudré déclaré des dégats sur ma voiture",
-      "J'ai rayé une voiture en manœuvrant, il faut que je le signale",
-      "Accident de la route hier soir, je dois faire les démarches",
-      "Ma portière a été enfoncée, je fais comment pour la déclaration ?",
-      "Je dois vous transmettre le constat amiable qu'on a rempli",
-      "Un automobiliste m'a percuté au feu rouge, je déclare le sinistre"
+      "J'ai eu une collision ce matin au feu rouge.",
+      "Je veux faire une déclaration suite à un choc.",
+      "Quelqu’un m’a rayé la voiture en stationnement, c'est pas croyable !",
+      "Mon capot est tombé, je suis dégoûté.",
+      "J'ai été heurté par une grosse camionnette.",
+      "Je déclare un sinistre, j'ai des dégâts importants.",
+      "Ma voiture a été tamponnée hier soir.",
+      "Il y avait un impact, je dois faire une déclaration.",
+      "J’ai un préjudice suite à un accident de la route.",
+      "Mon pare-choc est plié, ça ne ressemble plus à rien.",
+      "Je voudrais signaler un dommage, j'ai besoin d'aide.",
+      "J'ai été percuté par un cycliste, c'est le bazar.",
+      "Ma voiture est abîmée, je déclare le sinistre.",
+      "J’ai fait une grêle, ça m'inquiète.",
+      "Je veux signaler un accident de roulage.",
+      "Mon pare-brise est craquelé, j'ai besoin d'une prise en charge.",
+      "J'ai un choc sur la portière, je suis venu faire constater les dégâts.",
+      "Il y a eu un hecate, je suis perplexe.",
+      "Je déclare ma voiture endommagée.",
+      "Mon arrière-garde est cassé, je ne sais pas comment faire.",
+      "J'ai été victime d'un tamponnage."
     ],
     "vol_vehicule": [
-      "Bonjour on m'a volé ma voiture cette nuit",
-      "Ma voiture a disparu, je crois qu'elle a été volée",
-      "Je viens signaler le vol de mon véhicule",
-      "on a cassé la vitre et pris mon autoradio",
-      "quelqu'un a volé mes affaires dans la voiture",
-      "Ma moto n'est plus là où je l'avais garée, c'est un vol",
-      "je me suis fait voler mon GPS dans la caisse",
-      "Effraction sur mon véhicule et vol du sac à l'intérieur",
-      "on ma piqué la voiture devant chez moi",
-      "Ma voiture volée sur un parking, comment je fais ?",
-      "Vol de mon scooter, je dois le déclarer à l'assurance",
-      "On a forcé le coffre et emporté mes outils",
-      "je voudré déclaré le vol de ma voiture svp",
-      "Plus de voiture ce matin, elle a été dérobée pendant la nuit",
-      "Cambriolage de mon véhicule, la roue de secours a été prise",
-      "Ils ont volé ma valise laissée dans le coffre de la voiture"
+      "On m'a carrément pris ma Clio !",
+      "Ma voiture a disparu, je sais pas comment c'est possible.",
+      "Il y a eu un vol sur mon parking, c’est horrible.",
+      "J’ai fait une déclaration de vol, ma Fiesta a evaporé.",
+      "Vol de ma Polo, ça doit être l'œuvre d'un voyou.",
+      "Ma voiture est partie en sucette, je suis scandalisé.",
+      "Je n’arrive pas à croire, on m’a volé la Golf !",
+      "Un truc de fou, ma voiture a été dérobée.",
+      "On me dit que c'est un vol, je ne comprends pas comment ça s'est passé.",
+      "Ma voiture a disparu ce matin, je suis sans voix.",
+      "J’ai eu une surprise : mon véhicule a été volé !",
+      "Je pense qu’ils ont forcé la vitre et pris ma voiture.",
+      "Ils ont volé tout de dedans, c'est un carnage dans ma voiture.",
+      "Mon Peugeot a disparu, j'espère qu'on la retrouve vite.",
+      "La police doit enquêter sur ce vol de véhicule.",
+      "J’ai fait une constatation, ma voiture a été dérapée !",
+      "On m'a volé les clés et la voiture, c'est inadmissible.",
+      "Ma voiture est partie en flème, je suis au bout du rouleau.",
+      "C'est l'enfer, mon véhicule a été volé cette nuit !",
+      "J’ai un trou béant dans ma poche, et ma voiture aussi.",
+      "Je crois que quelqu’un m'a fait une jambée, ma voiture est partie.",
+      "Ils ont arraché la portière et pris ma voiture, c’est violent.",
+      "Ma voiture a disparu sans laisser de trace, ça me déconne.",
+      "Il faut absolument qu'ils retrouvent ma voiture, elle vaut cher !",
+      "J’ai un sentiment étrange, ma voiture est bien volée."
     ],
     "assistance_depannage": [
-      "Bonjour ma voiture est en panne sur le bord de la route",
-      "J'ai besoin d'une dépanneuse rapidement",
-      "Je suis en rade, pouvez-vous m'envoyer quelqu'un ?",
-      "Ma batterie est morte, je peux pas démarrer",
-      "je suis bloqué sur l'autoroute ma voiture démarre plus",
-      "J'ai crevé et je n'ai pas de roue de secours",
-      "Comment j'active l'assistance dépannage ?",
-      "ma bagnole veut plus avancer, aidez moi",
-      "Je suis tombé en panne d'essence en pleine campagne",
-      "Il me faut un remorquage jusqu'au garage",
-      "panne sur la nationale, jai besoin daide",
-      "Ma voiture fait un bruit bizarre et s'est arrêtée, envoyez un dépanneur",
-      "Je suis coincé sur une aire d'autoroute, moteur HS",
-      "Besoin d'assistance, je suis immobilisé au bord de la route",
-      "Mon véhicule ne redémarre pas ce matin, panne totale",
-      "Roue à plat sur le périphérique, il me faut de l'aide"
+      "J’ai un blocage moteur, ça ne démarre plus du tout !",
+      "Ma voiture est calée au bord de la route, je suis bloqué.",
+      "Je suis tombé en rade sur le parking, vous pouvez venir ?",
+      "La batterie est mort, j'ai besoin d'une dépanneuse urgente.",
+      "J’ai un problème avec l’allumage, ça ne tourne plus.",
+      "Ma voiture a perdu de la puissance, je suis inquiet.",
+      "Je suis coincé dans le stationnement, une dépanneuse s’il vous plaît.",
+      "Une dépanneuse pour moi, vite ! J'ai vraiment besoin d'aide.",
+      "J’ai un problème avec le démarreur, ça ne tourne pas.",
+      "Ma voiture est bloquée dans la neige, aidez-moi s’il vous plaît.",
+      "Je suis tombé en panne sèche, je perds de la chaleur.",
+      "J’ai besoin d’une assistance pour ma voiture, c'est urgent.",
+      "Ma voiture ne démarre plus, pouvez-vous me dépanner ?",
+      "La direction assistée a lâché, impossible de manœuvrer.",
+      "J'ai un problème avec le filtre à air, ça ne fonctionne pas.",
+      "Je suis bloqué dans une ruelle étroite, aidez !",
+      "Une dépanneuse pour aller chez moi, s’il vous plaît.",
+      "Ma voiture est tombée en panne près de la gare, pouvez-vous venir ?",
+      "J'ai un souci au niveau du carburateur, ça ne démarre pas.",
+      "Je suis coincé sur le bord de la route, j'ai besoin d'une assistance.",
+      "Ma batterie est faible, je crains que ça ne tombe à plat.",
+      "J’ai un problème avec l’alternateur, ça risque de tomber en panne.",
+      "Une dépanneuse rapide, s'il vous plaît ! J'ai peur pour ma voiture.",
+      "Je suis tombé en panne sur le chemin du retour, aidez-moi !"
     ],
     "resilier_contrat": [
-      "Bonjour je voudrais résilier mon assurance",
-      "Je veux arrêter mon contrat chez vous",
-      "Comment faire pour mettre fin à mon assurance auto ?",
-      "je souhaite résilier ma police d'assurance",
-      "J'ai vendu ma voiture, je veux stopper le contrat",
-      "Je pars chez un autre assureur, je résilie",
-      "je veux annuler mon contrat dassurance",
-      "Quelle est la procédure pour résilier avant l'échéance ?",
-      "Je ne veux plus de cette assurance, comment l'arrêter ?",
-      "Résiliation loi Hamon, je voudrais partir",
-      "arrété mon assurance habitation svp",
-      "Je déménage à l'étranger, je dois clôturer mon contrat",
-      "Comment je fais pour ne pas être reconduit l'année prochaine ?",
-      "Je souhaite mettre un terme à ma mutuelle",
-      "je veut plus payer cette assurance je resilie",
-      "Envoyez-moi la marche à suivre pour résilier mon contrat auto"
+      "Je veux plus rien payer d'assurance, je résilie !",
+      "Comment je fais pour j’annuler mon contrat ?",
+      "J’aimerais annuler ma mutuelle, c’est possible ?",
+      "Résilier ma police, c’est quoi la procedure ?",
+      "Je souhaite arrêter ma garantie habitation, s'il vous plaît.",
+      "Est-ce que je peux résilier mon assurance moto ?",
+      "Comment on fait pour mettre fin à ça ?",
+      "J’ai besoin de résilier mon contrat d’assurance santé.",
+      "Pour une résiliation de ma mutuelle, j’en ai marre !",
+      "Je voudrais annuler mon assurance habitation avant la fin du contrat.",
+      "Comment je fais pour stopper mon assurance, c'est compliqué ?",
+      "J'aimerais bien que vous me déchargeziez de cette assurance.",
+      "Résilier ma police d’assurance auto, ça se fait comment ?",
+      "Je souhaite arrêter mon assurance, c’est trop cher !",
+      "Est-ce qu’on peut annuler ma mutuelle santé ?",
+      "Comment je fais pour résilier mon contrat d'assurance habitation ?",
+      "J’ai besoin de savoir comment procéder pour la résiliation.",
+      "Résiliation de ma garantie, j’en ai assez !",
+      "Je voudrais que vous me donniez les démarches pour résilier.",
+      "Comment on annule une assurance auto ?",
+      "Je souhaite arrêter mon contrat, merci de m'aider.",
+      "Est-ce que je peux résilier ma mutuelle avant terme ?",
+      "J'ai besoin de résilier mon assurance habitation, c’est urgent !",
+      "Comment faire pour mettre fin à ma garantie santé ?"
     ],
     "modifier_contrat": [
-      "Bonjour j'ai déménagé, je dois changer mon adresse sur le contrat",
-      "Je veux ajouter un conducteur à mon assurance auto",
-      "Comment modifier les garanties de mon contrat ?",
-      "J'ai changé de voiture, il faut mettre à jour le contrat",
-      "je voudrais rajouter ma femme comme conductrice",
-      "Je souhaite passer du tiers au tous risques",
-      "il faut changer l'adresse de mon logement assuré",
-      "Mon fils va conduire ma voiture, je dois l'ajouter",
-      "je veux modifié mon contrat pour ajouter une option",
-      "Est-ce que je peux enlever une garantie que je n'utilise pas ?",
-      "changement de véhicule sur mon assurance auto",
-      "J'aimerais augmenter le niveau de couverture de mon habitation",
-      "je dois mettre a jour mon contrat suite a mon déménagement",
-      "Retirer mon ex-conjoint des conducteurs déclarés, c'est possible ?",
-      "Je veux modifier ma franchise, comment on fait ?",
-      "Ajouter la garantie bris de glace à mon contrat auto"
+      "Je veux voir si je peux changer le montant de ma prime.",
+      "J'ai un nouveau bébé, il faut que ça sorte pour ma famille.",
+      "Il faudrait que vous ajustiez ma cotisation, c'est devenu trop cher.",
+      "Mon assurance est trop chère, je voudrais une autre formule.",
+      "J'ai besoin d'ajouter un enfant à mon contrat.",
+      "Je suis allé(e) chez le garagiste et il faut bien mettre à jour l'assurance auto.",
+      "Est-ce qu'on peut changer mon assurance habitation ?",
+      "J'ai acheté un nouveau vélo, je veux l'inclure dans ma carte verte.",
+      "Pourrais-je modifier ma franchise ? C’est trop élevé, c’est impossible.",
+      "J’ai des problèmes de santé, faut que ça change pour mieux couvrir mes besoins.",
+      "Je déménage à la campagne, il faut impérativement changer mon adresse.",
+      "Est-ce qu'il est possible d'augmenter ma limite de protection juridique ?",
+      "Je voudrais supprimer un option, ça me coûte trop cher.",
+      "J’ai fait une grosse boîte à outils, je dois mettre à jour mon contrat !",
+      "Faut que vous regardiez si je peux avoir une réduction avec ma nouvelle entreprise.",
+      "Ma voiture est tombée en panne sèche, il faut qu'on ajuste l'assurance.",
+      "Je veux changer de tiers responsable, il a déménagé.",
+      "Est-ce qu’on peut modifier le montant de la garantie assistance ?",
+      "J’ai un nouveau travail, je suis obligés d’avoir une assurance professionnelle ?",
+      "J'aimerais changer ma date d'échéance de ma prime.",
+      "Je souhaite passer en formule intermédiaire, c'est plus adapté à mes besoins.",
+      "Il faudrait que vous vérifiez si je peux avoir une remise sur le paiement échelonné.",
+      "J'ai un nouveau permis, il faut bien mettre à jour les informations.",
+      "Je voudrais augmenter la valeur de remplacement de ma voiture."
     ],
     "probleme_paiement": [
-      "Bonjour j'ai été prélevé deux fois ce mois-ci",
-      "Il y a un souci avec mon prélèvement automatique",
-      "Je veux changer mon RIB pour les prélèvements",
-      "Vous m'avez débité en double, je veux un remboursement",
-      "mon paiement n'est pas passé, que faire ?",
-      "j'ai changé de banque, il faut mettre à jour mes coordonnées bancaires",
-      "Le montant prélevé n'est pas le bon ce mois-ci",
-      "problème de prelevement sur mon compte",
-      "Je n'arrive pas à payer ma cotisation en ligne",
-      "on m'a prélevé alors que j'avais résilié",
-      "je veux modifié mes infos bancaire pour le paiement",
-      "Double débit sur mon compte, pouvez-vous corriger ?",
-      "Mon virement a échoué, comment régulariser ?",
-      "changement de rib svp pour mes mensualités",
-      "Ma carte a expiré, il faut mettre à jour le moyen de paiement",
-      "Pourquoi ai-je été débité d'un montant plus élevé ?"
+      "J'ai un souci avec mon assurance, je suis en retard de paiement.",
+      "Impossible de faire tourner le prélèvement automatique, c’est bloqué.",
+      "Je n'ai pas reçu la bonne somme, ça ne correspond pas à ma facture.",
+      "Est-ce que je peux changer mon RIB ?",
+      "Mon assurance m'a prélevé une grosse somme, je suis un peu inquiet.",
+      "J'ai fait un prélèvement qui n’est pas sorti sur mon compte.",
+      "Je veux annuler un prélèvement urgentement !",
+      "Ma carte a été refusée, c’est pour ça que le paiement n’a pas eu lieu.",
+      "Comment on fait pour modifier la date de mon prochain prélèvement ?",
+      "J'ai l'impression qu'on m'a facturé plus cher ce mois-ci.",
+      "Mon assurance me demande des explications sur un prélèvement inconnu.",
+      "Je voudrais savoir pourquoi mon paiement a échoué.",
+      "Il y a une erreur sur le montant prélevé, je vous en prie.",
+      "J’ai oublié de payer, c'est pas grave ?",
+      "Pouvez-vous me confirmer que le prélèvement a bien été effectué ?",
+      "Je suis bloqué, je ne peux plus faire mes paiements par prélèvement.",
+      "J'aimerais modifier mon RIB pour les prochains prélèvements.",
+      "Mon assurance m’a prélevé une somme qui n’est pas sur ma facture.",
+      "J’ai un problème avec le compte bancaire indiqué sur ma carte.",
+      "Comment puis-je signaler un prélèvement frauduleux ?",
+      "Je ne comprends pas pourquoi mon prélèvement automatique est toujours en attente.",
+      "Est-ce que je peux changer l'adresse de mon compte pour les prochains prélèvements ?",
+      "Mon assurance a prélevé deux fois, ça me dépasse !",
+      "J’ai besoin d'aide pour comprendre pourquoi le prélèvement n'est pas accepté."
     ],
     "demander_attestation": [
-      "Bonjour j'ai besoin de mon attestation d'assurance",
-      "Pouvez-vous m'envoyer ma carte verte ?",
-      "Il me faut un justificatif d'assurance pour le contrôle technique",
-      "Je voudrais un document prouvant que je suis assuré",
-      "jai besoin de lattestation dassurance pour mon employeur",
-      "Comment obtenir ma carte verte auto ?",
-      "Envoyez-moi mon attestation habitation pour le propriétaire",
-      "il me faut un papier d'assurance pour l'école de mon fils",
-      "Je dois fournir une preuve d'assurance à la préfecture",
-      "attestation scolaire assurance svp",
-      "Pouvez-vous me renvoyer ma carte verte, j'ai perdu la mienne ?",
-      "J'ai besoin du justificatif d'assurance pour louer un appartement",
-      "je voudrai récupéré mon attestation par mail",
-      "Mon garagiste demande une attestation d'assurance, où la trouver ?",
-      "Il me faut une attestation de responsabilité civile",
-      "Où télécharger ma carte verte sur votre site ?"
+      "J’ai besoin de l’attestation pour mon assurance auto, s’il vous plaît.",
+      "Pouvez-vous me faire parvenir ma carte grise ?",
+      "Il me faudrait une attestation de prêt immobilier.",
+      "Où je peux récupérer mon document d'assurance habitation ?",
+      "Envoyez-moi ma convention d'assurance, merci !",
+      "J’ai perdu ma carte verte, pourriez-vous en imprimer une ?",
+      "Je suis à la recherche de mon attestation scolaire pour la mairie.",
+      "Pouvez-vous m'envoyer le justificatif de mon assurance ?",
+      "Il me faut un document prouvant ma couverture santé.",
+      "Où je trouve mes attestations de prévoyance ?",
+      "J’ai besoin d’une copie de mon attestation de garantie.",
+      "Envoyez-moi ma déposition, s'il vous plaît.",
+      "Je cherche l'attestation pour ma voiture de location.",
+      "Pouvez-vous me fournir mon relevé d’assurance professionnelle ?",
+      "Il me faut une attestat pour le loyer.",
+      "Où je récupère mon attestation de responsabilité civile ?",
+      "J’ai besoin d'une copie de mon attestation de non-opposition.",
+      "Envoyez-moi ma carte assurance vie, merci beaucoup.",
+      "Je voudrais une attestation de caution.",
+      "Pouvez-vous m’envoyer l’attestation de souscription à l’assurance habitation ?",
+      "Il me faut un document prouvant que je suis couvert en cas d'accident.",
+      "Où est-ce qu’on peut trouver mon attestation de suivi de dossier ?",
+      "J’ai besoin d’une attestation pour le prêt auto, c’est urgent !",
+      "Envoyez-moi ma copie du rapport d’expertise.",
+      "Je recherche l'attestation d'assurance habitation pour mon bailleur."
     ],
     "souscrire_assurance_habitation": [
-      "Bonjour je voudrais assurer mon appartement",
-      "Je viens d'emménager, il me faut une assurance habitation",
-      "Comment souscrire une assurance pour ma maison ?",
-      "Je cherche à assurer mon logement locatif",
-      "je veux une assurance pour mon studio",
-      "Quel contrat proposez-vous pour une maison individuelle ?",
-      "il me faut une assurance habitation pour signer mon bail",
-      "Je voudrais un devis pour assurer ma résidence principale",
-      "assurance appart, combien ça coûte ?",
-      "J'achète une maison, je dois l'assurer avant l'acte",
-      "je souhaite souscrire une assurance multirisque habitation",
-      "bonjour jaimerai assuré mon nouveau logement",
-      "Est-ce que je peux assurer une résidence secondaire chez vous ?",
-      "Je loue un appartement et le propriétaire exige une assurance",
-      "Comment mettre en place une assurance pour mon habitation ?",
-      "Je voudrais assurer mon logement étudiant"
+      "Je cherche une assurance pour mon nouveau chez-moi.",
+      "Il faudrait que je trouve une assurance habitation, vite !",
+      "J'aimerais bien comparer les prix, un multirisque ça me tente.",
+      "Est-ce qu’on peut avoir une assurance habitation pour une copropriété ?",
+      "Je suis à la recherche d'une assurance habitation pas trop chère.",
+      "J'ai besoin de protéger mon appartement contre le vol et les dégâts des eaux.",
+      "Une assurance habitation, c'est obligatoire, non ?",
+      "Je voudrais un devis pour l'assurance habitation, s’il vous plaît.",
+      "Ma maison est neuve, donc j'ai besoin d'une assurance.",
+      "Est-ce que vous proposez une assurance avec assistance juridique ?",
+      "J’hésite entre plusieurs assurances habitations, aidez-moi !",
+      "Je veux savoir ce qu'on peut couvrir dans une assurance multirisque.",
+      "Quel type de garantie est indispensable pour une assurance habitation ?",
+      "J'ai emménagé récemment, je suis à la recherche d'une assurance immédiate.",
+      "Un contrat d’assurance habitation pour mon studio.",
+      "J’aimerais bien un devis personnalisé selon mes besoins.",
+      "Est-ce que vous proposez des assurances avec des réductions étudiants ?",
+      "Je suis inquiet pour les dégâts des eaux, besoin d'une bonne assurance.",
+      "Assurance habitation, c'est pas compliqué, je veux juste le bon prix.",
+      "J’ai un appartement mitoyen, ça change quoi dans l’assurance ?",
+      "J'aurais besoin d'une assurance qui couvre les appareils électroménagers.",
+      "Je suis novice en matière d’assurance, expliquez-moi simplement.",
+      "Un devis pour une habitation avec garantie location.",
+      "Est-ce que vous assurez contre les catastrophes naturelles ?"
     ],
     "degat_des_eaux": [
-      "Bonjour j'ai une fuite d'eau qui a tout inondé chez moi",
-      "Mon voisin du dessus a provoqué un dégât des eaux",
-      "Il y a une infiltration d'eau dans mon plafond",
-      "Je veux déclarer un dégât des eaux dans ma cuisine",
-      "un tuyau a éclaté et ça a inondé mon salon",
-      "de l'eau coule du plafond de ma salle de bain",
-      "Ma machine à laver a débordé et abîmé le parquet",
-      "il y a de l'humidité et des taches d'eau sur mes murs",
-      "fuite deau chez moi jai besoin de déclaré",
-      "Le chauffe-eau a fui et inondé le couloir",
-      "Mon appartement a été inondé suite à une fuite chez le voisin",
-      "je voudré signalé un dégat des eaux",
-      "L'évier a débordé et l'eau est passée chez le voisin du dessous",
-      "Canalisation percée, tout est trempé, je déclare",
-      "Il y a eu une infiltration après les fortes pluies dans ma cave",
-      "Le radiateur a coulé et endommagé mon plancher"
+      "J’ai un souci d'infiltration au plafond, c’est vachement galère.",
+      "Il y a une grosse fuite dans ma salle de bain, ça coule à flots !",
+      "Je crois qu’une canalisation a craqué, il y a de l'eau qui s'infiltre partout.",
+      "Ma baignoire a claqué et j'ai un vrai bordel d'eau.",
+      "J'ai eu une tempête hier soir et maintenant il y a des dégâts d'eau.",
+      "Une fuite dans mon grenier, c’est la catastrophe !",
+      "Mon siphon est bouché et ça déborde dans le carrelage.",
+      "Il faut déclarer un dégât des eaux, j'espère que ça sera pris en charge.",
+      "J'ai l'impression qu'une canalisation a perdu de la pression, il y a de l'eau qui coule.",
+      "Je suis dégouté, ma cave est inondée !",
+      "Une fuite au niveau de la robinetterie, c’est pas normal ça !",
+      "Mon lave-vaisselle a fait n'importe quoi et mon sol est détrempé.",
+      "J'ai remarqué une tache d'eau sur le mur, ça vient d'où ?",
+      "Il y a eu un orage violent et j'ai des dégâts au niveau du toit.",
+      "Je pense qu’une canalisation de chauffage a perdu de l'eau.",
+      "Mon appartement est noyé sous l'eau, je suis paniqué !",
+      "J'ai des infiltrations dans la cuisine, ça commence à sentir mauvais.",
+      "Il faut faire une déclaration de sinistre, j'ai vraiment besoin d'aide.",
+      "Ma douche fuit comme une fontaine, c'est irréalisable !",
+      "J’ai un problème d'humidité qui s'est développé suite à une pluie torrentielle.",
+      "Je crois qu’un tuyau a cédé et ça inonde mon garage.",
+      "Mon robinet fuit sans arrêt, ça gicle !",
+      "Il y a des traces d'eau sur le sol, je soupçonne un problème de plomberie.",
+      "J'ai un dégât des eaux important, j'espère que vous pouvez m'aider à réparer les dégâts.",
+      "Je suis au téléphone pour déclarer des dommages liés à une inondation."
     ],
     "cambriolage": [
-      "Bonjour on m'a cambriolé cette nuit",
-      "Je me suis fait voler chez moi pendant les vacances",
-      "Des voleurs sont entrés dans ma maison",
-      "je veux déclarer un cambriolage à mon domicile",
-      "on a forcé ma porte et volé mes bijoux",
-      "Ils ont fracturé la fenêtre et pris ma télé",
-      "cambriolage chez moi, ils ont tout retourné",
-      "Mon appartement a été visité, il manque plein de choses",
-      "on ma volé mon ordinateur et de largent à la maison",
-      "Effraction pendant mon absence, plusieurs objets disparus",
-      "je voudré déclaré un vol à mon domicile",
-      "Quelqu'un s'est introduit chez moi et a volé mes affaires",
-      "Retour de week-end, la porte était fracturée et tout dévalisé",
-      "Ils ont emporté mes bijoux et mon coffre a été forcé",
-      "vol par effraction dans ma maison la nuit dernière",
-      "On a cassé un carreau pour entrer et voler chez moi"
+      "On s’est fait rouler, c'est une catastrophe !",
+      "J'ai eu un cambriolage, ça m'a traumatisé.",
+      "Quelqu'un est entré chez moi comme ça, sans prévenir.",
+      "Ils ont brisé ma porte d'entrée pour me voler.",
+      "Je suis victime d’une effraction, je dois déclarer.",
+      "On a volé tout ce qu’il y avait dans mon appartement.",
+      "J'ai un cambriolage à déclarer, c'est pas normal !",
+      "Quelqu'un est passé par la fenêtre, je n'ai rien vu.",
+      "Ils ont saccagé ma maison, c'est horrible.",
+      "Je me suis fait piquer, impossible de dormir.",
+      "Vol de biens dans mon logement, je veux une prise en charge.",
+      "On a forcé ma serrure, c’est vraiment inadmissible.",
+      "J'ai un vol avec effraction à signaler urgentement.",
+      "Ils ont mis le bazar dans ma chambre, un vrai carnage !",
+      "Je suis consterné par ce cambriolage.",
+      "Quelqu'un est entré et a tout pris, je suis au bout du rouleau.",
+      "Mon appartement a été profané, c'est dégoûtant.",
+      "Vol de bijoux et argent, ça me rend fou.",
+      "J'ai subi une effraction, je veux des explications.",
+      "Ils ont mis le feu à quelques affaires, heureusement rien de grave.",
+      "Je suis victime d’un cambriolage, je n’en reviens pas !",
+      "On a volé mon ordinateur portable, c'est précieux.",
+      "Mon domicile a été attaqué, j'ai peur.",
+      "J’ai eu une effraction dans mon appartement, je suis en état de choc.",
+      "Quelqu'un est entré par la fenêtre, ça m’a terrifié."
     ],
     "incendie_habitation": [
-      "Bonjour il y a eu un incendie dans mon appartement",
-      "Ma maison a brûlé, je dois le déclarer",
-      "Un feu s'est déclaré dans ma cuisine",
-      "je veux déclarer un incendie de mon logement",
-      "il y a eu le feu chez moi et tout est parti en fumée",
-      "Un court-circuit a provoqué un incendie dans le salon",
-      "ma cuisine a pris feu, dégâts importants",
-      "Le feu a ravagé une partie de ma maison",
-      "incendie chez moi cette nuit, beaucoup de dégats",
-      "Une bougie a mis le feu aux rideaux, tout est calciné",
-      "je voudré déclaré un sinistre incendie",
-      "Mon logement a été endommagé par les flammes et la fumée",
-      "Départ de feu dans le garage attenant à la maison",
-      "Après l'incendie, mes meubles sont détruits, je déclare",
-      "Le feu a pris dans le tableau électrique, gros dégâts",
-      "Ma maison a été touchée par un incendie, comment procéder ?"
+      "Il y a eu un drôle d'odeur de brûlé chez moi, je crois qu’il y a un incendie.",
+      "Mon appart a cramé, c'est l'horreur!",
+      "J'ai vu une fumée pas possible dans ma cuisine, ça avait l'air un début d'incendie.",
+      "Le garage a pris feu, merde!",
+      "Ma maison a été touchée par des flammes, je suis traumatisé.",
+      "Il y a eu un petit incendie dans le salon, rien de grave mais...",
+      "J’ai senti une odeur de plastique brûlé, j'ai cru que c'était un feu.",
+      "Mon appartement est en partie calciné, impossible de vivre ici!",
+      "On dirait qu'il y avait eu un incendie dans la cave, ça sent tellement fort.",
+      "Le feu a commencé dans ma cuisine, je n’y crois pas!",
+      "Ma maison a été ravagée par le feu, c'est une catastrophe.",
+      "J'ai vu des étincelles près de mon four, ça m'a fait peur.",
+      "Il y avait un incendie à l'étage, j'espère que tout le monde est sorti.",
+      "Mon garage a pris, j'ai dû appeler les pompiers.",
+      "C’est le bazar, ma cuisine est complètement brûlée!",
+      "Ma maison a été touchée par le feu, je suis anéanti.",
+      "J'ai vu de la fumée bleue provenant de mon salon.",
+      "Il y avait un début d'incendie dans mon placard, j’ai réagi vite fait!",
+      "Le feu s’est propagé rapidement dans ma cuisine.",
+      "Ma maison a pris feu, c'est un cauchemar !",
+      "J’ai senti une odeur très forte de brûlé...",
+      "Un incendie s'est déclaré dans la buanderie.",
+      "Mon appartement est fumant, je crois qu’il y a un feu.",
+      "Il y avait des flammes dans mon garage, j’ai paniqué!",
+      "Ma maison a été touchée, c'est incroyable !"
     ],
     "souscrire_mutuelle_sante": [
-      "Bonjour je cherche une mutuelle santé",
-      "Je voudrais souscrire une complémentaire santé",
-      "Comment prendre une mutuelle chez vous ?",
-      "Il me faut une bonne mutuelle pour mes lunettes et mes dents",
-      "je veux une complémentaire pour être mieux remboursé",
-      "Quelle mutuelle me conseillez-vous pour ma famille ?",
-      "je souhaite adhérer à une mutuelle santé",
-      "j'ai plus de mutuelle par mon employeur, il m'en faut une",
-      "mutuelle santé pas cher pour un jeune actif",
-      "Je pars à la retraite, je cherche une complémentaire adaptée",
-      "je voudrai souscrir une mutuelle pour mes enfants",
-      "Est-ce que vous proposez des mutuelles pour indépendants ?",
-      "Je veux une couverture santé complète, optique et dentaire",
-      "Comment adhérer à votre complémentaire santé ?",
-      "bonjour jaimerai une mutuelle santé svp",
-      "Je cherche à compléter les remboursements de la Sécu"
+      "Je cherche une mutuelle, vous me conseillez quoi ?",
+      "Une complémentaire santé c'est vraiment utile, non ?",
+      "J'aimerais bien avoir une assurance santé pour ma famille.",
+      "Est-ce que ça coûte cher une mutuelle aujourd'hui ?",
+      "Pouvez-vous me faire un devis pour une mutuelle jeune adulte ?",
+      "Je suis à la recherche d'une bonne mutuelle pas trop chère.",
+      "J’en ai marre de payer des tickets rien ne couvre, je veux une complémentaire !",
+      "J'ai besoin d'une assurance santé, mais je sais pas par où commencer.",
+      "Comment ça marche la mutuelle pour les petits enfants ?",
+      "Je voudrais changer ma mutuelle actuelle, quelles sont mes options ?",
+      "Est-ce que vous avez des mutuelles qui prennent en charge les médecines alternatives ?",
+      "J’ai une prise de tête avec les assurances, aidez-moi !",
+      "Devis pour une complémentaire santé pour un couple sans enfant.",
+      "Je suis à la recherche d'une mutuelle avec une bonne réputation.",
+      "Une mutuelle famille c'est obligatoire maintenant ?",
+      "J’aimerais bien avoir une assurance santé, mais je ne comprends rien aux termes.",
+      "Est-ce que vous travaillez avec l’Assurance Maladie pour les complémentaires santé ?",
+      "Je voudrais souscrire une mutuelle rapidement.",
+      "Quelle est la différence entre une mutuelle et une assurance santé ?",
+      "J'ai un bébé, j'ai besoin d'une bonne complémentaire santé !",
+      "Une mutuelle avec des franchises basses serait idéal.",
+      "Est-ce que je peux changer de mutuelle pendant l’année ?",
+      "Je suis perdu dans le choix de la mutuelle, vous pouvez me guider ?",
+      "J'aimerais comparer les devis de différentes mutuelles."
     ],
     "remboursement_soins": [
-      "Bonjour je n'ai pas été remboursé de ma consultation",
-      "Je voudrais savoir où en est mon remboursement",
-      "Quand vais-je toucher le remboursement de mes soins ?",
-      "Je comprends pas pourquoi je suis remboursé partiellement",
-      "jai envoyé ma feuille de soins mais rien reçu",
-      "Combien vais-je récupérer sur mes lunettes ?",
-      "je n'ai pas eu le remboursement de mon dentiste",
-      "Pourquoi le remboursement est plus faible que prévu ?",
-      "quand est ce que je serai remboursé de ma pharmacie ?",
-      "Je veux suivre mes remboursements de santé en ligne",
-      "j'ai payé une consultation, il me manque un remboursement",
-      "Le remboursement de mon ostéopathe n'est pas arrivé",
-      "je voudré comprendre mon décompte de remboursement",
-      "Mes soins dentaires ont été mal remboursés, je ne comprends pas",
-      "Où voir le détail de mes remboursements santé ?",
-      "Il manque un remboursement sur mon dernier relevé"
+      "Où est ma paye de remboursement, franchement ?",
+      "J'ai fait un examen chez le dentiste il y a deux semaines, quand je vais avoir l'argent ?",
+      "Je suis un peu perdue, vous pouvez me dire où en est ma demande de remboursement ?",
+      "J'ai envoyé mes tickets ces soins, mais rien ne bouge !",
+      "Il me faut mon remboursement pour ma chirothérapie, ça fait des plombes.",
+      "Je n’ai jamais reçu le remboursement pour ma rééducation !",
+      "Vous m'avez dit que ça se faisait rapidement, c'est pas le cas...",
+      "Ma mutuelle a bien pris en charge, mais j'attends toujours l'argent sur mon compte.",
+      "Je voudrais savoir si vous avez bien reçu mes justificatifs de frais médicaux.",
+      "J’ai fait un diagnostic il y a longtemps, quand est-ce que je vais être remboursé ?",
+      "Est-ce que le remboursement pour ma crise d'angoisse est bloqué ?",
+      "Je suis très déçue, mon dossier est toujours en attente !",
+      "J'ai besoin de savoir si vous avez bien calculé la somme à me rembourser.",
+      "Je n’arrive pas à trouver mes relevés de soins, ça me pose problème pour le remboursement.",
+      "Pourquoi mon remboursement est-il si long ?",
+      "C'est quoi les délais habituels pour un remboursement de ce type ?",
+      "J'ai besoin de clarifier le montant que vous m'avez promis.",
+      "Je suis parfois un peu confus dans vos explications concernant le remboursement.",
+      "Est-ce qu’il y a eu un problème avec ma demande ?",
+      "J’aimerais avoir une date approximative pour recevoir mon dû.",
+      "Pourriez-vous vérifier si ma consultation est bien prise en compte ?",
+      "J'ai besoin de confirmation que vous avez bien les bons documents.",
+      "J'ai subi des douleurs, je suis impatient d'être remboursé !",
+      "Je voudrais un état clair du montant restant à rembourser.",
+      "Est-ce qu’il faut faire quelque chose de mon côté pour accélérer le processus ?"
     ],
     "tiers_payant": [
-      "Bonjour je voudrais une prise en charge pour mon opération",
-      "Il me faut le tiers payant pour l'hôpital",
-      "Comment obtenir une prise en charge pour mes lunettes ?",
-      "je dois passer chez le dentiste, je veux le tiers payant",
-      "l'hôpital demande un accord de prise en charge",
-      "Pouvez-vous envoyer la prise en charge à l'opticien ?",
-      "je veux pas avancer les frais, tiers payant possible ?",
-      "Il me faut une prise en charge pour une hospitalisation",
-      "prise en charge optique svp, mes verres coûtent cher",
-      "Le dentiste demande un devis de prise en charge",
-      "je voudré le tier payant pour ma prothèse dentaire",
-      "Comment activer le tiers payant chez le pharmacien ?",
-      "J'ai une opération prévue, il me faut l'accord de l'assurance",
-      "besoin dune prise en charge pour la clinique",
-      "Pouvez-vous transmettre le tiers payant au laboratoire d'analyses ?",
-      "Je veux éviter d'avancer les frais chez l'opticien"
+      "J’ai eu un accident et là je suis chez le docteur, faut qu’on règle ça avec l'assurance.",
+      "Tiers payant, c'est quoi la marche à suivre exactement ?",
+      "Mon garage a été touché, il me faut une prise en charge immédiate.",
+      "Je voudrais demander une prise en charge pour les frais dentaires, vous m'aurez ça ?",
+      "Est-ce que je peux faire un tiers payant pour le kinésithérapeute ?",
+      "J'ai eu un choc, je vais à l'hosto, il faut une prise en charge.",
+      "Comment je fais pour avoir ce fichu tiers payant ?",
+      "Je suis dans le flou total avec cette prise en charge, vous pouvez m'expliquer ?",
+      "Ma mutuelle me demande un accord de prise en charge pour le laser.",
+      "J’ai besoin d’une attestation de tiers payant, vite !",
+      "Il faut absolument une prise en charge pour mes soins ophtalmologiques.",
+      "Je suis à bout, je veux que vous géré ça, le tiers payant.",
+      "Est-ce qu'on peut faire du tiers payant quand on est malade ?",
+      "J’ai eu un accident de voiture, il faut une prise en charge rapide !",
+      "Comment on procède pour le tiers payant au moment des soins ?",
+      "Je suis chez l'orthophoniste et il demande une prise en charge.",
+      "J'ai besoin d'une attestation tiers payant pour ma consultation.",
+      "Mon médecin veut un accord de prise en charge, c’est quoi la procedure ?",
+      "Faut qu’on règle le tiers payant pour ce problème de dos !",
+      "Je suis à l'hopital, je veux une prise en charge par votre assurance !",
+      "Je demande une attestation tiers payant pour mes yeux.",
+      "J'ai des factures que je voudrais faire prendre en charge.",
+      "Est-ce qu’il est possible d’avoir un dossier de tiers payant ?",
+      "Ma docteuh me demande un accord pour une prise en charge.",
+      "Si j’ai besoin de faire du tiers payant, comment ça marche ?"
     ],
     "souscrire_prevoyance": [
-      "Bonjour je voudrais souscrire une prévoyance",
-      "Je cherche une assurance décès pour protéger ma famille",
-      "Comment mettre en place une garantie invalidité ?",
-      "Je veux une couverture en cas d'arrêt de travail",
-      "je souhaite une prévoyance pour mes proches",
-      "il me faut une garantie décès-invalidité",
-      "Que proposez-vous en cas d'incapacité de travail ?",
-      "je veux protéger mes revenus si je tombe malade",
-      "prévoyance pour indépendant, c'est possible ?",
-      "Je voudrais un capital pour ma famille si je décède",
-      "je souhaite souscrir une assurance prévoyance",
-      "Comment assurer mes revenus en cas d'accident de la vie ?",
-      "bonjour jaimerai une garantie prévoyance svp",
-      "Je veux une rente si je deviens invalide",
-      "Une couverture décès pour rembourser mon crédit en cas de malheur",
-      "Je cherche à protéger mes enfants en cas de coup dur"
+      "Je cherche une assurance décès, c'est indispensable.",
+      "Est-ce que je peux avoir une prévoyance qui couvre le décès ?",
+      "J’aimerais savoir si ça peut me protéger contre l'invalidité permanente.",
+      "Une garantie décès, ça sert à quoi exactement ?",
+      "Même si je suis jeune, il faut prévoir, non ?",
+      "Je voudrais une assurance qui verse des droits à titre de prévoyance en cas de décès.",
+      "Est-ce que ça couvre aussi les frais de faire enterrer ma famille ?",
+      "C'est quoi le minimum pour une garantie invalidité décès ?",
+      "J’ai entendu parler d’assurance maintien du salaire, ça existe vraiment ?",
+      "Je suis inquiet pour mon épouse, je veux la protéger en cas de décès.",
+      "Est-ce que l’assurance prévoyance couvre aussi les frais médicaux avant le décès ?",
+      "Ça coûte combien une garantie décès ?",
+      "Je cherche une solution simple pour assurer ma famille.",
+      "J'ai besoin d'une assurance qui gère les conséquences financières du décès.",
+      "Maintien de salaire en cas d'arrêt de travail, c’est bien ça ?",
+      "Quelles sont les garanties essentielles pour une prévoyance décès ?",
+      "Est-ce que je peux souscrire une garantie décès même si j'ai des problèmes de santé ?",
+      "Je suis jeune actif, comment faire pour sécuriser mon futur en cas de décès ?",
+      "J'aimerais comprendre le fonctionnement d'une assurance prévoyance.",
+      "C’est vraiment utile une garantie décès, ou c’est juste un gadget ?",
+      "Quels sont les risques couverts par une prévoyance invalidité ?",
+      "Je veux une solution adaptée à ma situation familiale pour une garantie décès.",
+      "Est-ce que l’assurance prévoyance prend en compte les dettes que je pourrais avoir ?",
+      "J'ai des questions sur les versements et les droits en cas de décès avec une prévoyance.",
+      "Je suis un peu perdu, vous pouvez m’expliquer simplement ?"
     ],
     "escalade_humain": [
-      "Bonjour je suis un peu perdu je ne sais pas quoi faire",
-      "Je ne comprends rien, aidez-moi s'il vous plaît",
-      "Je sais pas trop dans quelle catégorie ça rentre",
-      "Franchement je suis perdu là, quelqu'un peut m'aider ?",
-      "jsais pas comment faire, aidez moi",
-      "Je ne sais pas par où commencer avec mon problème",
-      "C'est compliqué mon cas, je ne sais pas quoi choisir",
-      "je comprend rien à tout ça",
-      "Aidez-moi, je suis complètement dépassé par la situation",
-      "Je ne sais pas si c'est un sinistre ou autre chose",
-      "j'arrive pas à me débrouiller tout seul",
-      "Je suis paumé, il me faut de l'aide pour m'y retrouver",
-      "je c pas quoi faire avec mon dossier",
-      "Rien n'est clair pour moi, pouvez-vous m'aider ?",
-      "Je ne sais pas quelle démarche correspond à ma situation"
+      "Je suis complètement perdu, vous m’expliquez ?",
+      "J'ai besoin d'aide, ça me stresse trop.",
+      "Je comprends rien à ces petits caractères…",
+      "C'est quoi, ce jargon technique ?",
+      "Je ne sais pas comment ça marche, franchement.",
+      "Vous pourriez me simplifier les choses ?",
+      "J’ai un souci, je suis désorienté.",
+      "Ça fait des années que je n’ai jamais touché une assurance...",
+      "Je ne comprends pas pourquoi j'ai ces tarifs.",
+      "C’est trop compliqué pour moi à gérer seul.",
+      "Je suis bloqué, je ne sais plus où donner de la tête.",
+      "Pouvez-vous me guider ?",
+      "J’ai besoin d’une explication claire et simple.",
+      "Je ne vois pas le rapport entre tout ça…",
+      "Est-ce que vous pouvez m'expliquer plus lentement ?",
+      "Je suis un peu dépassé, je préfère parler à quelqu’un qui comprend.",
+      "C'est trop abstrait, j'aimerais des explications concrètes.",
+      "J'ai besoin d'une personne pour me conseiller personnellement.",
+      "Je ne sais pas comment remplir ce formulaire, c’est horrible !",
+      "Ça m’inquiète, je voudrais comprendre les risques.",
+      "Pouvez-vous me rassurer un peu ?",
+      "Je suis très mal à l'aise avec cette interface...",
+      "J’ai des questions, beaucoup de questions!"
     ],
     "parler_a_conseiller": [
-      "Bonjour je voudrais parler à un conseiller",
-      "Pouvez-vous me passer un humain s'il vous plaît",
-      "Je veux parler à une vraie personne",
-      "Mettez-moi en relation avec un agent",
-      "je veux plus parler au robot, un conseiller svp",
-      "Passez-moi quelqu'un du service client",
-      "j'aimerais discuter avec un conseiller au téléphone",
-      "Je souhaite être mis en relation avec un opérateur",
-      "un humain svp j'en ai marre du chatbot",
-      "Comment joindre un conseiller directement ?",
-      "je veux parlé à quelqu'un pas à une machine",
-      "Puis-je avoir un vrai interlocuteur ?",
-      "Transférez-moi vers un agent s'il vous plaît",
-      "je voudrai parler a un vrai conseiller humain",
-      "Je préfère échanger avec une personne du support",
-      "Est-ce possible d'avoir quelqu'un en ligne ?"
+      "Je suis super frustré, je veux pas discuter avec une machine.",
+      "Un humain, s'il vous plaît, ça m'aidera à comprendre.",
+      "Passez-moi quelqu’un qui peut me donner des explications claires.",
+      "J'ai besoin d'une vraie conversation, pas un script.",
+      "Je suis perdu dans les infos, j'aimerais parler à un conseiller.",
+      "Vous avez des conseillers humains disponibles ?",
+      "J'en ai ras le bol de ces chatbots, je veux quelqu’un !",
+      "Mettez-moi en relation avec une personne réelle, vite !",
+      "Un agent humain serait parfait pour mon dossier.",
+      "Je suis impatient d'être reçu par un conseiller.",
+      "J'ai besoin d'aide, pas d'algorithmes.",
+      "Pourriez-vous me transférer à un humain ?",
+      "Je ne comprends rien aux automatismes, j’ai besoin de vous.",
+      "Un conseiller humain pourrait me rassurer.",
+      "Passez-moi une personne pour que je puisse poser mes questions.",
+      "J'aimerais parler à quelqu’un qui peut me guider.",
+      "Je veux discuter de mon contrat avec un vrai conseiller.",
+      "Où puis-je trouver un conseiller d'assurance ?",
+      "J'ai besoin d'être soutenu par un humain.",
+      "Vous avez des conseillers disponibles au téléphone ?",
+      "Je suis très insatisfait, j’aimerais parler à un humain.",
+      "J'ai besoin de quelqu'un qui puisse me poser les bonnes questions.",
+      "Un conseiller pour m'expliquer les termes de mon contrat.",
+      "Passez-moi une personne de contact, s'il vous plaît.",
+      "Je suis perdu, j’ai besoin d’aide humaine."
     ],
     "suivre_dossier": [
-      "Bonjour je voudrais savoir où en est mon dossier",
-      "Quel est l'avancement de mon sinistre ?",
-      "Je veux suivre l'état de mon dossier",
-      "Où en est le traitement de ma déclaration ?",
-      "jaimerai avoir des nouvelles de mon dossier",
-      "Mon sinistre a été déclaré la semaine dernière, ça avance ?",
-      "je voudrais un point sur mon dossier en cours",
-      "Est-ce que mon dossier a été traité ?",
-      "quand est ce que mon dossier sera fini ?",
-      "Je n'ai aucune nouvelle de mon dossier depuis 15 jours",
-      "je veux savoir ou en est ma demande",
-      "Pouvez-vous me dire à quelle étape en est mon dossier ?",
-      "Suivi de mon dossier sinistre auto s'il vous plaît",
-      "mon dossier avance t il ? je n'ai pas de retour",
-      "Je souhaite connaître le statut de mon indemnisation",
-      "À quel stade en est le traitement de mon accident ?"
+      "Où est mon dossier de dossier ?",
+      "Je veux juste savoir où ça en est l'affaire",
+      "Est-ce que vous avez vu ma déclaration de sinistre ?",
+      "Ça fait une éternité, j’aimerais avoir des nouvelles, s'il vous plaît",
+      "Mon dossier il stagne un peu, non ?",
+      "Vous pouvez me donner un coup de fil pour me tenir au courant ?",
+      "Avez-vous bien reçu les documents que j'ai envoyés ?",
+      "Je suis un peu dans le flou, je ne sais pas où mon dossier est",
+      "Quand est-ce que ça va bouger enfin ?",
+      "Est-ce qu’on peut avoir une estimation du temps de traitement ?",
+      "J'ai besoin de savoir si ma demande a bien été enregistrée",
+      "Mon assurance, j’attends des réponses, c'est urgent !",
+      "Pourrais-je avoir un statut de mon dossier ?",
+      "Il y a des jours où je suis à bout de patience, je veux des nouvelles !",
+      "Je voudrais une mise à jour sur ma situation",
+      "J'ai déposé le sinistre il y a longtemps, ça avance pas !",
+      "Je voudrais savoir si vous avez besoin de quoi que ce soit de ma part pour accélérer les choses",
+      "Est-ce que quelqu'un travaille sur mon dossier ?",
+      "Je suis un peu perdu, je ne comprends rien à votre communication",
+      "J’ai besoin d’une réponse rapide concernant mon dossier",
+      "Pouvez-vous me dire si le dossier a été transmis au service compétent ?",
+      "Est-ce que mes documents sont bien en cours de traitement ?",
+      "Comment ça se passe pour ma prise en charge ?",
+      "Je voudrais savoir quand je peux espérer obtenir une indemnisation",
+      "J'ai toujours le même message : \"en cours d'instruction\"... ça change rien !"
     ],
     "faire_reclamation": [
-      "Bonjour je veux faire une réclamation",
-      "Je conteste la décision que vous avez prise",
-      "Je ne suis pas d'accord avec le montant de mon indemnisation",
-      "Je veux porter réclamation contre votre traitement",
-      "je souhaite contester le refus de prise en charge",
-      "votre décision est injuste, je fais une réclamation",
-      "Je suis mécontent du service, je veux me plaindre",
-      "je conteste le rejet de mon dossier",
-      "réclamation svp, on m'a mal remboursé",
-      "Je veux déposer une plainte contre votre gestion de mon sinistre",
-      "je ne suis pas dacord avec votre réponse je réclame",
-      "Comment faire une réclamation officielle ?",
-      "Je conteste la franchise que vous m'avez appliquée",
-      "je veux contesté votre décision de refus",
-      "Votre indemnisation est ridicule, je porte réclamation",
-      "Je souhaite faire appel de votre décision, elle est injustifiée"
+      "Je voudrais signaler un sinistre.",
+      "J'ai besoin de faire une réclamation suite à l'orage.",
+      "C’est quoi la procédure pour faire une réclamation ?",
+      "Votre assurance ne rembourse rien, c'est inadmissible !",
+      "J'ai des soucis avec ma garantie, je veux faire une réclamation.",
+      "Je suis très mécontent de la gestion de mon dossier.",
+      "Comment je fais pour porter plainte et obtenir un remboursement ?",
+      "Il y a eu un dommage important, j’aimerais faire une réclamation.",
+      "Je pense avoir droit à un préjudice, je vais demander des réparations.",
+      "J'ai un problème avec ma déclaration de sinistre, je veux que ça se règle.",
+      "Votre expert n’a pas pris en compte mes pertes.",
+      "Je suis déçu par le manque de communication, je veux une réclamation.",
+      "Comment on fait pour contester un refus de remboursement ?",
+      "Il faut que vous vérifiiez mon dossier, j'ai des doutes.",
+      "J’ai subi des dommages et je souhaite déclencher ma garantie.",
+      "Votre assurance est complètement dépassée, ça ne marche pas !",
+      "Je veux signaler un dysfonctionnement, je vais faire une réclamation.",
+      "J'ai besoin de vous aider à évaluer mes dégâts.",
+      "Comment je procède pour obtenir mon dû ?",
+      "J’ai été lésé par votre contrat, je demande réparation.",
+      "Votre expert m'a dit que ça ne rentrait pas dans la garantie !",
+      "Il y a un litige sur le montant du remboursement.",
+      "Je veux faire valider ma réclamation et obtenir mon assurance.",
+      "C’est quoi les délais pour traiter une réclamation ?"
     ],
     "horaires_et_contact": [
-      "Bonjour quels sont vos horaires d'ouverture ?",
-      "Comment je peux vous joindre ?",
-      "Vous êtes ouverts jusqu'à quelle heure ?",
-      "Quel est votre numéro de téléphone ?",
-      "à quelle heure ouvre votre agence ?",
-      "Comment vous contacter en cas d'urgence ?",
-      "vous êtes ouverts le samedi ?",
-      "Je voudrais vos coordonnées s'il vous plaît",
-      "cest quoi votre adresse mail de contact ?",
-      "Quels jours êtes-vous joignables ?",
-      "je voudré savoir vos horaires",
-      "Y a-t-il une permanence le week-end ?",
-      "Comment prendre rendez-vous dans votre agence ?",
-      "vos bureaux sont ouverts le midi ?",
-      "Par quel moyen puis-je vous contacter ?",
-      "Où se trouve votre agence la plus proche ?"
+      "Bonjour, vous travaillez quand exactement ?",
+      "Est-ce que vous êtes ouvert le dimanche aussi ?",
+      "Jusqu'à quelle heure je peux prendre rendez-vous ?",
+      "Comment je fais pour vous contacter par téléphone ?",
+      "Quel est votre numéro de téléphone ? Merci.",
+      "Je voudrais savoir vos horaires d'ouverture précis.",
+      "Vous avez une permanence le soir ?",
+      "Si j'ai un sinistre, comment je vous contacte en urgence ?",
+      "Est-ce que vous avez un fax ?",
+      "J'aimerais connaître l'adresse postale de votre agence.",
+      "Pourriez-vous me donner vos coordonnées complètes ?",
+      "Vous êtes ouverts le soir ?",
+      "Quel est le numéro de téléphone de l'agence de Lyon ?",
+      "Comment je vous appelle pour des infos ?",
+      "Est-ce que vous avez une assistance téléphonique 24h/24 ?",
+      "Jusqu'à quelle heure je peux passer ?",
+      "Je voudrais un email pour vous contacter.",
+      "Quel est votre numéro ? Je suis en urgence.",
+      "Vous travaillez quoi, vos horaires ?",
+      "Je voulais savoir si vous êtes ouverts le mercredi soir.",
+      "Comment on vous contacte en cas de besoin urgent ?",
+      "Jusqu'à quelle heure je peux venir ?",
+      "Pourriez-vous me donner l'adresse email pour les déclarations ?",
+      "Vous avez un service client au téléphone ?"
     ]
   },
   "eval": [
-    {"text": "Je passe le permis dans deux semaines et j'ai réservé une citadine, comment mettre une protection dessus ?", "expected": "souscrire_assurance_auto"},
-    {"text": "On m'a remis les clés d'un utilitaire hier, il me faut une couverture avant de prendre la route", "expected": "souscrire_assurance_auto"},
-    {"text": "Mon fils vient d'avoir sa première voiture, quelles offres avez-vous pour le couvrir ?", "expected": "souscrire_assurance_auto"},
-    {"text": "Je change de véhicule et je voudrais repartir sur un nouveau contrat chez vous", "expected": "souscrire_assurance_auto"},
-    {"text": "On s'est rentrés dedans à un carrefour, il faut que je vous prévienne", "expected": "declarer_sinistre_auto"},
-    {"text": "J'ai frotté un poteau en reculant, l'aile est bien amochée", "expected": "declarer_sinistre_auto"},
-    {"text": "Un camion a reculé sur mon capot, comment j'ouvre le dossier ?", "expected": "declarer_sinistre_auto"},
-    {"text": "Ma carrosserie est enfoncée après un choc, je dois vous transmettre le papier rempli à deux", "expected": "declarer_sinistre_auto"},
-    {"text": "Je retrouve ma place de parking vide, quelqu'un est parti avec mon auto", "expected": "vol_vehicule"},
-    {"text": "On a fracturé une portière et embarqué mon sac posé sur le siège", "expected": "vol_vehicule"},
-    {"text": "Mon deux-roues a disparu du garage collectif cette nuit", "expected": "vol_vehicule"},
-    {"text": "Ils ont brisé la lunette arrière pour prendre ce qu'il y avait dans le coffre", "expected": "vol_vehicule"},
-    {"text": "Je suis immobilisé sur la bande d'arrêt d'urgence, le moteur a lâché", "expected": "assistance_depannage"},
-    {"text": "Impossible de faire démarrer la voiture ce matin, je crois que c'est la batterie", "expected": "assistance_depannage"},
-    {"text": "Un pneu à plat en pleine campagne et rien pour le changer, je fais quoi ?", "expected": "assistance_depannage"},
-    {"text": "Le véhicule s'est arrêté net sur la voie rapide, il faut le remorquer", "expected": "assistance_depannage"},
-    {"text": "Je change de compagnie, je souhaite mettre fin à ce qui me lie à vous", "expected": "resilier_contrat"},
-    {"text": "Ma maison est vendue, je n'ai plus besoin de la couvrir chez vous", "expected": "resilier_contrat"},
-    {"text": "Je ne veux surtout pas que le contrat se renouvelle tout seul l'an prochain", "expected": "resilier_contrat"},
-    {"text": "Comment mettre un terme à mon engagement grâce à la loi qui permet de partir à tout moment ?", "expected": "resilier_contrat"},
-    {"text": "Je viens de changer de ville, il faut actualiser mes coordonnées sur le dossier", "expected": "modifier_contrat"},
-    {"text": "Ma compagne va prendre le volant régulièrement, il faut la mentionner", "expected": "modifier_contrat"},
-    {"text": "Je voudrais passer à une formule qui couvre tout plutôt que le minimum", "expected": "modifier_contrat"},
-    {"text": "Peut-on rajouter la protection des vitres à ce qui est déjà en place ?", "expected": "modifier_contrat"},
-    {"text": "Vous avez pris l'argent deux fois sur mon compte le même jour", "expected": "probleme_paiement"},
-    {"text": "J'ai changé d'établissement bancaire, il faut enregistrer mes nouvelles coordonnées", "expected": "probleme_paiement"},
-    {"text": "La somme retirée ce mois-ci ne correspond pas à ce qui était prévu", "expected": "probleme_paiement"},
-    {"text": "Le retrait automatique a été rejeté faute de provision, comment je régularise ?", "expected": "probleme_paiement"},
-    {"text": "L'auto-école me réclame un papier prouvant que je suis couvert", "expected": "demander_attestation"},
-    {"text": "Le futur propriétaire veut une preuve écrite que le logement est garanti", "expected": "demander_attestation"},
-    {"text": "J'ai égaré le petit papier à coller sur le pare-brise, pouvez-vous m'en refaire un ?", "expected": "demander_attestation"},
-    {"text": "Où puis-je récupérer le document qui atteste ma responsabilité civile ?", "expected": "demander_attestation"},
-    {"text": "Je viens de poser mes cartons dans un nouvel appart, il faut le protéger", "expected": "souscrire_assurance_habitation"},
-    {"text": "L'agence immobilière refuse de me remettre les clés sans garantie sur le logement", "expected": "souscrire_assurance_habitation"},
-    {"text": "Je deviens propriétaire d'une maison, que faut-il pour la couvrir dès la signature ?", "expected": "souscrire_assurance_habitation"},
-    {"text": "Je pars étudier dans une autre ville et je loue une chambre à protéger", "expected": "souscrire_assurance_habitation"},
-    {"text": "L'eau du logement du dessus a traversé mon plafond et abîmé la peinture", "expected": "degat_des_eaux"},
-    {"text": "Une canalisation a cédé et mon parquet baigne dans l'eau", "expected": "degat_des_eaux"},
-    {"text": "Le ballon d'eau chaude s'est mis à couler partout dans le couloir", "expected": "degat_des_eaux"},
-    {"text": "Des traces d'humidité sont apparues au plafond après une fuite chez le voisin", "expected": "degat_des_eaux"},
-    {"text": "En rentrant de vacances, la porte était forcée et il manque nos objets de valeur", "expected": "cambriolage"},
-    {"text": "Quelqu'un s'est introduit par la fenêtre et a emporté l'écran de télévision", "expected": "cambriolage"},
-    {"text": "On a visité l'appartement pendant qu'on dormait, plusieurs affaires ont disparu", "expected": "cambriolage"},
-    {"text": "Ils ont pénétré chez moi par effraction et raflé les bijoux du coffre", "expected": "cambriolage"},
-    {"text": "Un départ de flammes dans la cuisine a tout noirci de suie", "expected": "incendie_habitation"},
-    {"text": "Le tableau électrique a pris feu et une partie du salon est calcinée", "expected": "incendie_habitation"},
-    {"text": "Une bougie oubliée a embrasé les rideaux et endommagé la pièce", "expected": "incendie_habitation"},
-    {"text": "Les flammes ont ravagé le garage attenant à la maison", "expected": "incendie_habitation"},
-    {"text": "Je n'ai plus de couverture santé par mon travail, il m'en faut une pour être mieux remboursé", "expected": "souscrire_mutuelle_sante"},
-    {"text": "Je cherche à compléter ce que la Sécu ne prend pas, surtout pour les dents et les yeux", "expected": "souscrire_mutuelle_sante"},
-    {"text": "Bientôt à la retraite, je veux une complémentaire adaptée à mon âge", "expected": "souscrire_mutuelle_sante"},
-    {"text": "Comment rejoindre votre complémentaire pour couvrir toute la famille ?", "expected": "souscrire_mutuelle_sante"},
-    {"text": "J'ai transmis ma feuille de soins il y a un moment mais rien n'est arrivé sur mon compte", "expected": "remboursement_soins"},
-    {"text": "Pourquoi on me rend moins que ce que j'attendais pour ma paire de lunettes ?", "expected": "remboursement_soins"},
-    {"text": "Où puis-je consulter le détail de ce qui m'a été rendu pour mes soins ?", "expected": "remboursement_soins"},
-    {"text": "La somme rendue pour mon dentiste me paraît trop basse, je ne comprends pas", "expected": "remboursement_soins"},
-    {"text": "L'hôpital veut un accord pour que je n'aie pas à sortir l'argent de ma poche", "expected": "tiers_payant"},
-    {"text": "Mes verres coûtent une fortune, je voudrais que vous régliez directement l'opticien", "expected": "tiers_payant"},
-    {"text": "Le dentiste attend un devis validé pour ma prothèse avant de commencer", "expected": "tiers_payant"},
-    {"text": "Je préfère ne pas faire l'avance pour mon hospitalisation, c'est possible ?", "expected": "tiers_payant"},
-    {"text": "Je veux mettre un capital de côté pour mes proches au cas où il m'arrive quelque chose", "expected": "souscrire_prevoyance"},
-    {"text": "Comment garantir mes revenus si un accident m'empêche de travailler ?", "expected": "souscrire_prevoyance"},
-    {"text": "Je cherche une rente au cas où je perdrais mon autonomie", "expected": "souscrire_prevoyance"},
-    {"text": "Que se passe-t-il pour ma famille et mon crédit si je viens à disparaître ?", "expected": "souscrire_prevoyance"},
-    {"text": "Honnêtement je nage complètement, je ne sais pas ce qu'il faut faire", "expected": "escalade_humain"},
-    {"text": "Tout ça me dépasse, je n'arrive pas à savoir dans quelle case je rentre", "expected": "escalade_humain"},
-    {"text": "Je suis largué, rien n'est clair, quelqu'un peut me guider ?", "expected": "escalade_humain"},
-    {"text": "Je bloque, je ne sais absolument pas quelle démarche colle à mon souci", "expected": "escalade_humain"},
-    {"text": "J'en ai assez de la machine, mettez-moi quelqu'un en chair et en os", "expected": "parler_a_conseiller"},
-    {"text": "Je préfère m'adresser directement à un membre de votre équipe", "expected": "parler_a_conseiller"},
-    {"text": "Pouvez-vous me basculer vers une personne du support ?", "expected": "parler_a_conseiller"},
-    {"text": "J'aimerais échanger de vive voix avec un de vos agents", "expected": "parler_a_conseiller"},
-    {"text": "Ça fait deux semaines, j'aimerais savoir si ça bouge sur ma déclaration", "expected": "suivre_dossier"},
-    {"text": "À quelle étape se trouve le traitement de mon accident ?", "expected": "suivre_dossier"},
-    {"text": "Je n'ai aucun retour, pouvez-vous me dire si ma demande progresse ?", "expected": "suivre_dossier"},
-    {"text": "Je voudrais connaître le statut de mon indemnisation en cours", "expected": "suivre_dossier"},
-    {"text": "Le montant que vous m'accordez est trop faible, je m'y oppose formellement", "expected": "faire_reclamation"},
-    {"text": "Vous avez rejeté ma prise en charge et je trouve ça inacceptable", "expected": "faire_reclamation"},
-    {"text": "Je souhaite contester officiellement la franchise que vous m'imposez", "expected": "faire_reclamation"},
-    {"text": "Votre décision me semble injustifiée, je veux la faire réexaminer", "expected": "faire_reclamation"},
-    {"text": "Jusqu'à quelle heure vos bureaux restent ouverts en semaine ?", "expected": "horaires_et_contact"},
-    {"text": "Peut-on vous joindre le week-end en cas de pépin ?", "expected": "horaires_et_contact"},
-    {"text": "Quelle est l'adresse de votre point d'accueil le plus proche de chez moi ?", "expected": "horaires_et_contact"},
-    {"text": "Par quel canal puis-je entrer en contact avec vous ?", "expected": "horaires_et_contact"},
-    {"text": "Je souhaite enlever mon ancien conjoint de la liste des personnes qui conduisent", "expected": "modifier_contrat"},
-    {"text": "On a soulevé la vitre de ma voiture et pris le lecteur à l'intérieur", "expected": "vol_vehicule"},
-    {"text": "Je viens d'acquérir un scooter, comment le faire garantir chez vous ?", "expected": "souscrire_assurance_auto"},
-    {"text": "L'infiltration après l'orage a détrempé le mur de ma cave", "expected": "degat_des_eaux"}
+    {
+      "text": "Je voudrais une assurance auto avec kilométrage illimité.",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Est-ce que vous prenez en compte mon historique de conduite pour le prix de l’assurance ?",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "J’aimerais une assurance auto sans franchise.",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "J’ai un jeune conducteur, vos tarifs sont élevés ?",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Pouvez-vous m'expliquer les garanties obligatoires d'une assurance auto ?",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Je voudrais comparer votre assurance avec celle que j'avais avant.",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "J'ai besoin de conseils pour choisir la meilleure assurance auto pour moi.",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Est-ce que l'assurance est facile à résilier si je change de ville ?",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "J’aimerais une assurance auto avec assistance 24h/24 et 7j/7.",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Ma voiture est neuve, quelles sont les conditions d’assurance ?",
+      "expected": "souscrire_assurance_auto"
+    },
+    {
+      "text": "Ma voiture est en trombe après l'impact.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Je suis venu pour déclarer un sinistre automobile.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "J’ai eu un embouteillage et quelqu’un a freiné brusquement.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Mon capot est déformé, je veux une estimation des réparations.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Je dois faire une déclaration suite à un choc violent.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "J'ai un problème avec mon optique, je déclare le sinistre.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Ma voiture est touchée en bas, ça ne ressemble plus à rien.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "J’ai fait un hecate et je suis désolé, je veux déclarer.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Je déclare un accident de la route.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Mon pare-brise a une fissure importante.",
+      "expected": "declarer_sinistre_auto"
+    },
+    {
+      "text": "Je ne sais pas qui m’a fait ça, mais ils ont eu tort.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "On m’a volé le GPS et la voiture, c'est vraiment nul.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Ma voiture a été dérobée, je suis très inquiet.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "J'ai fait une déclaration de vol, ma Rover est partie en l'air !",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Ils ont forcé la serrure et pris mon véhicule, ça me met mal.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Je suis sûr que quelqu’un sait où est ma voiture.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Ma voiture a disparu avec tout ce qu'il y avait dedans.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "J'ai alerté la police pour un vol de véhicule, c'est urgent !",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Ils ont arraché le tableau de bord et pris mon véhicule.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Je ne comprends pas comment ils ont pu faire ça, c’est incroyable.",
+      "expected": "vol_vehicule"
+    },
+    {
+      "text": "Ma voiture ne démarre pas, c'est très étrange.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "J’ai besoin d’une assistance technique, je ne sais plus quoi faire.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "L'embrayage a lâché, impossible de changer de vitesse.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Je suis coincé dans un champ, une dépanneuse s'il vous plaît !",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Ma voiture est tombée en panne à cause du gel.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "J’ai un problème avec la transmission, ça ne fonctionne pas.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Une dépanneuse pour me ramener chez moi, merci.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Je suis bloqué sur le parking, j'ai besoin d'aide immédiatement.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Ma batterie est complètement déchargée, c'est une catastrophe !",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "J’ai un souci au niveau du système électrique, ça ne marche plus.",
+      "expected": "assistance_depannage"
+    },
+    {
+      "text": "Je voudrais annuler ma police d'assurance, ça me coûte trop cher.",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Résilier ma mutuelle, comment je fais concrètement ?",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Je souhaite arrêter mon contrat, j'ai trouvé une meilleure offre.",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Est-ce que je peux résilier ma garantie habitation sans frais ?",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "J’aimerais connaître la procédure pour annuler ma police d’assurance.",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Comment on procède pour la résiliation de ma mutuelle ?",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Je voudrais résilier mon assurance auto, merci de me guider.",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Résilier ma garantie habitation, c'est possible en urgence ?",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Je souhaite arrêter mon contrat d’assurance santé, j’ai besoin de conseils.",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Est-ce que je peux demander une résiliation anticipée ?",
+      "expected": "resilier_contrat"
+    },
+    {
+      "text": "Est-ce qu'on peut changer mon assurance habitation pour un loyer ?",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "J’ai eu un accident et je veux que l’assurance révise ma prime.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Je suis en train de faire des travaux dans ma maison, faut que ça couvre les dégâts.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Je voudrais ajouter une clause spécifique concernant mes objets de valeur.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "J’aimerais savoir si j'arrive à avoir une assurance bateau maintenant.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Mon assurance ne prend pas en compte mon appareil photo, je dois changer !",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Il faudrait que vous me donniez un devis pour une nouvelle formule d'assurance.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Je voudrais modifier ma notification d’urgence.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "Est-ce qu’il est possible de supprimer la garantie décès ?",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "J’ai changé de situation professionnelle, faut que ça s'adapte.",
+      "expected": "modifier_contrat"
+    },
+    {
+      "text": "J'ai un souci avec le code de ma carte, ça doit être la cause.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Je voudrais savoir si je peux changer mon conseiller en ligne.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Mon assurance m’a prélevé des euros et je ne sais pas où ils sont allés !",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Je suis à court d'argent, j'aimerais reporter ma date de prélèvement.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "J’ai un problème avec le lien de ma carte bancaire, il ne fonctionne pas.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Est-ce que vous pouvez me renseigner sur la procédure à suivre pour un prélèvement erroné ?",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Mon assurance m’a prélevé des frais que je n'ai pas acceptés.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "J'ai fait un paiement qui a mis plus de temps que prévu, il faut que j’en parle.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Je voudrais mettre à jour mon RIB en ligne.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Il y a une erreur dans le montant de mon prélèvement automatique.",
+      "expected": "probleme_paiement"
+    },
+    {
+      "text": "Pouvez-vous me faire parvenir le document de preuve d'assurance ?",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Il me faut un attestat d’assurance pour le centre aisé.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Où je trouve mes justificatifs d’assurance en ligne ?",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "J'ai besoin de mon attestation du contrat d’assurance.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Envoyez-moi ma copie des conditions générales d'assurance.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Je voudrais une attestation du financement auto.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Pouvez-vous m'envoyer le document prouvant que j'ai souscrit une assurance ?",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Il me faudrait un bout de papier qui confirme mon assurance habitation.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Où je récupère mon attestation de visite médicale pour l’assurance ?",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "J’ai besoin d’une attestation pour ma prime à la retraite supplémentaire.",
+      "expected": "demander_attestation"
+    },
+    {
+      "text": "Je voudrais savoir si l'assurance inclut la responsabilité civile.",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "J'ai un loyer conséquent, ça influence le prix de l'assurance ?",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Je cherche une assurance facile à comprendre et à utiliser.",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Assurance habitation, c’est vraiment utile ou pas ?",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Est-ce qu'il y a des offres spéciales pour les nouveaux locataires ?",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Je veux une assurance avec une bonne protection juridique.",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "J’ai déjà une assurance auto, est-ce que ça peut être combiné ?",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Un devis pour un appartement de 3 pièces.",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Est-ce que l’assurance prend en compte le mobilier ?",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Je suis à la recherche d'une assurance habitation qui couvre les dommages causés par des tiers.",
+      "expected": "souscrire_assurance_habitation"
+    },
+    {
+      "text": "Mon étagère dans la salle d’eau est détruite par l’eau.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Il y a une fuite dans mon adoucisseur d’eau, ça s'écoule partout.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "J'ai besoin de faire une déclaration de sinistre suite à des infiltrations.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Je crois qu’une canalisation a explosé !",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Mon tapis est détrempé, j’ai l’impression que ça vient du plafond.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Il faut impérativement déclarer un dégât des eaux dans les plus brefs délais.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "J'ai remarqué une tache d'eau sur mon papier peint, ça ne sèche pas !",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Je suis inquiète, il y a des infiltrations qui s’installent rapidement.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Mon frigo est tombé et a laissé couler de l'eau sur le sol.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Il y a eu un problème avec ma chaudière et maintenant j’ai des dégâts d’eau.",
+      "expected": "degat_des_eaux"
+    },
+    {
+      "text": "Ils ont volé mes objets personnels, c'est une violation.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Je déclare un vol avec effraction, je veux des garanties.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Mon coffre-fort a été brisé, ils voulaient l'argent.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "J'ai subi un cambriolage, ça me cause beaucoup de stress.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Ils ont saccagé ma cuisine, c’est une honte.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Je suis victime d’une intrusion, je veux être protégé.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Vol de télévision et meubles, ils n’ont rien laissé.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "On a forcé la porte d'entrée, c'est un acte criminel.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "J'ai un vol avec effraction à déclarer, je suis désemparé.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "Ils ont mis le chaos dans mon salon, je suis bouleversé.",
+      "expected": "cambriolage"
+    },
+    {
+      "text": "J'ai vu de la fumée épaisse sortir de ma cheminée.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Un incendie s'est produit au niveau du plan de travail.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Mon appartement est à moitié brûlé, je suis dévasté.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Il y avait un début d’incendie dans les fils électriques, c'était trop dangereux!",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Le feu a pris dans le grenier, j'ai dû quitter la maison.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Ma maison a été ravagée par l'incendie, je n'en reviens pas !",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "J’ai vu de la fumée noire à travers ma fenêtre, ça m'a terrifié.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Il y avait un incendie contrôlé dans le voisinage, j’espère que tout va bien.",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Mon appartement est en proie au feu, c'est une situation terrible!",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Le feu a commencé sous l’évier, je suis chanceux d’avoir réagi !",
+      "expected": "incendie_habitation"
+    },
+    {
+      "text": "Pour une complémentaire santé, quels sont les niveaux de garantie à choisir ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Devis pour une mutuelle senior.",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Est-ce que ma mutuelle actuelle est toujours bonne ou dois-je changer ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "J’ai entendu parler de certaines mutuelles avec des tarifs très avantageux, vous en connaissez ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Je cherche une mutuelle qui couvre bien le télétravail.",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Une complémentaire santé pour étudiant, c'est possible ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Est-ce que les petites entreprises ont des tarifs plus intéressants pour les mutuelles ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "J’ai besoin d’une assurance santé pour mes animaux de compagnie aussi !",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Pour une complémentaire santé, y a t'il des promotions en ce moment ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "Je suis novice dans le domaine des assurances, pouvez-vous m'expliquer simplement ?",
+      "expected": "souscrire_mutuelle_sante"
+    },
+    {
+      "text": "J’ai fait plusieurs démarches, quand est-ce que ça se concrétise ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Ma facture n'est pas claire, comment cela affecte-t-il le remboursement ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "C'est possible d'avoir un solde de remboursement précis ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Je ne comprends pas pourquoi mon dossier n'a pas été traité.",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "J'ai des questions sur la composition du remboursement.",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Est-ce que je peux avoir accès à l’avancement de ma demande en ligne ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Pourriez-vous me confirmer que le paiement est bien en cours ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "J'attends impatiemment mes documents de remboursement.",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Ce remboursement est-il affecté par quelque chose (erreur, blocage…) ?",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "Je suis au bout du rouleau et j'ai besoin de cet argent.",
+      "expected": "remboursement_soins"
+    },
+    {
+      "text": "J'ai eu un problème avec mon assurance santé, faut que je fasse quoi pour le tier payant?",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Je suis à l'urologue et il m'a demandé de faire un dossier tiers payant.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "J'ai des frais de consultation que j’aimerais faire prendre en charge.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Attestation tier payant pour ma visite chez le dentiste, s'il vous plaît !",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Mon médecin veut une prise en charge, je ne comprends pas pourquoi.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Je veux comprendre comment fonctionne le tiers payant dans mon contrat.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "J'ai un accident au travail et j’ai besoin d'une prise en charge urgente.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Pourrais-je avoir une attestation de tier payant pour mes soins esthétiques ?",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Faut qu'on me rembourse les frais de pharmacie, je veux le tiers payant !",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "Je suis à l’institut de beauté et ils veulent un accord de prise en charge.",
+      "expected": "tiers_payant"
+    },
+    {
+      "text": "C'est quoi le rapport entre assurance décès et assurance vie ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Est-ce que je peux choisir les bénéficiaires de ma garantie décès ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Je cherche une assurance qui me permette de transmettre mon patrimoine en cas de décès.",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Maintien de salaire pendant combien de temps ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "J’aimerais savoir si la prévoyance couvre l’invalidité temporaire aussi.",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Est-ce que je peux demander un devis sans engagement ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Quelles sont les conditions pour souscrire une garantie décès aujourd'hui ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "C’est possible d’ajouter des garanties complémentaires à ma prévoyance ?",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Je suis intéressé par les produits de prévoyance qui incluent une garantie invalidité.",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "Je veux savoir si je peux bénéficier d’avantages fiscaux grâce à une assurance décès.",
+      "expected": "souscrire_prevoyance"
+    },
+    {
+      "text": "C’est trop compliqué pour moi de tout analyser seul.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "J'ai besoin d'un coup de main urgent !",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "Je ne sais pas si je fais bien les choses.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "Je suis un peu perdu dans tous ces termes.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "J'aimerais vraiment que quelqu'un me prenne en charge.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "C’est trop stressant, j'aurais besoin de quelqu’un pour m’éclairer.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "Je ne comprends pas le vocabulaire utilisé.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "J’ai besoin d'une personne qui puisse me répondre directement.",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "Je suis perdu dans les détails, vous pouvez m'aider ?",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "C'est un peu lourd à digérer, aidez-moi !",
+      "expected": "escalade_humain"
+    },
+    {
+      "text": "Je ne veux plus attendre des réponses automatiques.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "J'aimerais être mis en relation avec un agent compétent.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Un conseiller humain pour m’aider à faire mon choix.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Mettez-moi direct en contact avec quelqu’un !",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "J’en ai marre de ces robots, je veux parler à un humain !",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Je suis bloqué et j'ai besoin d'une personne pour me débloquer.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Un conseiller d'assurance serait vraiment apprécié ici.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Passez-moi une vraie voix humaine au téléphone.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Je voudrais discuter de mon sinistre avec quelqu’un.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "J'ai un problème, j'ai besoin d'aide d'un conseiller.",
+      "expected": "parler_a_conseiller"
+    },
+    {
+      "text": "Ça me paraît anormalement long, vous pouvez m’expliquer ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Mon dossier est-il bien au cql ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Pourriez-vous me confirmer que ma demande a été traitée ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Je suis dans l'attente de vos nouvelles concernant mon dossier.",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "J’aimerais comprendre les étapes du processus",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Est-ce qu'il y a des retards sur mon dossier ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Je voudrais savoir si vous avez besoin d'informations complémentaires de ma part",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Pouvez-vous me donner un numéro de suivi pour mon dossier ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "Est-ce que vous pouvez me dire quand je recevrai la première réponse ?",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "J'ai l’impression que mon dossier est oublié.",
+      "expected": "suivre_dossier"
+    },
+    {
+      "text": "J'ai des preuves de mes pertes, je suis prêt à engager une procédure.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Votre service client est injoignable, j'ai besoin d'être entendu !",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Je suis en colère, ça ne peut pas rester là.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Mon dossier est bloqué, je demande une intervention urgente.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "J’ai eu un accident et je veux faire une réclamation pour le remboursement.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Il faut que vous corrigiez votre erreur.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Comment on marche pour demander des dommages et intérêts ?",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Votre assurance ne comprend rien à mon problème.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Je suis sous contrat depuis longtemps, ça ne peut pas se terminer comme ça !",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "J’ai besoin d'un geste commercial, je souhaite faire une réclamation.",
+      "expected": "faire_reclamation"
+    },
+    {
+      "text": "Est-ce que vos horaires changent selon la saison ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Comment on vous contacte en cas de problème ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Jusqu’à quelle heure je peux faire une visite ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Je voudrais savoir si vous avez un numéro pour les urgences.",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Vous êtes ouverts le dimanche matin ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Quel est votre numéro de téléphone, s'il vous plaît ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Est-ce que vous faites des visites à domicile ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Comment on vous contacte quand on a une question ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Jusqu’à quelle heure je peux vous appeler pour un devis ?",
+      "expected": "horaires_et_contact"
+    },
+    {
+      "text": "Je cherche vos horaires d'ouverture sur internet.",
+      "expected": "horaires_et_contact"
+    }
   ],
   "oos": [
     "Quel temps fera-t-il demain à Marseille ?",

@@ -1,6 +1,8 @@
 # Déraison Assurances — one *intent engine*, five ways
 
-[🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md) — 📖 User guide: [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
+[🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md)
+
+📖 User guide: [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
 > **How do you build** an intent-detection engine.
 >This repo answers by showing **five ways** to do it, side by side, on a concrete case: the routing chatbot of a (fictional) insurance company that helps its customers on the chatbox.
@@ -15,11 +17,11 @@ history of NLP**, from bag-of-words to generative LLM:
 
 | # | Engine | Representation | Classifier | The trade-off |
 |---|--------|---------------|-----------|---------------|
-| 1 | **TF-IDF** | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
-| 2 | **fastText (custom)** | subword embeddings **learned on our examples** | fastText softmax | Light; a step up from bag-of-words. |
-| 3 | **fastText (pretrained)** | **cc.fr.300** French vectors (Common Crawl) | logistic regression | Transfer learning: already knows *voiture* ≈ *véhicule*. |
-| 4 | **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
-| 5 | **LLM** | — (prompt) | **Gemma** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF** | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | subword embeddings **learned on our examples** | fastText softmax | Light; a step up from bag-of-words. |
+| 3 | <span style="color:#28CD41">■</span> **fastText (pretrained)** | **cc.fr.300** French vectors (Common Crawl) | logistic regression | Transfer learning: already knows *voiture* ≈ *véhicule*. |
+| 4 | <span style="color:#AF52DE">■</span> **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
+| 5 | <span style="color:#FF3B30">■</span> **LLM** | (prompt) | **Gemma / qwen** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
 
 > The UI is **bilingual EN/FR** — a 🇬🇧/🇫🇷 flag toggle (top-right, next to a
 > light/dark button); the LLM is even prompted in the query's own detected
@@ -207,7 +209,7 @@ worth:
 | 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
 | 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
 
-<sup>¹ The four LLM configs are measured on the 30-example prompt-experiment sample; the four classifiers on the full 88 held-out paraphrases. Colours match every figure in this repo.</sup>
+<sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR — only the generative LLM does this. ¹ The four LLM configs are measured on the 30-example prompt-experiment sample; the four classifiers on the full 88 held-out paraphrases. Colours match every figure in this repo.</sup>
 
 > **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
 > (~50 ms) is actually the **slowest non-LLM engine** — the forest's hundreds of
@@ -242,6 +244,26 @@ it carries in the results table above and in every other figure of this repo:
 > and its real edge is **slot extraction + zero-shot**, not top accuracy. The
 > larger `gemma4:e4b` reaches ~93 % but at ~40 s/call (`INTENT_LLM_MODEL` swaps
 > it back). Heavier ≠ better — pick by need.
+
+### Where does each engine go wrong? Confusion matrices
+
+An accuracy number hides *how* an engine fails. Each heatmap counts, for every
+true intent (rows), which intent the engine predicted (columns), plus an
+`Abstain` column for the "hand off to a human" cases. The diagonal is where the
+engine is right; off-diagonal cells are its confusions. Every matrix wears its
+engine's own colour (white to colour). Read them in order and the diagonal
+sharpens: the lexical engines scatter and lean hard on `Abstain`, BERT lands a
+near-clean diagonal, and the LLM configs sharpen further with a better model and
+few-shot examples.
+
+| | |
+|---|---|
+| ![TF-IDF + Random Forest confusion matrix](docs/img/confusion-tfidf-en.png) | ![fastText (learned) confusion matrix](docs/img/confusion-fasttext_custom-en.png) |
+| ![fastText (pretrained) confusion matrix](docs/img/confusion-fasttext_pretrained-en.png) | ![BERT + MLP confusion matrix](docs/img/confusion-bert-en.png) |
+| ![qwen2.5:3b zero-shot confusion matrix](docs/img/confusion-qwen-zs-en.png) | ![qwen2.5:3b few-shot confusion matrix](docs/img/confusion-qwen-fs-en.png) |
+| ![gemma3:4b zero-shot confusion matrix](docs/img/confusion-gemma-zs-en.png) | ![gemma3:4b few-shot confusion matrix](docs/img/confusion-gemma-fs-en.png) |
+
+Regenerate all eight with `python -m eval.confusion`.
 
 ### Bigger model, or a few examples? A 2×2 on the LLM
 

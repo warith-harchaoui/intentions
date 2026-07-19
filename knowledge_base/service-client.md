@@ -32,6 +32,29 @@
 - je c pas quoi faire avec mon dossier
 - Rien n'est clair pour moi, pouvez-vous m'aider ?
 - Je ne sais pas quelle démarche correspond à ma situation
+- Je suis complètement perdu, vous m’expliquez ?
+- J'ai besoin d'aide, ça me stresse trop.
+- Je comprends rien à ces petits caractères…
+- C'est quoi, ce jargon technique ?
+- Je ne sais pas comment ça marche, franchement.
+- Vous pourriez me simplifier les choses ?
+- J’ai un souci, je suis désorienté.
+- Ça fait des années que je n’ai jamais touché une assurance...
+- Je ne comprends pas pourquoi j'ai ces tarifs.
+- C’est trop compliqué pour moi à gérer seul.
+- Je suis bloqué, je ne sais plus où donner de la tête.
+- Pouvez-vous me guider ?
+- J’ai besoin d’une explication claire et simple.
+- Je ne vois pas le rapport entre tout ça…
+- Est-ce que vous pouvez m'expliquer plus lentement ?
+- Je suis un peu dépassé, je préfère parler à quelqu’un qui comprend.
+- C'est trop abstrait, j'aimerais des explications concrètes.
+- J'ai besoin d'une personne pour me conseiller personnellement.
+- Je ne sais pas comment remplir ce formulaire, c’est horrible !
+- Ça m’inquiète, je voudrais comprendre les risques.
+- Pouvez-vous me rassurer un peu ?
+- Je suis très mal à l'aise avec cette interface...
+- J’ai des questions, beaucoup de questions!
 ## Réponse
 Pas d'inquiétude — si vous ne savez pas, je préfère vous passer un vrai
 conseiller plutôt que de vous laisser seul face à une machine. Je vous mets
@@ -71,6 +94,31 @@ situation. Un instant, je vous transfère.
 - Je préfère échanger avec une personne du support
 - Est-ce possible d'avoir quelqu'un en ligne ?
 - Arrêtez le menu automatique, je veux un conseiller en direct
+- Je suis super frustré, je veux pas discuter avec une machine.
+- Un humain, s'il vous plaît, ça m'aidera à comprendre.
+- Passez-moi quelqu’un qui peut me donner des explications claires.
+- J'ai besoin d'une vraie conversation, pas un script.
+- Je suis perdu dans les infos, j'aimerais parler à un conseiller.
+- Vous avez des conseillers humains disponibles ?
+- J'en ai ras le bol de ces chatbots, je veux quelqu’un !
+- Mettez-moi en relation avec une personne réelle, vite !
+- Un agent humain serait parfait pour mon dossier.
+- Je suis impatient d'être reçu par un conseiller.
+- J'ai besoin d'aide, pas d'algorithmes.
+- Pourriez-vous me transférer à un humain ?
+- Je ne comprends rien aux automatismes, j’ai besoin de vous.
+- Un conseiller humain pourrait me rassurer.
+- Passez-moi une personne pour que je puisse poser mes questions.
+- J'aimerais parler à quelqu’un qui peut me guider.
+- Je veux discuter de mon contrat avec un vrai conseiller.
+- Où puis-je trouver un conseiller d'assurance ?
+- J'ai besoin d'être soutenu par un humain.
+- Vous avez des conseillers disponibles au téléphone ?
+- Je suis très insatisfait, j’aimerais parler à un humain.
+- J'ai besoin de quelqu'un qui puisse me poser les bonnes questions.
+- Un conseiller pour m'expliquer les termes de mon contrat.
+- Passez-moi une personne de contact, s'il vous plaît.
+- Je suis perdu, j’ai besoin d’aide humaine.
 ## Réponse
 Bien sûr, je vous mets en relation avec un conseiller. Merci de patienter
 quelques instants ; pour gagner du temps, gardez votre numéro de contrat à
@@ -109,6 +157,31 @@ portée de main.
 - mon dossier avance t il ? je n'ai pas de retour
 - Je souhaite connaître le statut de mon indemnisation
 - À quel stade en est le traitement de mon accident ?
+- Où est mon dossier de dossier ?
+- Je veux juste savoir où ça en est l'affaire
+- Est-ce que vous avez vu ma déclaration de sinistre ?
+- Ça fait une éternité, j’aimerais avoir des nouvelles, s'il vous plaît
+- Mon dossier il stagne un peu, non ?
+- Vous pouvez me donner un coup de fil pour me tenir au courant ?
+- Avez-vous bien reçu les documents que j'ai envoyés ?
+- Je suis un peu dans le flou, je ne sais pas où mon dossier est
+- Quand est-ce que ça va bouger enfin ?
+- Est-ce qu’on peut avoir une estimation du temps de traitement ?
+- J'ai besoin de savoir si ma demande a bien été enregistrée
+- Mon assurance, j’attends des réponses, c'est urgent !
+- Pourrais-je avoir un statut de mon dossier ?
+- Il y a des jours où je suis à bout de patience, je veux des nouvelles !
+- Je voudrais une mise à jour sur ma situation
+- J'ai déposé le sinistre il y a longtemps, ça avance pas !
+- Je voudrais savoir si vous avez besoin de quoi que ce soit de ma part pour accélérer les choses
+- Est-ce que quelqu'un travaille sur mon dossier ?
+- Je suis un peu perdu, je ne comprends rien à votre communication
+- J’ai besoin d’une réponse rapide concernant mon dossier
+- Pouvez-vous me dire si le dossier a été transmis au service compétent ?
+- Est-ce que mes documents sont bien en cours de traitement ?
+- Comment ça se passe pour ma prise en charge ?
+- Je voudrais savoir quand je peux espérer obtenir une indemnisation
+- J'ai toujours le même message : "en cours d'instruction"... ça change rien !
 ## Réponse
 Je vais vérifier l'état de votre dossier. Donnez-moi votre numéro de dossier
 ou de contrat. Je vous indiquerai la dernière étape enregistrée et les
@@ -148,6 +221,30 @@ ou de contrat. Je vous indiquerai la dernière étape enregistrée et les
 - je veux contesté votre décision de refus
 - Votre indemnisation est ridicule, je porte réclamation
 - Je souhaite faire appel de votre décision, elle est injustifiée
+- Je voudrais signaler un sinistre.
+- J'ai besoin de faire une réclamation suite à l'orage.
+- C’est quoi la procédure pour faire une réclamation ?
+- Votre assurance ne rembourse rien, c'est inadmissible !
+- J'ai des soucis avec ma garantie, je veux faire une réclamation.
+- Je suis très mécontent de la gestion de mon dossier.
+- Comment je fais pour porter plainte et obtenir un remboursement ?
+- Il y a eu un dommage important, j’aimerais faire une réclamation.
+- Je pense avoir droit à un préjudice, je vais demander des réparations.
+- J'ai un problème avec ma déclaration de sinistre, je veux que ça se règle.
+- Votre expert n’a pas pris en compte mes pertes.
+- Je suis déçu par le manque de communication, je veux une réclamation.
+- Comment on fait pour contester un refus de remboursement ?
+- Il faut que vous vérifiiez mon dossier, j'ai des doutes.
+- J’ai subi des dommages et je souhaite déclencher ma garantie.
+- Votre assurance est complètement dépassée, ça ne marche pas !
+- Je veux signaler un dysfonctionnement, je vais faire une réclamation.
+- J'ai besoin de vous aider à évaluer mes dégâts.
+- Comment je procède pour obtenir mon dû ?
+- J’ai été lésé par votre contrat, je demande réparation.
+- Votre expert m'a dit que ça ne rentrait pas dans la garantie !
+- Il y a un litige sur le montant du remboursement.
+- Je veux faire valider ma réclamation et obtenir mon assurance.
+- C’est quoi les délais pour traiter une réclamation ?
 ## Réponse
 Je prends votre réclamation au sérieux et je la transmets au service dédié.
 Vous recevrez un accusé de réception sous 48 heures et une réponse sous dix
@@ -188,6 +285,30 @@ Médiateur de l'Assurance.
 - Par quel moyen puis-je vous contacter ?
 - Où se trouve votre agence la plus proche ?
 - Avez-vous une ligne joignable les jours fériés ?
+- Bonjour, vous travaillez quand exactement ?
+- Est-ce que vous êtes ouvert le dimanche aussi ?
+- Jusqu'à quelle heure je peux prendre rendez-vous ?
+- Comment je fais pour vous contacter par téléphone ?
+- Quel est votre numéro de téléphone ? Merci.
+- Je voudrais savoir vos horaires d'ouverture précis.
+- Vous avez une permanence le soir ?
+- Si j'ai un sinistre, comment je vous contacte en urgence ?
+- Est-ce que vous avez un fax ?
+- J'aimerais connaître l'adresse postale de votre agence.
+- Pourriez-vous me donner vos coordonnées complètes ?
+- Vous êtes ouverts le soir ?
+- Quel est le numéro de téléphone de l'agence de Lyon ?
+- Comment je vous appelle pour des infos ?
+- Est-ce que vous avez une assistance téléphonique 24h/24 ?
+- Jusqu'à quelle heure je peux passer ?
+- Je voudrais un email pour vous contacter.
+- Quel est votre numéro ? Je suis en urgence.
+- Vous travaillez quoi, vos horaires ?
+- Je voulais savoir si vous êtes ouverts le mercredi soir.
+- Comment on vous contacte en cas de besoin urgent ?
+- Jusqu'à quelle heure je peux venir ?
+- Pourriez-vous me donner l'adresse email pour les déclarations ?
+- Vous avez un service client au téléphone ?
 ## Réponse
 Nos conseillers sont disponibles du lundi au vendredi de 8h à 19h et le
 samedi de 9h à 13h. L'assistance et les sinistres urgents sont joignables

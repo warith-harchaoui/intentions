@@ -31,9 +31,33 @@
 - Je loue un appartement et le propriétaire exige une assurance
 - Comment mettre en place une assurance pour mon habitation ?
 - Je voudrais assurer mon logement étudiant
+- Je cherche une assurance pour mon nouveau chez-moi.
+- Il faudrait que je trouve une assurance habitation, vite !
+- J'aimerais bien comparer les prix, un multirisque ça me tente.
+- Est-ce qu’on peut avoir une assurance habitation pour une copropriété ?
+- Je suis à la recherche d'une assurance habitation pas trop chère.
+- J'ai besoin de protéger mon appartement contre le vol et les dégâts des eaux.
+- Une assurance habitation, c'est obligatoire, non ?
+- Je voudrais un devis pour l'assurance habitation, s’il vous plaît.
+- Ma maison est neuve, donc j'ai besoin d'une assurance.
+- Est-ce que vous proposez une assurance avec assistance juridique ?
+- J’hésite entre plusieurs assurances habitations, aidez-moi !
+- Je veux savoir ce qu'on peut couvrir dans une assurance multirisque.
+- Quel type de garantie est indispensable pour une assurance habitation ?
+- J'ai emménagé récemment, je suis à la recherche d'une assurance immédiate.
+- Un contrat d’assurance habitation pour mon studio.
+- J’aimerais bien un devis personnalisé selon mes besoins.
+- Est-ce que vous proposez des assurances avec des réductions étudiants ?
+- Je suis inquiet pour les dégâts des eaux, besoin d'une bonne assurance.
+- Assurance habitation, c'est pas compliqué, je veux juste le bon prix.
+- J’ai un appartement mitoyen, ça change quoi dans l’assurance ?
+- J'aurais besoin d'une assurance qui couvre les appareils électroménagers.
+- Je suis novice en matière d’assurance, expliquez-moi simplement.
+- Un devis pour une habitation avec garantie location.
+- Est-ce que vous assurez contre les catastrophes naturelles ?
 ## Réponse
 Bien sûr. Pour votre devis habitation, indiquez-moi la surface, le nombre de
-pièces, si vous êtes locataire ou propriétaire, et l'adresse du logement.
+pièces, si vous êtes locataire ou propriétaire et l'adresse du logement.
 J'ouvre le formulaire de souscription ; l'attestation vous sera envoyée dès
 la signature.
 
@@ -70,6 +94,31 @@ la signature.
 - Il y a eu une infiltration après les fortes pluies dans ma cave
 - Le radiateur a coulé et endommagé mon plancher
 - Un joint de douche a lâché et l'eau s'est infiltrée dans la cloison
+- J’ai un souci d'infiltration au plafond, c’est vachement galère.
+- Il y a une grosse fuite dans ma salle de bain, ça coule à flots !
+- Je crois qu’une canalisation a craqué, il y a de l'eau qui s'infiltre partout.
+- Ma baignoire a claqué et j'ai un vrai bordel d'eau.
+- J'ai eu une tempête hier soir et maintenant il y a des dégâts d'eau.
+- Une fuite dans mon grenier, c’est la catastrophe !
+- Mon siphon est bouché et ça déborde dans le carrelage.
+- Il faut déclarer un dégât des eaux, j'espère que ça sera pris en charge.
+- J'ai l'impression qu'une canalisation a perdu de la pression, il y a de l'eau qui coule.
+- Je suis dégouté, ma cave est inondée !
+- Une fuite au niveau de la robinetterie, c’est pas normal ça !
+- Mon lave-vaisselle a fait n'importe quoi et mon sol est détrempé.
+- J'ai remarqué une tache d'eau sur le mur, ça vient d'où ?
+- Il y a eu un orage violent et j'ai des dégâts au niveau du toit.
+- Je pense qu’une canalisation de chauffage a perdu de l'eau.
+- Mon appartement est noyé sous l'eau, je suis paniqué !
+- J'ai des infiltrations dans la cuisine, ça commence à sentir mauvais.
+- Il faut faire une déclaration de sinistre, j'ai vraiment besoin d'aide.
+- Ma douche fuit comme une fontaine, c'est irréalisable !
+- J’ai un problème d'humidité qui s'est développé suite à une pluie torrentielle.
+- Je crois qu’un tuyau a cédé et ça inonde mon garage.
+- Mon robinet fuit sans arrêt, ça gicle !
+- Il y a des traces d'eau sur le sol, je soupçonne un problème de plomberie.
+- J'ai un dégât des eaux important, j'espère que vous pouvez m'aider à réparer les dégâts.
+- Je suis au téléphone pour déclarer des dommages liés à une inondation.
 ## Réponse
 Coupez l'arrivée d'eau si vous le pouvez et protégez ce qui peut l'être.
 Je transmets votre déclaration au service sinistres habitation. Remplissez
@@ -109,6 +158,31 @@ conservez les factures des biens endommagés.
 - Ils ont emporté mes bijoux et mon coffre a été forcé
 - vol par effraction dans ma maison la nuit dernière
 - On a cassé un carreau pour entrer et voler chez moi
+- On s’est fait rouler, c'est une catastrophe !
+- J'ai eu un cambriolage, ça m'a traumatisé.
+- Quelqu'un est entré chez moi comme ça, sans prévenir.
+- Ils ont brisé ma porte d'entrée pour me voler.
+- Je suis victime d’une effraction, je dois déclarer.
+- On a volé tout ce qu’il y avait dans mon appartement.
+- J'ai un cambriolage à déclarer, c'est pas normal !
+- Quelqu'un est passé par la fenêtre, je n'ai rien vu.
+- Ils ont saccagé ma maison, c'est horrible.
+- Je me suis fait piquer, impossible de dormir.
+- Vol de biens dans mon logement, je veux une prise en charge.
+- On a forcé ma serrure, c’est vraiment inadmissible.
+- J'ai un vol avec effraction à signaler urgentement.
+- Ils ont mis le bazar dans ma chambre, un vrai carnage !
+- Je suis consterné par ce cambriolage.
+- Quelqu'un est entré et a tout pris, je suis au bout du rouleau.
+- Mon appartement a été profané, c'est dégoûtant.
+- Vol de bijoux et argent, ça me rend fou.
+- J'ai subi une effraction, je veux des explications.
+- Ils ont mis le feu à quelques affaires, heureusement rien de grave.
+- Je suis victime d’un cambriolage, je n’en reviens pas !
+- On a volé mon ordinateur portable, c'est précieux.
+- Mon domicile a été attaqué, j'ai peur.
+- J’ai eu une effraction dans mon appartement, je suis en état de choc.
+- Quelqu'un est entré par la fenêtre, ça m’a terrifié.
 ## Réponse
 Je suis désolé pour cette épreuve. Déposez plainte au commissariat au plus
 vite : le dépôt de plainte conditionne l'indemnisation. Faites l'inventaire
@@ -148,6 +222,31 @@ dossier au service sinistres habitation.
 - Le feu a pris dans le tableau électrique, gros dégâts
 - Ma maison a été touchée par un incendie, comment procéder ?
 - Un barbecue a enflammé la terrasse et le mur du salon
+- Il y a eu un drôle d'odeur de brûlé chez moi, je crois qu’il y a un incendie.
+- Mon appart a cramé, c'est l'horreur!
+- J'ai vu une fumée pas possible dans ma cuisine, ça avait l'air un début d'incendie.
+- Le garage a pris feu, merde!
+- Ma maison a été touchée par des flammes, je suis traumatisé.
+- Il y a eu un petit incendie dans le salon, rien de grave mais...
+- J’ai senti une odeur de plastique brûlé, j'ai cru que c'était un feu.
+- Mon appartement est en partie calciné, impossible de vivre ici!
+- On dirait qu'il y avait eu un incendie dans la cave, ça sent tellement fort.
+- Le feu a commencé dans ma cuisine, je n’y crois pas!
+- Ma maison a été ravagée par le feu, c'est une catastrophe.
+- J'ai vu des étincelles près de mon four, ça m'a fait peur.
+- Il y avait un incendie à l'étage, j'espère que tout le monde est sorti.
+- Mon garage a pris, j'ai dû appeler les pompiers.
+- C’est le bazar, ma cuisine est complètement brûlée!
+- Ma maison a été touchée par le feu, je suis anéanti.
+- J'ai vu de la fumée bleue provenant de mon salon.
+- Il y avait un début d'incendie dans mon placard, j’ai réagi vite fait!
+- Le feu s’est propagé rapidement dans ma cuisine.
+- Ma maison a pris feu, c'est un cauchemar !
+- J’ai senti une odeur très forte de brûlé...
+- Un incendie s'est déclaré dans la buanderie.
+- Mon appartement est fumant, je crois qu’il y a un feu.
+- Il y avait des flammes dans mon garage, j’ai paniqué!
+- Ma maison a été touchée, c'est incroyable !
 ## Réponse
 Votre sécurité d'abord : assurez-vous que tout le monde est hors de danger
 et que les secours sont passés. Je transmets votre déclaration au service
