@@ -235,28 +235,24 @@ chevauchent à peine : les moteurs sont *réellement* différents, pas du bruit 
 > mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
 > on choisit selon le besoin.
 
-### L'ingénierie de prompt, ça sert vraiment ? Une expérience 2×2
+### Un modèle plus gros, ou quelques exemples ? Un 2×2 sur le LLM
 
-La leçon *représentation* ci-dessus parle du **modèle**. Celle-ci parle du
-**prompt**. On croise deux réglages indépendants — la **qualité** du prompt (un
-prompt *mauvais* : une tâche + un schéma simples mais raisonnables, pas un
-épouvantail — vs un prompt *bon* qui ajoute des règles de désambiguïsation issues
-de l'analyse d'erreurs) et les **exemples** (zéro-shot vs trois exemples few-shot,
-sur des phrases **fraîches** hors jeu de test, donc sans tricher) — soit quatre
-prompts sur un seul axe. On lance le 2×2 complet sur plusieurs modèles locaux et
-on ne montre **que** celui où le prompt *bon* gagne vraiment, avec la montée la
-plus nette :
+La leçon *représentation* ci-dessus parle du classifieur. Celle-ci parle du
+**LLM**, selon deux réglages indépendants — le **modèle** (un petit `qwen2.5:3b`
+vs le plus gros `gemma3:4b`) et les **exemples** (zéro-shot vs trois exemples
+few-shot, sur des phrases **fraîches** hors jeu de test, donc sans tricher) — à
+prompt (soigné) constant :
 
-![Ingénierie de prompt : de mieux en mieux](docs/img/shootout-fr.png)
+![Modèle et "few shots" : de mieux en mieux](docs/img/shootout-fr.png)
 
-> **Soigner le prompt paie surtout quand le modèle est faible.** Sur le petit
-> `qwen2.5:3b`, les quatre prompts grimpent **60 → 60 → 67 → 77 %** — +17 points
-> par les mots et les exemples seuls. Sur `gemma3:4b`, déjà à ~90 %, le même
-> effort ne bouge presque rien (il est proche de son plafond). La morale qu'un(e)
-> praticien(ne) reconnaît : *avant de sortir un modèle plus gros, corrige le
-> prompt — mais n'attends pas de miracle quand le modèle est déjà fort.*
-> (Échantillon tenu à l'écart de 30 ; prédictions mises en cache par config dans
-> `eval/.llm_shootout/`.)
+> **Le modèle fait le grand saut ; le few-shot ajoute un petit plus.**
+> L'exactitude grimpe **67 → 77 → 87 → 93 %** : passer du petit modèle au plus
+> gros, c'est le bond de +20 points ; ajouter une poignée d'exemples few-shot
+> gagne ~10 points de plus sur chaque modèle. La morale qu'un(e) praticien(ne)
+> reconnaît : *prends d'abord un modèle plus fort, puis grappille les derniers
+> points avec des exemples bien choisis — encore faut-il qu'ils soient frais,
+> sinon on ne mesure que de la fuite.* (Échantillon tenu à l'écart de 30 ;
+> prédictions mises en cache par config dans `eval/.llm_shootout/`.)
 
 ---
 

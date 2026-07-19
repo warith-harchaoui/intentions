@@ -21,9 +21,11 @@ history of NLP**, from bag-of-words to generative LLM:
 | 4 | **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
 | 5 | **LLM** | — (prompt) | **Gemma** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
 
-> The UI is French because it is a French insurance assistant; the code,
-> docstrings and this README are English. A full French mirror lives in
-> [`LISEZMOI.md`](LISEZMOI.md).
+> The UI is **bilingual EN/FR** — a 🇬🇧/🇫🇷 flag toggle (top-right, next to a
+> light/dark button); the LLM is even prompted in the query's own detected
+> language. The *knowledge base* stays French (a French insurer's content). The
+> code, docstrings and this README are English; a full French mirror of this
+> page lives in [`LISEZMOI.md`](LISEZMOI.md).
 
 ## Why this project exists — the pedagogical goal
 
@@ -235,26 +237,23 @@ are *genuinely* different, not noise apart:
 > larger `gemma4:e4b` reaches ~93 % but at ~40 s/call (`INTENT_LLM_MODEL` swaps
 > it back). Heavier ≠ better — pick by need.
 
-### Does prompt engineering actually help? A 2×2 experiment
+### Bigger model, or a few examples? A 2×2 on the LLM
 
-The *representation* lesson above is about the **model**. This one is about the
-**prompt**. We cross two independent switches — prompt **quality** (a *bad*
-prompt: a plain-but-reasonable task + schema, not a strawman — vs a *good* one
-that adds error-driven disambiguation rules) and **examples** (zero-shot vs
-three worked few-shot examples, on *fresh* sentences never in the test set, so
-no leakage) — giving four prompts along one axis. We ran the full 2×2 on several
-local models and show the **single** one where the *good* prompt genuinely wins,
-climbing the most cleanly:
+The *representation* lesson above is about the classifier. This one is about the
+**LLM**, along two independent switches — the **model** (a small `qwen2.5:3b` vs
+the larger `gemma3:4b`) and the **examples** (zero-shot vs three worked few-shot
+examples, on *fresh* sentences never in the test set, so no leakage) — at a
+fixed, engineered prompt:
 
-![Prompt engineering: better and better](docs/img/shootout-en.png)
+![Model and few-shots: better and better](docs/img/shootout-en.png)
 
-> **Prompt work pays most when the model is weak.** On the small `qwen2.5:3b`,
-> the four prompts climb **60 → 60 → 67 → 77 %** — a +17-point lift from wording
-> and examples alone. On `gemma3:4b`, already ~90 %, the same effort barely
-> moves the needle (it is near its ceiling). The takeaway a practitioner
-> recognises: *before reaching for a bigger model, fix the prompt — but don't
-> expect miracles once the model is already strong.* (Held-out sample of 30;
-> predictions cached per config in `eval/.llm_shootout/`.)
+> **The model buys the big jump; few-shot adds a little on top.** Accuracy
+> climbs **67 → 77 → 87 → 93 %**: going from the small model to the larger one is
+> the +20-point move, and adding a handful of few-shot examples lifts each model
+> a further ~10 points. The practitioner's takeaway: *reach for a stronger model
+> first, then squeeze the last points with well-chosen examples — the few-shot
+> examples must be fresh, or you are just measuring leakage.* (Held-out sample of
+> 30; predictions cached per config in `eval/.llm_shootout/`.)
 
 ---
 
