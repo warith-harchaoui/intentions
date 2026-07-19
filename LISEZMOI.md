@@ -59,7 +59,7 @@ flowchart LR
     style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
-    style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style E fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
 ```
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
@@ -207,14 +207,25 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 > on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps —
 > voir `eval/bench.py` ; le chiffre du LLM est le calcul propre d'Ollama.)
 
-**Les distributions, pas juste les points** — chaque violon ci-dessous est une
-**validation croisée répétée 5 blocs** : 5 blocs × 5 mélanges = **25 mesures
-réelles** par moteur (apprendre sur 4/5 des K = 21 intentions / N = 500
-exemples, tester sur le 1/5 restant). Chaque point est un vrai score de
-généralisation — aucun artifice de rééchantillonnage — et les densités se
-chevauchent à peine : les moteurs sont *réellement* différents, pas du bruit :
+**Les distributions, pas juste les points.** Les quatre classifieurs
+*entraînables* passent une **validation croisée répétée 5 blocs** : 5 blocs ×
+5 mélanges = **25 mesures réelles** chacun (apprendre sur 4/5 des K = 21
+intentions / N = 500 exemples, tester sur le 1/5 restant), tracés en **violons**
+lisses. Les quatre configs LLM sont zéro-shot — rien n'est entraîné, donc chacune
+est *un seul* nombre held-out, un **Dirac** tracé en une ligne horizontale. Les
+huit moteurs partagent une couleur, la même dans **toutes** les figures du dépôt
+(voir la légende plus bas) :
 
-![Distribution d'exactitude par moteur (violin plot)](docs/img/violin-accuracy-fr.png)
+![Exactitude par moteur — violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
+
+**Légende des couleurs (une couleur par moteur, partout).**
+
+| Moteur | Couleur | | Moteur | Couleur |
+|---|---|---|---|---|
+| ⬤ TF-IDF | Bleu `#007AFF` | | ⬤ qwen2.5:3b · zero shot | Jaune `#FFCC00` |
+| ⬤ fastText (appris) | Turquoise `#79DBDC` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
+| ⬤ fastText (pré-entraîné) | Violet `#AF52DE` | | ⬤ gemma3:4b · zero shot | Rose `#FF2D55` |
+| ⬤ BERT | Vert `#28CD41` | | ⬤ gemma3:4b · few shots | Rouge `#FF3B30` |
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
 > l'exactitude monte 51 → 66 → 74 → 86 %. Mais en **validation croisée** sur les
@@ -287,7 +298,7 @@ flowchart LR
     style E2 fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
-    style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style E5 fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
     style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style WEB fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E

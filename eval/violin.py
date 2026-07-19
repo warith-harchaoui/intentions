@@ -44,53 +44,121 @@ _CV_RESULTS = Path(__file__).resolve().parent / "crossval_results.json"
 _SHOOTOUT_RESULTS = Path(__file__).resolve().parent / "llm_shootout_results.json"
 _IMG_DIR = Path(__file__).resolve().parent.parent / "docs" / "img"
 
-# The four *trainable* engines shown in the cross-validation violins, in the
-# pedagogical progression order, with house-palette colours (matching the
-# Mermaid progression) and bilingual labels.
-_ENGINE_META: dict[str, dict[str, str]] = {
-    "tfidf": {"fr": "TF-IDF", "en": "TF-IDF", "color": "#007AFF"},
-    "fasttext_custom": {
+# ── THE 8 ENGINES: single source of truth for colour + order ───────────────
+# One entry per "engine", used by EVERY figure (the Vega charts here and the
+# Mermaid diagrams in the docs) so a given engine is ALWAYS the same colour.
+# Colours are the 8 chromatic hues of the house palette
+# (harchaoui.org/warith/colors), one per engine, chosen distinct.
+#
+#   * ``kind: "cv"``  — a trainable classifier: shown as a smooth **violin**
+#     (repeated cross-validation, 25 folds).
+#   * ``kind: "llm"`` — an LLM configuration (model × examples): a single
+#     held-out accuracy → a **Dirac** drawn as one horizontal line (in the
+#     accuracy figure) and as a bar (in the shootout figure). ``model``/``prompt``
+#     locate its number in ``llm_shootout_results.json``.
+ENGINES: list[dict[str, str]] = [
+    {"key": "tfidf", "fr": "TF-IDF", "en": "TF-IDF", "color": "#007AFF", "kind": "cv"},
+    {
+        "key": "fasttext_custom",
         "fr": "fastText\n(appris)",
         "en": "fastText\n(learned)",
-        "color": "#79DBDC",
+        "color": "#79DBDC",  # Turquoise
+        "kind": "cv",
     },
-    "fasttext_pretrained": {
+    {
+        "key": "fasttext_pretrained",
         "fr": "fastText\n(pré-entraîné)",
         "en": "fastText\n(pretrained)",
-        "color": "#AF52DE",
+        "color": "#AF52DE",  # Purple
+        "kind": "cv",
     },
-    "bert": {"fr": "BERT", "en": "BERT", "color": "#28CD41"},
-}
+    {"key": "bert", "fr": "BERT", "en": "BERT", "color": "#28CD41", "kind": "cv"},
+    {
+        "key": "qwen-zs",
+        "fr": "qwen2.5:3b\nzero shot",
+        "en": "qwen2.5:3b\nzero shot",
+        "color": "#FFCC00",  # Yellow
+        "kind": "llm",
+        "model": "qwen2.5:3b",
+        "prompt": "good-zs",
+    },
+    {
+        "key": "qwen-fs",
+        "fr": "qwen2.5:3b\nfew shots",
+        "en": "qwen2.5:3b\nfew shots",
+        "color": "#FF9500",  # Orange
+        "kind": "llm",
+        "model": "qwen2.5:3b",
+        "prompt": "good-fs",
+    },
+    {
+        "key": "gemma-zs",
+        "fr": "gemma3:4b\nzero shot",
+        "en": "gemma3:4b\nzero shot",
+        "color": "#FF2D55",  # Pink
+        "kind": "llm",
+        "model": "gemma3:4b",
+        "prompt": "good-zs",
+    },
+    {
+        "key": "gemma-fs",
+        "fr": "gemma3:4b\nfew shots",
+        "en": "gemma3:4b\nfew shots",
+        "color": "#FF3B30",  # Red
+        "kind": "llm",
+        "model": "gemma3:4b",
+        "prompt": "good-fs",
+    },
+]
 
 # Bilingual chart strings (kept tiny — the real explanation is in the docs).
 _TEXT: dict[str, dict[str, str]] = {
     "fr": {
-        "cv_title": "Exactitude par moteur (validation croisée 5 blocs)",
+        "cv_title": "Exactitude par moteur",
+        "cv_subtitle": (
+            "violons = validation croisée (25 mesures) · "
+            "lignes LLM = point held-out unique (Dirac)"
+        ),
         "axis": "Exactitude (plus c'est haut, mieux c'est)",
         "shoot_title": "Modèle et few shots : de mieux en mieux",
     },
     "en": {
-        "cv_title": "Accuracy by engine (5-fold cross-validation)",
+        "cv_title": "Accuracy by engine",
+        "cv_subtitle": (
+            "violins = cross-validation (25 measurements) · "
+            "LLM lines = single held-out point (a Dirac)"
+        ),
         "axis": "Accuracy (higher is better)",
         "shoot_title": "Model and few shots: better and better",
     },
 }
 
-# The shootout figure is a 2×2: **model** (a weaker vs a stronger local model)
-# × **examples** (zero-shot vs few-shot). Prompt *quality* is held constant at
-# the engineered ("good") prompt so the two axes that vary are model and
-# examples. Reading left→right the accuracy climbs — a bigger model helps most,
-# few-shot adds a little on top. Models are ordered weak→strong.
-_SHOOT_MODELS: list[str] = ["qwen2.5:3b", "gemma3:4b"]
-# (internal prompt key at fixed quality, x-axis sub-label) — the examples axis.
-_SHOOT_EXAMPLES: list[tuple[str, str]] = [
-    ("good-zs", "zero shot"),
-    ("good-fs", "few shots"),
-]
 
-# A sequential blue ramp (light → deep sysblue) signalling "getting better"
-# across the four bars — one hue deepening, not four unrelated colours.
-_PROMPT_RAMP: list[str] = ["#CCE4FF", "#7FB5FF", "#3B92FF", "#0055CC"]
+def _llm_accuracies(shootout: dict) -> dict[str, float]:
+    """Map each LLM engine ``key`` to its held-out accuracy from the shootout.
+
+    Parameters
+    ----------
+    shootout : dict
+        Parsed ``llm_shootout_results.json`` (``summary`` field).
+
+    Returns
+    -------
+    dict[str, float]
+        ``{engine_key: accuracy}`` for the four ``kind == "llm"`` engines.
+    """
+    by_cfg = {
+        (s.get("model", ""), s.get("prompt", "")): s.get("point_accuracy", 0.0)
+        for s in shootout.get("summary", {}).values()
+    }
+    out: dict[str, float] = {}
+    for eng in ENGINES:
+        if eng["kind"] == "llm":
+            acc = by_cfg.get((eng["model"], eng["prompt"]))
+            if acc is not None:
+                out[eng["key"]] = acc
+    return out
+
 
 # House-style base config shared by every chart (Roboto, no chart-junk).
 _BASE_CONFIG = {
@@ -101,73 +169,82 @@ _BASE_CONFIG = {
 }
 
 
-def build_cv_spec(results: dict, lang: str) -> dict:
-    """Build the cross-validation violin spec in ``lang``.
+def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
+    """Build the all-8-engines accuracy figure in ``lang``.
+
+    One column per engine, in :data:`ENGINES` order, coloured by the shared
+    palette. The four **trainable** engines are smooth CV **violins** (25 folds
+    each); the four **LLM** configs are single held-out accuracies, each drawn
+    as a **Dirac** — one horizontal line (no width = no distribution).
 
     Parameters
     ----------
-    results : dict
-        Parsed ``crossval_results.json`` (uses the ``cv`` field: a list of
-        real fold accuracies per trainable engine).
+    cv_results : dict
+        Parsed ``crossval_results.json`` (``cv`` field: fold accuracies).
+    shootout_results : dict
+        Parsed ``llm_shootout_results.json`` (LLM config accuracies).
     lang : str
         ``"fr"`` or ``"en"``.
 
     Returns
     -------
     dict
-        A Vega-Lite v5 faceted-density (violin) specification.
+        A Vega-Lite v5 faceted, layered specification.
     """
-    cv: dict[str, list[float]] = results.get("cv", {})
-    # Long-format rows: one per (engine, fold accuracy). Only engines present
-    # in the CV results are drawn, in progression order.
+    cv: dict[str, list[float]] = cv_results.get("cv", {})
+    llm_accs = _llm_accuracies(shootout_results)
+
+    # One shared dataset; ``kind`` tells violins (many rows) from Diracs (one
+    # row) so the two layers below never collide. Engines kept in ENGINES order.
     rows: list[dict[str, object]] = []
     present: list[str] = []
     colours: list[str] = []
-    for engine, meta in _ENGINE_META.items():
-        if engine not in cv:
-            continue
-        present.append(meta[lang])
-        colours.append(meta["color"])
-        for value in cv[engine]:
-            rows.append({"engine": meta[lang], "accuracy": value})
+    for eng in ENGINES:
+        label = eng[lang]
+        if eng["kind"] == "cv":
+            if eng["key"] not in cv:
+                continue
+            present.append(label)
+            colours.append(eng["color"])
+            for value in cv[eng["key"]]:
+                rows.append({"engine": label, "accuracy": value, "kind": "cv"})
+        else:  # llm
+            if eng["key"] not in llm_accs:
+                continue
+            present.append(label)
+            colours.append(eng["color"])
+            rows.append(
+                {"engine": label, "accuracy": llm_accs[eng["key"]], "kind": "llm"}
+            )
+
+    color_enc = {
+        "field": "engine",
+        "type": "nominal",
+        "scale": {"domain": present, "range": colours},
+        "legend": None,
+    }
+    y_enc = {
+        "field": "accuracy",
+        "type": "quantitative",
+        "title": _TEXT[lang]["axis"],
+        "axis": {"format": "%"},
+        "scale": {"domain": [0, 1]},
+    }
 
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
             "text": _TEXT[lang]["cv_title"],
+            "subtitle": _TEXT[lang]["cv_subtitle"],
+            "subtitleColor": "#6E6E73",
             "font": "Roboto",
+            "subtitleFont": "Roboto",
             "anchor": "start",
             "fontSize": 16,
         },
         "config": _BASE_CONFIG,
         "data": {"values": rows},
-        "transform": [
-            {
-                "density": "accuracy",
-                "groupby": ["engine"],
-                "extent": [0, 1],
-                "as": ["accuracy", "density"],
-            }
-        ],
-        "mark": {"type": "area", "orient": "horizontal"},
-        "width": 95,
-        "height": 420,
-        "encoding": {
-            "y": {
-                "field": "accuracy",
-                "type": "quantitative",
-                "title": _TEXT[lang]["axis"],
-                "axis": {"format": "%"},
-                "scale": {"domain": [0, 1]},
-            },
-            "x": {
-                "field": "density",
-                "type": "quantitative",
-                "stack": "center",
-                "impute": None,
-                "title": None,
-                "axis": {"labels": False, "ticks": False, "grid": False, "values": []},
-            },
+        "facet": {
             "column": {
                 "field": "engine",
                 "type": "nominal",
@@ -176,15 +253,55 @@ def build_cv_spec(results: dict, lang: str) -> dict:
                     "titleOrient": "bottom",
                     "labelOrient": "bottom",
                     "labelPadding": 6,
+                    "labelFontSize": 11,
+                    # Two-line engine labels (model / examples) never overlap.
+                    "labelExpr": "split(datum.value, '\\n')",
                 },
                 "title": None,
-            },
-            "color": {
-                "field": "engine",
-                "type": "nominal",
-                "scale": {"domain": present, "range": colours},
-                "legend": None,
-            },
+            }
+        },
+        "spec": {
+            "width": 70,
+            "height": 420,
+            "layer": [
+                {
+                    # Violins: the trainable engines, smoothed by KDE.
+                    "transform": [
+                        {"filter": "datum.kind === 'cv'"},
+                        {
+                            "density": "accuracy",
+                            "groupby": ["engine"],
+                            "extent": [0, 1],
+                            "as": ["accuracy", "density"],
+                        },
+                    ],
+                    "mark": {"type": "area", "orient": "horizontal"},
+                    "encoding": {
+                        "y": y_enc,
+                        "x": {
+                            "field": "density",
+                            "type": "quantitative",
+                            "stack": "center",
+                            "impute": None,
+                            "title": None,
+                            "axis": {
+                                "labels": False,
+                                "ticks": False,
+                                "grid": False,
+                                "values": [],
+                            },
+                        },
+                        "color": color_enc,
+                    },
+                },
+                {
+                    # LLM Diracs: one horizontal line per config at its held-out
+                    # accuracy (no width = no distribution).
+                    "transform": [{"filter": "datum.kind === 'llm'"}],
+                    "mark": {"type": "rule", "size": 4},
+                    "encoding": {"y": y_enc, "color": color_enc},
+                },
+            ],
         },
     }
 
@@ -211,27 +328,19 @@ def build_shootout_spec(results: dict, lang: str) -> dict:
     dict
         A Vega-Lite v5 bar-chart specification.
     """
-    summary: dict[str, dict] = results.get("summary", {})
-    # Index every (model, prompt) accuracy.
-    acc: dict[tuple[str, str], float] = {
-        (s.get("model", ""), s.get("prompt", "")): s.get("point_accuracy", 0.0)
-        for s in summary.values()
-    }
+    llm_accs = _llm_accuracies(results)
     rows: list[dict[str, object]] = []
     order: list[str] = []
     colours: list[str] = []
-    i = 0
-    # Bars in reading order: for each model (weak→strong), zero-shot then
-    # few-shot. Labels are two-line: model on top, examples below.
-    for model in _SHOOT_MODELS:
-        for prompt, ex_label in _SHOOT_EXAMPLES:
-            if (model, prompt) not in acc:
-                continue
-            label = f"{model}\n{ex_label}"
-            order.append(label)
-            colours.append(_PROMPT_RAMP[i % len(_PROMPT_RAMP)])
-            rows.append({"config": label, "accuracy": acc[(model, prompt)]})
-            i += 1
+    # The four LLM engines, in ENGINES order, each with its palette colour — the
+    # SAME colour it carries in the accuracy figure and everywhere else.
+    for eng in ENGINES:
+        if eng["kind"] != "llm" or eng["key"] not in llm_accs:
+            continue
+        label = eng[lang]
+        order.append(label)
+        colours.append(eng["color"])
+        rows.append({"config": label, "accuracy": llm_accs[eng["key"]]})
 
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -326,18 +435,28 @@ def render_all() -> list[Path]:
         shootout results are present).
     """
     written: list[Path] = []
-    # Cross-validation violins (require the crossval results).
-    if _CV_RESULTS.is_file():
-        cv = json.loads(_CV_RESULTS.read_text(encoding="utf-8"))
+    cv = (
+        json.loads(_CV_RESULTS.read_text(encoding="utf-8"))
+        if _CV_RESULTS.is_file()
+        else {}
+    )
+    shoot = (
+        json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
+        if _SHOOTOUT_RESULTS.is_file()
+        else {}
+    )
+    # The all-8-engines accuracy figure (violins + LLM Dirac lines) needs both
+    # the crossval and the shootout results.
+    if cv:
         for lang in ("fr", "en"):
             written.append(
                 _render(
-                    build_cv_spec(cv, lang), _IMG_DIR / f"violin-accuracy-{lang}.png"
+                    build_cv_spec(cv, shoot, lang),
+                    _IMG_DIR / f"violin-accuracy-{lang}.png",
                 )
             )
     # Shootout bars (only when the shootout has been run).
-    if _SHOOTOUT_RESULTS.is_file():
-        shoot = json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
+    if shoot:
         for lang in ("fr", "en"):
             written.append(
                 _render(

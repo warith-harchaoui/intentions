@@ -54,7 +54,7 @@ flowchart LR
     style B fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
-    style E fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style E fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
 ```
 
 The comparator then shows the **pay-off** with real, measured numbers (not
@@ -211,14 +211,24 @@ worth:
 > "slow": measure, don't assume. (CPU time via `process_time`, immune to other
 > apps' load — see `eval/bench.py`; the LLM figure is Ollama's own compute.)
 
-**The distributions, not just the point estimates** — each violin below is a
-**repeated 5-fold cross-validation**: 5 folds × 5 shuffles = **25 real
-measurements** per engine (train on 4/5 of the K = 21 intents / N = 500
-examples, test on the held-out 1/5). Every point is a genuine generalisation
-score — no resampling tricks — and the densities barely overlap, so the engines
-are *genuinely* different, not noise apart:
+**The distributions, not just the point estimates.** The four *trainable*
+classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
+**25 real measurements** each (train on 4/5 of the K = 21 intents / N = 500
+examples, test on the held-out 1/5), drawn as smooth **violins**. The four LLM
+configs are zero-shot — nothing is trained, so each is a *single* held-out
+number, a **Dirac** drawn as one horizontal line. All eight engines share one
+colour, used in every figure of this repo (see the legend below):
 
-![Accuracy distribution per engine (violin plot)](docs/img/violin-accuracy-en.png)
+![Accuracy per engine — violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
+
+**Colour legend (one colour per engine, everywhere).**
+
+| Engine | Colour | | Engine | Colour |
+|---|---|---|---|---|
+| ⬤ TF-IDF | Blue `#007AFF` | | ⬤ qwen2.5:3b · zero shot | Yellow `#FFCC00` |
+| ⬤ fastText (learned) | Turquoise `#79DBDC` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
+| ⬤ fastText (pretrained) | Purple `#AF52DE` | | ⬤ gemma3:4b · zero shot | Pink `#FF2D55` |
+| ⬤ BERT | Green `#28CD41` | | ⬤ gemma3:4b · few shots | Red `#FF3B30` |
 
 > **Two lenses, one honest story.** On the paraphrase set above, accuracy
 > climbs 51 → 66 → 74 → 86 %. But under **cross-validation** on the
@@ -287,7 +297,7 @@ flowchart LR
     style E2 fill:#79DBDC,stroke:#0E7490,color:#1C1C1E
     style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
-    style E5 fill:#FFEACC,stroke:#FF9500,color:#1C1C1E
+    style E5 fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
     style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style WEB fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
