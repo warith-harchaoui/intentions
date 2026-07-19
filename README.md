@@ -196,13 +196,18 @@ worth:
 > the reproducible, seeded ones (bootstrap + CV); the millisecond/second
 > figures just convey the ~4-orders-of-magnitude spread TF-IDF → LLM.
 
-| # | Engine | Accuracy (held-out) | CPU / call | Slots |
-|---|--------|--------------------:|-----------:|:-----:|
-| 1 | **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
-| 2 | **fastText (custom)** | 66 % | ~33 µs | ❌ |
-| 3 | **fastText (pretrained cc.fr.300)** | 74 % | ~250 µs | ❌ |
-| 4 | **BERT (SBERT + MLP)** | **86 %** | ~20 ms | ❌ |
-| 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
+| # | Engine | Accuracy | CPU / call | Slots |
+|---|--------|---------:|-----------:|:-----:|
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | 66 % | ~33 µs | ❌ |
+| 3 | <span style="color:#AF52DE">■</span> **fastText (pretrained)** | 74 % | ~250 µs | ❌ |
+| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+
+<sup>¹ The four LLM configs are measured on the 30-example prompt-experiment sample; the four classifiers on the full 88 held-out paraphrases. Colours match every figure in this repo.</sup>
 
 > **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
 > (~50 ms) is actually the **slowest non-LLM engine** — the forest's hundreds of
@@ -216,19 +221,10 @@ classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
 **25 real measurements** each (train on 4/5 of the K = 21 intents / N = 500
 examples, test on the held-out 1/5), drawn as smooth **violins**. The four LLM
 configs are zero-shot — nothing is trained, so each is a *single* held-out
-number, a **Dirac** drawn as one horizontal line. All eight engines share one
-colour, used in every figure of this repo (see the legend below):
+number, a **Dirac** drawn as one horizontal line. Each engine keeps the colour
+it carries in the results table above and in every other figure of this repo:
 
 ![Accuracy per engine — violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
-
-**Colour legend (one colour per engine, everywhere).**
-
-| Engine | Colour | | Engine | Colour |
-|---|---|---|---|---|
-| ⬤ TF-IDF | Blue `#007AFF` | | ⬤ qwen2.5:3b · zero shot | Yellow `#FFCC00` |
-| ⬤ fastText (learned) | Turquoise `#1D8C8D` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
-| ⬤ fastText (pretrained) | Purple `#AF52DE` | | ⬤ gemma3:4b · zero shot | Pink `#FF2D55` |
-| ⬤ BERT | Green `#28CD41` | | ⬤ gemma3:4b · few shots | Red `#FF3B30` |
 
 > **Two lenses, one honest story.** On the paraphrase set above, accuracy
 > climbs 51 → 66 → 74 → 86 %. But under **cross-validation** on the

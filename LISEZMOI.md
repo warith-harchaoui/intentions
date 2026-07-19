@@ -191,13 +191,18 @@ Le jeu de test est volontairement **riche en paraphrases** (faible recouvrement
 lexical avec l'entraînement) : il mesure la **généralisation**, pas la
 mémorisation du vocabulaire — c'est là que la représentation prouve sa valeur.
 
-| # | Moteur | Exactitude (held-out) | CPU / appel | Slots |
-|---|--------|----------------------:|------------:|:-----:|
-| 1 | **TF-IDF + RandomForest** | 51 % | ~50 ms | ❌ |
-| 2 | **fastText (appris)** | 66 % | ~33 µs | ❌ |
-| 3 | **fastText (pré-entraîné cc.fr.300)** | 74 % | ~250 µs | ❌ |
-| 4 | **BERT (SBERT + MLP)** | **86 %** | ~20 ms | ❌ |
-| 5 | **LLM (Gemma via Ollama)** | 82 % | ~5 s | ✅ |
+| # | Moteur | Exactitude | CPU / appel | Slots |
+|---|--------|-----------:|------------:|:-----:|
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + RandomForest** | 51 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 66 % | ~33 µs | ❌ |
+| 3 | <span style="color:#AF52DE">■</span> **fastText (pré-entraîné)** | 74 % | ~250 µs | ❌ |
+| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+
+<sup>¹ Les quatre configs LLM sont mesurées sur l'échantillon de 30 exemples de l'expérience de prompt ; les quatre classifieurs sur les 88 paraphrases tenues à l'écart. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
 
 > **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
 > (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
@@ -212,20 +217,11 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 5 mélanges = **25 mesures réelles** chacun (apprendre sur 4/5 des K = 21
 intentions / N = 500 exemples, tester sur le 1/5 restant), tracés en **violons**
 lisses. Les quatre configs LLM sont zéro-shot — rien n'est entraîné, donc chacune
-est *un seul* nombre held-out, un **Dirac** tracé en une ligne horizontale. Les
-huit moteurs partagent une couleur, la même dans **toutes** les figures du dépôt
-(voir la légende plus bas) :
+est *un seul* nombre held-out, un **Dirac** tracé en une ligne horizontale.
+Chaque moteur garde la couleur qu'il porte dans le tableau des résultats
+ci-dessus et dans toutes les autres figures du dépôt :
 
 ![Exactitude par moteur — violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
-
-**Légende des couleurs (une couleur par moteur, partout).**
-
-| Moteur | Couleur | | Moteur | Couleur |
-|---|---|---|---|---|
-| ⬤ TF-IDF | Bleu `#007AFF` | | ⬤ qwen2.5:3b · zero shot | Jaune `#FFCC00` |
-| ⬤ fastText (appris) | Turquoise `#1D8C8D` | | ⬤ qwen2.5:3b · few shots | Orange `#FF9500` |
-| ⬤ fastText (pré-entraîné) | Violet `#AF52DE` | | ⬤ gemma3:4b · zero shot | Rose `#FF2D55` |
-| ⬤ BERT | Vert `#28CD41` | | ⬤ gemma3:4b · few shots | Rouge `#FF3B30` |
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
 > l'exactitude monte 51 → 66 → 74 → 86 %. Mais en **validation croisée** sur les

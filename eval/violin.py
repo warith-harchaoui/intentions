@@ -95,7 +95,7 @@ ENGINES: list[dict[str, str]] = [
         "key": "gemma-zs",
         "fr": "gemma3:4b\nzero shot",
         "en": "gemma3:4b\nzero shot",
-        "color": "#FF2D55",  # Pink
+        "color": "#FF8AC4",  # Pink (255,138,196), light enough to not read as red
         "kind": "llm",
         "model": "gemma3:4b",
         "prompt": "good-zs",
@@ -115,19 +115,11 @@ ENGINES: list[dict[str, str]] = [
 _TEXT: dict[str, dict[str, str]] = {
     "fr": {
         "cv_title": "Exactitude par moteur",
-        "cv_subtitle": (
-            "violons = validation croisée (25 mesures) · "
-            "lignes LLM = point held-out unique (Dirac)"
-        ),
         "axis": "Exactitude (plus c'est haut, mieux c'est)",
         "shoot_title": "Modèle et few shots : de mieux en mieux",
     },
     "en": {
         "cv_title": "Accuracy by engine",
-        "cv_subtitle": (
-            "violins = cross-validation (25 measurements) · "
-            "LLM lines = single held-out point (a Dirac)"
-        ),
         "axis": "Accuracy (higher is better)",
         "shoot_title": "Model and few shots: better and better",
     },
@@ -235,10 +227,7 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": {
             "text": _TEXT[lang]["cv_title"],
-            "subtitle": _TEXT[lang]["cv_subtitle"],
-            "subtitleColor": "#6E6E73",
             "font": "Roboto",
-            "subtitleFont": "Roboto",
             "anchor": "start",
             "fontSize": 16,
         },
@@ -264,6 +253,11 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
             "width": 70,
             "height": 420,
             "layer": [
+                {
+                    # A straight x-axis baseline under each column, at 0 %.
+                    "mark": {"type": "rule", "size": 1, "color": "#8E8E93"},
+                    "encoding": {"y": {"datum": 0}},
+                },
                 {
                     # Violins: the trainable engines, smoothed by KDE.
                     "transform": [
