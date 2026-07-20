@@ -130,7 +130,7 @@ pip install -r requirements.txt
 
 # Optionnel — le chemin SBERT + MLP PyTorch du moteur BERT (~2 Go) :
 pip install "sentence-transformers>=3.0.0" torch
-# Optionnel — le moteur fastText pré-entraîné : télécharger cc.fr.300 (~4,5 Go) :
+# Optionnel — le moteur fastText pré-entraîné : télécharger cc.fr.300 (~4,5 Go au téléchargement, ~7 Go sur disque) :
 python scripts/download_fasttext.py
 # Optionnel — la couche d'évaluation (DeepEval ; Giskard exige Python ≤ 3.11) :
 pip install ".[eval]"
@@ -345,7 +345,9 @@ le long de la progression, seule la représentation change.
 ```bash
 pytest -m "not slow"                   # suite rapide (déterministe, sans réseau)
 pytest                                 # suite complète (BERT réel + Ollama)
-python -m eval.harness                 # exactitude/latence des 3 moteurs
+python -m eval.harness                 # exactitude/latence de tous les moteurs
+python -m eval.crossval                # distributions bootstrap + k-fold
+python -m eval.violin                  # génère le violon dans docs/img/
 ```
 
 ---

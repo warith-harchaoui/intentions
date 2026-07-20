@@ -1,4 +1,4 @@
-# Intent Engine — 3 approches comparées
+# Intent Engine — 5 approches comparées
 
 > Grand tableau comparatif pour choisir **comment détecter l'intention** d'un
 > client d'assurance : à l'ancienne (TF-IDF), avec une représentation type

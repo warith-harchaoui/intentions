@@ -9,7 +9,7 @@ tighten or relax a bar, which is exactly what "versioned thresholds" in the
 coding standard asks for.
 
 The bars are intentionally conservative for a tiny demo KB and per engine,
-because the three approaches have genuinely different accuracy/latency
+because the approaches have genuinely different accuracy/latency
 profiles (see ``PROS_CONS.md``):
 
 * TF-IDF is fast but surface-level → a modest accuracy bar.

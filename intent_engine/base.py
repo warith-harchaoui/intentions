@@ -3,8 +3,8 @@
 Module summary
 --------------
 Defines the small, engine-agnostic data types and the abstract base class
-that the TF-IDF, BERT and LLM engines all implement. Keeping the contract
-here means the router, the API and the front end can treat the three very
+that the TF-IDF, fastText, BERT and LLM engines all implement. Keeping the contract
+here means the router, the API and the front end can treat these very
 different engines through one identical interface: give me a French
 sentence, hand me back a ranked list of intents plus a scripted answer.
 

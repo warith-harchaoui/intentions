@@ -131,7 +131,7 @@ pip install -r requirements.txt
 
 # Optional — the SBERT + PyTorch MLP path for the BERT engine (~2 GB):
 pip install "sentence-transformers>=3.0.0" torch
-# Optional — the pretrained fastText engine: download cc.fr.300 (~4.5 GB):
+# Optional — the pretrained fastText engine: download cc.fr.300 (~4.5 GB compressed, ~7 GB on disk):
 python scripts/download_fasttext.py
 # Optional — the evaluation layer (DeepEval; Giskard needs Python ≤ 3.11):
 pip install ".[eval]"

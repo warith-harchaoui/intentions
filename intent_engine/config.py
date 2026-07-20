@@ -9,7 +9,7 @@ timeouts. Values are read once from the environment (and an optional
 ``.env`` file) and cached, so the rest of the code never touches
 ``os.environ`` directly.
 
-Why a single module: the three intent engines, the FastAPI server and the
+Why a single module: the intent engines, the FastAPI server and the
 CLI all need the same handful of settings. Funnelling them through one
 ``Settings`` object keeps defaults in one place and makes the whole thing
 overridable for tests without monkeypatching scattered constants.

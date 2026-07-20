@@ -1,12 +1,14 @@
-"""Déraison Assurances — a teaching intent engine, three ways.
+"""Déraison Assurances — a teaching intent engine, five ways.
 
 Module summary
 --------------
 Top-level package for a small but complete demonstration of how a phone /
 chat insurance assistant detects a caller's *intention* from a Markdown
-knowledge base, using three progressively heavier approaches:
+knowledge base, using five progressively heavier approaches:
 
 * ``tfidf`` — scikit-learn TF-IDF + logistic regression (the classic).
+* ``fasttext_custom`` — fastText subword embeddings learned on our examples.
+* ``fasttext_pretrained`` — pretrained fastText cc.fr.300 French vectors.
 * ``bert``  — BERT-family sentence embeddings + a learned classifier.
 * ``llm``   — a local LLM (Gemma via Ollama) with a strict JSON contract.
 

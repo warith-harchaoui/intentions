@@ -128,7 +128,7 @@ def _cmd_compare(router: IntentRouter, args: argparse.Namespace) -> int:
         Process exit code (0 on success).
     """
     # Run everything available and print one block per engine — this is the
-    # money shot for the "three approaches" demo.
+    # money shot for the engine-comparison demo.
     print(f'Phrase : "{args.text}"\n')
     for name, result in router.compare(args.text).items():
         _print_result(name, result)
@@ -235,7 +235,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_classify.set_defaults(func=_cmd_classify)
 
     # ``compare`` — all engines.
-    p_compare = sub.add_parser("compare", help="Comparer les 3 moteurs.")
+    p_compare = sub.add_parser("compare", help="Comparer les moteurs.")
     p_compare.add_argument("text", help="La phrase du client.")
     p_compare.set_defaults(func=_cmd_compare)
 

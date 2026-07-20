@@ -3,8 +3,8 @@
 Module summary
 --------------
 The orchestration layer that the CLI and the API sit on top of. It owns
-the parsed knowledge base, lazily builds and caches the three engines
-(TF-IDF, BERT, LLM), and exposes three things everyone needs:
+the parsed knowledge base, lazily builds and caches the engines
+(TF-IDF, fastText, BERT, LLM), and exposes three things everyone needs:
 
 * :meth:`IntentRouter.classify` — run one engine on one utterance.
 * :meth:`IntentRouter.compare` — run every available engine and return all
@@ -300,8 +300,8 @@ class IntentRouter:
     def compare(self, text: str) -> dict[str, IntentResult]:
         """Run every available engine on the same utterance.
 
-        This is the core of the teaching demo: identical input, three
-        representations, three verdicts and three latencies to eyeball.
+        This is the core of the teaching demo: identical input, one set of
+        representations, verdicts and latencies to eyeball.
 
         Parameters
         ----------

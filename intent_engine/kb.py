@@ -4,7 +4,7 @@ Module summary
 --------------
 The single source of truth for the whole project is a folder of Markdown
 files where **every ``# h1`` heading is one intention**. Under each
-heading a small, human-writable convention captures everything the three
+heading a small, human-writable convention captures everything the
 engines need:
 
 * a ``>`` block-quote of ``**Key** : value`` metadata (display title,

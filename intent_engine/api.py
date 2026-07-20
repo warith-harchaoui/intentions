@@ -113,8 +113,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Déraison Assurances — Intent Engine",
         description=(
-            "Comparateur pédagogique de trois moteurs d'intentions "
-            "(TF-IDF, BERT, LLM) pour un chatbot d'assurance."
+            "Comparateur pédagogique de cinq moteurs d'intention "
+            "(TF-IDF, fastText ×2, BERT, LLM) pour un chatbot d'assurance."
         ),
         version="0.1.0",
     )

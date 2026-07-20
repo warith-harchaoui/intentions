@@ -5,12 +5,12 @@ Module summary
 A single accuracy number (97 % vs 82 % vs 94 %) is not a fair verdict on a
 33-example test set — it hides the sampling uncertainty. This module builds
 a **real test base** that reports *distributions*, not point estimates, so
-we can honestly say whether the three engines are actually different or just
+we can honestly say whether the engines are actually different or just
 noise apart on a small set.
 
 Two complementary methods:
 
-* **Bootstrap on the held-out set** (all three engines). Each engine is run
+* **Bootstrap on the held-out set** (all engines). Each engine is run
   once over the labelled eval set (``dataset.jsonl``); the per-example
   correctness vector is then resampled with replacement ``B`` times to get
   the sampling distribution of accuracy — mean, standard deviation and a
@@ -383,7 +383,7 @@ def run(engines: list[str] | None = None) -> dict[str, object]:
     Parameters
     ----------
     engines : list[str] | None, optional
-        Engines to include; defaults to all three.
+        Engines to include; defaults to all.
 
     Returns
     -------

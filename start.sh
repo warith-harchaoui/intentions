@@ -29,7 +29,7 @@ pip install -q -r requirements.txt
 # without it (the LLM column is simply hidden).
 if ! curl -s "http://localhost:11434/api/tags" >/dev/null 2>&1; then
   echo "⚠️  Ollama ne répond pas — le moteur LLM sera masqué."
-  echo "    Démarrez-le avec 'ollama serve' puis 'ollama pull gemma4:e4b'."
+  echo "    Démarrez-le avec 'ollama serve' puis 'ollama pull gemma3:4b'."
 fi
 
 # Launch the server. --reload for a comfortable dev loop.

@@ -18,7 +18,7 @@ Two things the classifiers cannot do out of the box:
   structured entities (policy number, urgency, channel), which is what you
   actually need to *execute* the request, not just label it.
 
-The price is real: it is the slowest and heaviest of the three, it can
+The price is real: it is the slowest and heaviest of them all, it can
 hallucinate an intent that is not in the catalogue (we defend against that
 by rejecting unknown ids), and it depends on a running model server. This
 engine is the demonstration of "prompt engineering, done properly" — a

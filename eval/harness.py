@@ -109,7 +109,7 @@ def evaluate_engine(engine: str, router: IntentRouter | None = None) -> EvalRepo
         Accuracy, mean latency and the list of misclassifications.
     """
     # Build a router lazily if the caller did not supply one. Reusing a
-    # router across engines avoids re-parsing the KB three times.
+    # router across engines avoids re-parsing the KB once per engine.
     if router is None:
         router = IntentRouter.from_directory(get_settings().knowledge_base_dir)
     cases: list[EvalCase] = load_dataset()
@@ -231,12 +231,12 @@ def main(argv: list[str] | None = None) -> int:
         prog="eval.harness",
         description="Évalue l'exactitude et la latence des moteurs.",
     )
-    # ``--engine`` restricts the run; omit it to evaluate all three.
+    # ``--engine`` restricts the run; omit it to evaluate all engines.
     parser.add_argument(
         "--engine",
         choices=["tfidf", "fasttext_custom", "fasttext_pretrained", "bert", "llm"],
         default=None,
-        help="Moteur à évaluer (défaut : les trois).",
+        help="Moteur à évaluer (défaut : tous).",
     )
     args = parser.parse_args(argv)
 
