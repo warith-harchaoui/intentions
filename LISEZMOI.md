@@ -29,7 +29,6 @@ volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 📊 Le comparatif détaillé et sourcé (benchmarks, RGPD, coûts) : **[`PROS_CONS.md`](PROS_CONS.md)**.
 📖 Le mode d'emploi pas à pas (avec captures) : **[`MODEDEMPLOI.md`](MODEDEMPLOI.md)**.
 🍳 Le cookbook exécutable : **[`EXAMPLES.md`](EXAMPLES.md)**.
-🎯 Mon avis honnête sur le projet : **[`ASSESSMENT.md`](ASSESSMENT.md)**.
 📐 Le standard de code suivi partout : **[`CODING.md`](CODING.md)**.
 
 ## Pourquoi ce projet — l'objectif pédagogique

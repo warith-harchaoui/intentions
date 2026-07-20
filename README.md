@@ -352,7 +352,7 @@ The evaluation layer (coding standard rule 14) ships a **labelled dataset**
 a **statistical base** (`eval/crossval.py`: bootstrap CIs + k-fold CV) with
 **violin plots** (`eval/violin.py`), and **DeepEval** (LLM) + **Giskard** (ML)
 integrations enabled by `pip install ".[eval]"`. See the testing strategy in
-[`ASSESSMENT.md`](ASSESSMENT.md).
+the [`eval/`](eval/) modules and their docstrings.
 
 ---
 
