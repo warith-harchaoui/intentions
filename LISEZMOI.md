@@ -240,13 +240,17 @@ ci-dessus et dans toutes les autres figures du dépôt :
 > une vraie leçon sur la **calibration des réseaux de neurones**. Analyse
 > complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **Sur le choix du LLM.** Le défaut est le compact `gemma3:4b` (~5 s à chaud) :
-> sa meilleure config atteint **70 %**, *sous* les 77 % de BERT. Un petit LLM
-> local troque de l'exactitude contre de la vitesse et son vrai atout est
-> l'**extraction de slots + le zero-shot**, pas la précision brute. Un plus gros
-> modèle monte plus haut mais paie en secondes par appel (`INTENT_LLM_MODEL`
-> change le modèle). Plus lourd n'est pas automatiquement meilleur : on choisit
-> selon le besoin.
+> **Sur le choix du LLM — et un gros LLM bat-il BERT ?** Le compact `gemma3:4b`
+> par défaut (~5 s à chaud) atteint **70 %**, *sous* les 77 % de BERT : un petit
+> LLM local troque de l'exactitude contre de la vitesse, son vrai atout étant
+> l'**extraction de slots + le zéro-shot**. Mais **la taille compte** — sur le
+> même jeu held-out, un plus gros modèle local reprend la tête :
+> **`gemma4:e4b-mlx` 79 %** et **`gemma4:12b-mlx` ~78 %**, tous deux devant les
+> 77 % de BERT. Le petit modèle était simplement *sous-dimensionné* ; la hiérarchie
+> tient et les plus gros modèles génératifs repassent en tête, au prix réel de
+> secondes par appel contre ~20 ms pour BERT. On choisit selon le besoin
+> (`INTENT_LLM_MODEL` change le modèle). *Jeu held-out auto-généré, marges de
+> quelques points : lire le classement, pas les décimales.*
 
 ### Où chaque moteur se trompe ? Matrices de confusion
 

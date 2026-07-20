@@ -241,12 +241,16 @@ it carries in the results table above and in every other figure of this repo:
 > (~73 % after tuning its threshold) — a real lesson on **neural-net
 > calibration**. Full analysis + sources in [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **On the LLM choice.** The default is the compact `gemma3:4b` (~5 s warm): its
-> best config lands at **70 %**, *below* BERT's 77 %. A small local LLM trades
-> accuracy for speed, and its real edge is **slot extraction + zero-shot**, not
-> top accuracy. A larger model climbs higher but pays for it in seconds per call
-> (`INTENT_LLM_MODEL` swaps the model). Heavier is not automatically better: pick
-> by need.
+> **On the LLM choice — and does a bigger LLM beat BERT?** The default compact
+> `gemma3:4b` (~5 s warm) lands at **70 %**, *below* BERT's 77 %: a small local LLM
+> trades accuracy for speed, its real edge being **slot extraction + zero-shot**.
+> But **size matters** — on the same held-out set, a bigger local model reclaims
+> the top: **`gemma4:e4b-mlx` 79 %** and **`gemma4:12b-mlx` ~78 %**, both edging
+> past BERT's 77 %. So the small model was simply *under-sized*; the hierarchy
+> holds and the biggest generative models lead again, at a real cost of seconds
+> per call versus BERT's ~20 ms. Pick by need (`INTENT_LLM_MODEL` swaps the
+> model). *Held-out set auto-generated, margins a few points: read the ranking,
+> not the decimals.*
 
 ### Where does each engine go wrong? Confusion matrices
 
