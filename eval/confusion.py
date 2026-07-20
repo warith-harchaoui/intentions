@@ -7,10 +7,10 @@ predicted (columns) for every true intent (rows), plus an ``Abstention`` /
 its confusions. Each matrix uses that engine's own house colour (white →
 colour), matching every other figure in the repo.
 
-* the four **trainable** classifiers are run live over the 88 held-out
+* the four **trainable** classifiers are run live over the 210 held-out
   paraphrases;
 * the four **LLM** configs (model × examples) reuse the cached predictions of
-  the prompt experiment (``eval/.llm_shootout/``), a 30-example sample.
+  the prompt experiment (``eval/.llm_shootout/``) over the same 210.
 
 Intent labels are prettified for the axes: ``vol_vehicule`` → ``Vol Véhicule``.
 
@@ -44,14 +44,80 @@ _SHOOT_CACHE = Path(__file__).resolve().parent / ".llm_shootout"
 # and ``faire_reclamation`` reads ``Faire réclamation`` (only the first word is
 # capitalised, accents restored, no underscores).
 _ACCENT: dict[str, str] = {
-    "vehicule": "véhicule", "declarer": "déclarer", "depannage": "dépannage",
-    "resilier": "résilier", "probleme": "problème", "degat": "dégât",
-    "sante": "santé", "prevoyance": "prévoyance", "a": "à",
+    "vehicule": "véhicule",
+    "declarer": "déclarer",
+    "depannage": "dépannage",
+    "resilier": "résilier",
+    "probleme": "problème",
+    "degat": "dégât",
+    "sante": "santé",
+    "prevoyance": "prévoyance",
+    "a": "à",
     "reclamation": "réclamation",
 }
 
 _ABSTAIN_KEY = "__abstain__"  # sentinel id (never a real intent)
 _ABSTAIN_LABEL = {"fr": "Abstention", "en": "Abstain"}
+
+# Ink colour for cells whose background is light enough to read black on.
+_INK_DARK = "#1C1C1E"
+_INK_LIGHT = "#FFFFFF"
+
+
+def _hex_rgb(hex_colour: str) -> tuple[int, int, int]:
+    """Return the ``(r, g, b)`` 0-255 channels of a ``#rrggbb`` string."""
+    h = hex_colour.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def _relative_luminance(rgb: tuple[float, float, float]) -> float:
+    """WCAG relative luminance of an sRGB ``(r, g, b)`` triple (0-255)."""
+
+    def _lin(channel: float) -> float:
+        c = channel / 255.0
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+    r, g, b = (_lin(c) for c in rgb)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+# A cell whose (interpolated) fill is darker than this relative luminance reads
+# as "dark" to the eye and gets white ink; anything lighter keeps black ink.
+# 0.5 is the textbook light/dark split: the saturated house hues (blue, teal,
+# purple, red at L≈0.2, green/pink/orange at L≈0.43) all cross it and take
+# white on their densest cells, while pale cells and the light yellow keep
+# black — exactly the convention "black on light, white on dark".
+_DARK_LUMINANCE = 0.5
+
+
+def _cell_ink(count: int, max_count: int, colour_hex: str) -> str:
+    """Pick the readable ink for a cell painted white→``colour_hex``.
+
+    The heatmap interpolates each cell's fill linearly (in sRGB, matching Vega's
+    default) from white at count 0 to the engine's full hue at the largest
+    count. We reproduce that fill, take its relative luminance and return white
+    ink on a dark cell, black ink on a light one.
+
+    Parameters
+    ----------
+    count : int
+        The cell's value.
+    max_count : int
+        The largest value in the matrix (the fill scale's upper bound).
+    colour_hex : str
+        The engine's full hue as ``#rrggbb`` (the fill at ``max_count``).
+
+    Returns
+    -------
+    str
+        ``#FFFFFF`` on a dark cell, else ``#1C1C1E``.
+    """
+    # Fraction of the way from white to the full hue (0 = white, 1 = full hue).
+    t = 0.0 if max_count <= 0 else count / max_count
+    cr, cg, cb = _hex_rgb(colour_hex)
+    bg = (255 * (1 - t) + cr * t, 255 * (1 - t) + cg * t, 255 * (1 - t) + cb * t)
+    return _INK_LIGHT if _relative_luminance(bg) < _DARK_LUMINANCE else _INK_DARK
+
 
 _TEXT = {
     "fr": {"title": "Matrice de confusion", "x": "Prédit", "y": "Réel"},
@@ -86,7 +152,7 @@ def _pretty(intent_id: str, lang: str) -> str:
 
 
 def _confusion_cv(engine: str, router: IntentRouter) -> dict:
-    """Confusion counts for a trainable engine, run live over the 88-set."""
+    """Confusion counts for a trainable engine, run live over the 210-set."""
     counts: dict[tuple[str, str], int] = {}
     for case in load_dataset():
         result = router.classify(case["text"], engine)
@@ -104,8 +170,8 @@ def _confusion_llm(engine: dict, intents: list[str]) -> dict:
         return {}
     cache: dict[str, str] = json.loads(path.read_text(encoding="utf-8"))
     counts: dict[tuple[str, str], int] = {}
-    # Only the examples the LLM actually classified (the cached ones) — the LLM
-    # runs on a smaller sample than the classifiers (it is far slower).
+    # Only the examples the LLM actually classified (its cached predictions);
+    # the caches now cover the full 210 held-out set, one entry per utterance.
     for case in load_dataset():
         if case["text"] not in cache:
             continue
@@ -144,11 +210,15 @@ def build_heatmap_spec(
     id_x = intents + [_ABSTAIN_KEY]
     x_labels = [_pretty(i, lang) for i in id_x]
     y_labels = [_pretty(i, lang) for i in intents]
+    # The fill scale runs white → colour over [0, max_count]; the ink per cell
+    # is chosen from that same interpolation so the number always stays legible.
+    max_count = max((counts.get((t, p), 0) for t in intents for p in id_x), default=0)
     rows = [
         {
             "true": _pretty(t, lang),
             "pred": _pretty(p, lang),
             "count": counts.get((t, p), 0),
+            "ink": _cell_ink(counts.get((t, p), 0), max_count, colour),
         }
         for t in intents
         for p in id_x
@@ -215,7 +285,18 @@ def build_heatmap_spec(
                     "x": x_enc,
                     "y": y_enc,
                     "text": {"field": "count", "type": "quantitative"},
-                    "color": {"value": "#1C1C1E"},
+                    # Identity scale: the ``ink`` value (a hex string) IS the
+                    # colour, so each number is drawn in the shade we picked for
+                    # its cell (black on pale cells, white on saturated ones).
+                    "color": {
+                        "field": "ink",
+                        "type": "nominal",
+                        "scale": {
+                            "domain": [_INK_DARK, _INK_LIGHT],
+                            "range": [_INK_DARK, _INK_LIGHT],
+                        },
+                        "legend": None,
+                    },
                 },
             },
         ],

@@ -185,10 +185,10 @@ python -m eval.harness --engine bert
 
 | Engine | Accuracy | CPU / call | Gate (min accuracy) |
 |--------|:--------:|-----------:|:-------------------:|
-| `tfidf` | 51 % | ~50 ms | ✅ ≥ 45 % |
-| `fasttext_custom` | 66 % | ~33 µs | ✅ ≥ 55 % |
-| `fasttext_pretrained` | 74 % | ~250 µs | ✅ ≥ 65 % |
-| `bert` | 86 % | ~20 ms | ✅ ≥ 75 % |
+| `tfidf` | 68 % | ~50 ms | ✅ ≥ 45 % |
+| `fasttext_custom` | 71 % | ~33 µs | ✅ ≥ 55 % |
+| `fasttext_pretrained` | 73 % | ~250 µs | ✅ ≥ 65 % |
+| `bert` | 77 % | ~20 ms | ✅ ≥ 75 % |
 
 (TF-IDF also passes the out-of-scope abstention gate: it abstains on **93 %** of
 15 off-topic inputs, bar ≥ 60 %.)

@@ -37,9 +37,10 @@ Project maintainers.
 from __future__ import annotations
 
 import numpy as np
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 
-class TorchMLPClassifier:
+class TorchMLPClassifier(BaseEstimator, ClassifierMixin):
     """A compact PyTorch MLP behind a scikit-learn-style estimator API.
 
     Parameters
@@ -82,11 +83,11 @@ class TorchMLPClassifier:
         self.lr = lr
         self.weight_decay = weight_decay
         self.seed = seed
-        # Populated during fit.
-        self.classes_: np.ndarray = np.asarray([])
+        # The fitted network + label bookkeeping live only after ``fit`` sets
+        # them. ``classes_`` is deliberately NOT seeded here: it is sklearn's
+        # fitted-state marker, so ``check_is_fitted`` (and skore) must see it
+        # appear only once the estimator is actually trained.
         self._model = None
-        # Maps each label to its integer class index for the loss function.
-        self._label_to_idx: dict[str, int] = {}
 
     def _build(self, input_dim: int, n_classes: int):
         """Construct the MLP network for a given input/output shape.
@@ -199,3 +200,22 @@ class TorchMLPClassifier:
             features = torch.tensor(np.asarray(x), dtype=torch.float32)
             probabilities = torch.softmax(self._model(features), dim=1)
         return probabilities.numpy()
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        """Return the argmax class label for each row of ``x``.
+
+        Completes the scikit-learn classifier contract (so the estimator drops
+        into a :class:`~sklearn.pipeline.Pipeline` and skore reports); existing
+        callers that argmax :meth:`predict_proba` themselves are unaffected.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            ``(n_samples, dim)`` feature matrix.
+
+        Returns
+        -------
+        np.ndarray
+            ``(n_samples,)`` predicted labels drawn from :attr:`classes_`.
+        """
+        return self.classes_[self.predict_proba(x).argmax(axis=1)]

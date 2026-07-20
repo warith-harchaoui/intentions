@@ -13,6 +13,10 @@ python-multipart>=0.0.20    # form parsing (future file uploads)
 scikit-learn>=1.5.0         # TfidfVectorizer + LogisticRegression
 numpy>=1.26.0               # array math shared by both classifiers
 
+# --- Rigorous evaluation stack (probabl methodology) ---------------------
+skore>=0.23.0              # EstimatorReport / CrossValidationReport / ComparisonReport
+skrub>=0.10.0              # DataOps graph declaring the sklearn-side pipeline
+
 # --- fastText engine (Approach 2 — trained on our examples) --------------
 fasttext-wheel>=0.9.2      # prebuilt fastText (no compiler needed)
 

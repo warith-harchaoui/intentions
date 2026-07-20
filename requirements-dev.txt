@@ -1,0 +1,28 @@
+# Dev + test dependencies for the Déraison Assurances intent engine.
+# pip-installable mirror of the [project.optional-dependencies] dev/sbert
+# groups in pyproject.toml (the source of truth). Runtime deps live in
+# requirements.txt; install both for a full local dev environment:
+#
+#     pip install -r requirements.txt -r requirements-dev.txt \
+#         --extra-index-url https://download.pytorch.org/whl/cpu
+#
+# The --extra-index-url pulls a CPU-only PyTorch (no CUDA) — matches CI and
+# keeps the download small on machines without an NVIDIA GPU.
+
+# --- Lint + test (coding standard rules 13 & 15) -------------------------
+ruff>=0.6.0                # single PEP 8 + pydocstyle + isort gate
+pytest>=8.0.0              # fast, deterministic test lane
+
+# --- BERT engine (Approach 4) + MLP head runtime -------------------------
+# torch also backs the fast MLP-plumbing tests; sentence-transformers is the
+# "proper" SBERT embedding path (falls back to Ollama when absent).
+torch>=2.0.0
+sentence-transformers>=3.0.0
+
+# --- Heavy evaluation tooling (run manually, not in CI) ------------------
+# DeepEval scores the LLM engine; Giskard scans the ML classifiers (no wheel
+# for Python 3.12+); vl-convert renders the Vega figures to PNG. Uncomment or
+# `pip install ".[eval]"` when running the full evaluation experiments.
+#     deepeval>=1.0.0
+#     giskard>=2.14.0 ; python_version < '3.12'
+#     vl-convert-python>=1.0.0

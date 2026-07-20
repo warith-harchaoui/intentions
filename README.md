@@ -51,18 +51,18 @@ Read the engine table top to bottom and you are walking the field's history:
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>bag-of-words<br/>51 %"] --> B["2 · fastText<br/>learned subwords<br/>66 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>74 %"] --> D["4 · BERT + MLP<br/>contextual<br/>86 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>82 %"]
+    A["1 · TF-IDF<br/>bag-of-words<br/>68 %"] --> B["2 · fastText<br/>learned subwords<br/>71 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>77 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>70 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
-    style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
-    style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style C fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style D fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
 ```
 
 The comparator then shows the **pay-off** with real, measured numbers (not
-opinions): on a **paraphrase-heavy** test set, accuracy climbs monotonically
-**51 % → 66 % → 74 % → 86 %** across engines 1→4, and the LLM adds slot
-extraction on top. And crucially, it shows the **honest caveats** an ML
+opinions): on a **paraphrase-heavy** test set, held-out accuracy climbs
+monotonically **68 % → 71 % → 73 % → 77 %** across engines 1→4, and the LLM adds
+slot extraction on top. And crucially, it shows the **honest caveats** an ML
 practitioner cares about — sampling uncertainty (bootstrap violin plots),
 train/test-split variance (k-fold cross-validation), model mis-calibration
 (neural nets are over-confident on out-of-scope input), and privacy (why it
@@ -183,7 +183,7 @@ paraphrase; the semantic ones are confident. *That* is the lesson in one query.
 
 ---
 
-## Measured results (21-intent KB, 88-example paraphrase test set)
+## Measured results (21-intent KB, 210-example paraphrase test set)
 
 Reproducible with `python -m eval.harness` (accuracy/latency) and
 `python -m eval.crossval` (bootstrap + cross-validation distributions).
@@ -200,16 +200,16 @@ worth:
 
 | # | Engine | Accuracy | CPU / call | Slots |
 |---|--------|---------:|-----------:|:-----:|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | 66 % | ~33 µs | ❌ |
-| 3 | <span style="color:#AF52DE">■</span> **fastText (pretrained)** | 74 % | ~250 µs | ❌ |
-| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41">■</span> **fastText (pretrained)** | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE">■</span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
 
-<sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR — only the generative LLM does this. ¹ The four LLM configs are measured on the 30-example prompt-experiment sample; the four classifiers on the full 88 held-out paraphrases. Colours match every figure in this repo.</sup>
+<sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR; only the generative LLM does this. The four classifier scores are skore's raw argmax accuracy on the **held-out 210 paraphrases** (no abstention); ¹ the four LLM configs are scored on the **same 210** with their natural JSON output. Colours match every figure in this repo.</sup>
 
 > **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
 > (~50 ms) is actually the **slowest non-LLM engine** — the forest's hundreds of
@@ -220,30 +220,33 @@ worth:
 
 **The distributions, not just the point estimates.** The four *trainable*
 classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
-**25 real measurements** each (train on 4/5 of the K = 21 intents / N = 500
-examples, test on the held-out 1/5), drawn as smooth **violins**. The four LLM
+**25 real measurements** each (train on 4/5 of the K = 21 intents / N = 1008
+examples, test on the held-out 1/5), scored by **skore** and drawn as smooth
+**violins**. The four LLM
 configs are zero-shot — nothing is trained, so each is a *single* held-out
 number, a **Dirac** drawn as one horizontal line. Each engine keeps the colour
 it carries in the results table above and in every other figure of this repo:
 
 ![Accuracy per engine — violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
 
-> **Two lenses, one honest story.** On the paraphrase set above, accuracy
-> climbs 51 → 66 → 74 → 86 %. But under **cross-validation** on the
-> in-distribution KB examples, the engines are *closer*: lexical methods do fine
-> when the test looks like the training, and collapse under paraphrase shift —
-> the whole reason semantic representations exist.
+> **Two lenses, one honest story.** On the paraphrase set above, held-out
+> accuracy climbs 68 → 71 → 73 → 77 %. Under **cross-validation** on the
+> in-distribution KB examples the same order holds (72 → 75 → 76 → 78 %), a
+> little higher because the folds look more like their training text: lexical
+> methods do fine when the test resembles the training, and lose the most under
+> paraphrase shift, which is the whole reason semantic representations exist.
 >
 > Out-of-scope safety net: on 15 off-topic inputs (weather, maths, cooking…),
 > TF-IDF abstains ~93 % of the time; the neural BERT is more over-confident
 > (~73 % after tuning its threshold) — a real lesson on **neural-net
 > calibration**. Full analysis + sources in [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **On the LLM choice.** The default is the compact `gemma3:4b` (~5 s warm): it
-> lands at **82 %**, *below* BERT — a small local LLM trades accuracy for speed
-> and its real edge is **slot extraction + zero-shot**, not top accuracy. The
-> larger `gemma4:e4b` reaches ~93 % but at ~40 s/call (`INTENT_LLM_MODEL` swaps
-> it back). Heavier ≠ better — pick by need.
+> **On the LLM choice.** The default is the compact `gemma3:4b` (~5 s warm): its
+> best config lands at **70 %**, *below* BERT's 77 %. A small local LLM trades
+> accuracy for speed, and its real edge is **slot extraction + zero-shot**, not
+> top accuracy. A larger model climbs higher but pays for it in seconds per call
+> (`INTENT_LLM_MODEL` swaps the model). Heavier is not automatically better: pick
+> by need.
 
 ### Where does each engine go wrong? Confusion matrices
 
@@ -275,13 +278,13 @@ fixed, engineered prompt:
 
 ![Model and few shots: better and better](docs/img/shootout-en.png)
 
-> **The model buys the big jump; few-shot adds a little on top.** Accuracy
-> climbs **67 → 77 → 87 → 93 %**: going from the small model to the larger one is
-> the +20-point move, and adding a handful of few-shot examples lifts each model
-> a further ~10 points. The practitioner's takeaway: *reach for a stronger model
-> first, then squeeze the last points with well-chosen examples — the few-shot
-> examples must be fresh, or you are just measuring leakage.* (Held-out sample of
-> 30; predictions cached per config in `eval/.llm_shootout/`.)
+> **The model buys the jump; few-shot adds a little on top.** Accuracy climbs
+> **63 → 64 → 68 → 70 %**: going from the small model to the larger one is the
+> bigger move, and adding a handful of few-shot examples lifts each model a
+> further point or two. The practitioner's takeaway: *reach for a stronger model
+> first, then squeeze the last points with well-chosen examples; the few-shot
+> examples must be fresh, or you are just measuring leakage.* (Scored on the full
+> 210 held-out; predictions cached per config in `eval/.llm_shootout/`.)
 
 ---
 
@@ -313,8 +316,8 @@ flowchart LR
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
     style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style E2 fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
-    style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
-    style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E3 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E4 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E5 fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
     style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E

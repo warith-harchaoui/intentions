@@ -40,9 +40,33 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # Result files produced by the eval, and where the figures land.
+# The violins draw the **skore** per-fold accuracies (the rigorous source of
+# truth: same 25-fold RepeatedKFold report whose mean/std the docs quote); the
+# legacy crossval file is only a fallback when skore has not been run.
+_SKORE_RESULTS = Path(__file__).resolve().parent / "skore_results.json"
 _CV_RESULTS = Path(__file__).resolve().parent / "crossval_results.json"
 _SHOOTOUT_RESULTS = Path(__file__).resolve().parent / "llm_shootout_results.json"
 _IMG_DIR = Path(__file__).resolve().parent.parent / "docs" / "img"
+
+
+def _load_cv_folds() -> dict:
+    """Return ``{"cv": {engine_key: [fold_accuracies]}}`` for the violins.
+
+    Prefers ``skore_results.json`` (the ``cv_folds`` list skore writes per
+    engine); falls back to the legacy ``crossval_results.json`` ``cv`` field so
+    the figure still renders on an older tree.
+    """
+    if _SKORE_RESULTS.is_file():
+        skore = json.loads(_SKORE_RESULTS.read_text(encoding="utf-8"))
+        folds = {
+            key: rec["cv_folds"] for key, rec in skore.items() if rec.get("cv_folds")
+        }
+        if folds:
+            return {"cv": folds}
+    if _CV_RESULTS.is_file():
+        return json.loads(_CV_RESULTS.read_text(encoding="utf-8"))
+    return {}
+
 
 # ── THE 8 ENGINES: single source of truth for colour + order ───────────────
 # One entry per "engine", used by EVERY figure (the Vega charts here and the
@@ -442,11 +466,7 @@ def render_all() -> list[Path]:
         shootout results are present).
     """
     written: list[Path] = []
-    cv = (
-        json.loads(_CV_RESULTS.read_text(encoding="utf-8"))
-        if _CV_RESULTS.is_file()
-        else {}
-    )
+    cv = _load_cv_folds()
     shoot = (
         json.loads(_SHOOTOUT_RESULTS.read_text(encoding="utf-8"))
         if _SHOOTOUT_RESULTS.is_file()

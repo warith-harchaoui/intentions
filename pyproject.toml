@@ -23,6 +23,10 @@ dependencies = [
     "python-multipart>=0.0.20",
     "scikit-learn>=1.5.0",
     "numpy>=1.26.0",
+    # Rigorous evaluation stack (probabl methodology): skore reports +
+    # skrub DataOps graph for the sklearn-side pipeline.
+    "skore>=0.23.0",
+    "skrub>=0.10.0",
     "httpx>=0.27.0",
     # fastText engine (Approach 2, always available — trains on our examples).
     # fasttext-wheel ships prebuilt binaries (no compiler needed).

@@ -43,7 +43,7 @@
 
 ---
 
-## Ce que **ce dépôt** mesure (21 intentions, 88 paraphrases tenues à l'écart)
+## Ce que **ce dépôt** mesure (21 intentions, 210 paraphrases tenues à l'écart)
 
 Chiffres reproductibles : `python -m eval.harness` (exactitude/latence) et
 `python -m eval.crossval` (distributions). Ce ne sont pas des benchmarks
@@ -52,28 +52,28 @@ paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 
 | # | Moteur | Exactitude | CPU / appel | Slots |
 |---|--------|-----------:|------------:|:-----:|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 51 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 66 % | ~33 µs | ❌ |
-| 3 | <span style="color:#AF52DE">■</span> **fastText (pré-entraîné)** | 74 % | ~250 µs | ❌ |
-| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41">■</span> **fastText (pré-entraîné)** | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE">■</span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
 
-<sup>¹ Configs LLM sur l'échantillon de 30 exemples (expérience de prompt) ; classifieurs sur les 88 paraphrases tenues à l'écart.</sup>
+<sup>¹ Les 4 scores classifieurs sont l'exactitude argmax brute (skore) sur les 210 tenus à l'écart, sans abstention ; les 4 configs LLM sont scorées sur ces mêmes 210 avec leur sortie JSON native.</sup>
 
-> **La progression, c'est ça la leçon.** 51 → 66 → 74 → **86 %** : chaque marche
+> **La progression, c'est ça la leçon.** 68 → 71 → 73 → **77 %** : chaque marche
 > ajoute de la *sémantique* à la représentation et l'exactitude suit. Le
 > sac-de-mots mémorise des chaînes ; fastText apprend des sous-mots ; les
 > vecteurs pré-entraînés apportent le sens de milliards de mots ; **BERT y
-> ajoute le contexte et culmine à 86 %.** Le petit LLM `gemma3:4b` (82 %,
-> ~5 s) **reste sous BERT** en exactitude et **des centaines de fois plus lent** : son intérêt
+> ajoute le contexte et arrive en tête à 77 %.** Le petit LLM `gemma3:4b`
+> (au mieux 70 %, ~5 s) **reste sous BERT** en exactitude et **des centaines de fois plus lent** : son intérêt
 > n'est *pas* la précision brute mais l'**extraction de slots**, le **zero-shot**
 > (aucune donnée) et un catalogue qui bouge à la vitesse d'une ligne de prompt.
 > *Plus lourd n'est pas toujours meilleur : on choisit selon le besoin (vitesse ?
 > slots ? démarrage à froid ? explicabilité ?).* Un plus gros LLM (`gemma4:e4b`)
-> remonte à ~93 % mais à ~40 s/appel — l'arbitrage vitesse/exactitude en direct.
+> monte plus haut mais paie en secondes par appel (~40 s), l'arbitrage vitesse/exactitude en direct.
 
 ### Les distributions, pas juste les points (bootstrap + violin)
 
@@ -86,12 +86,13 @@ chevauchent pas), pas séparés par le hasard :
 
 ### Deux angles complémentaires (held-out vs validation croisée)
 
-- **Held-out paraphrases** (changement de distribution) : 51 / 66 / 74 / 86 %.
-  L'écart est large — le lexical est fragile.
+- **Held-out paraphrases** (changement de distribution) : 68 / 71 / 73 / 77 %.
+  L'écart se resserre mais l'ordre tient : le lexical reste en bas.
 - **Validation croisée k-fold** sur les exemples in-distribution de la KB :
-  ~72 % (TF-IDF) / 69 % (fastText appris) / 82 % (BERT). Les moteurs sont
-  **plus proches** quand le test ressemble à l'entraînement. C'est *toute*
-  l'histoire : le lexical marche « chez lui » et s'effondre dès qu'on paraphrase.
+  ~72 % (TF-IDF) / ~75 % (fastText appris) / ~76 % (fastText pré-entraîné) /
+  ~78 % (BERT). Les moteurs sont **plus proches** quand le test ressemble à
+  l'entraînement. C'est *toute* l'histoire : le lexical marche « chez lui » et
+  perd du terrain dès qu'on paraphrase.
 
 ### Chronométrage robuste : temps CPU + compute Ollama (pas le wall-clock)
 
@@ -160,8 +161,8 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 
 - **Pour** : entraîne conjointement les embeddings de sous-mots **et** un
   classifieur softmax, en une commande, en une fraction de seconde. Robuste aux
-  fautes de frappe par construction. 100 % local, minuscule. Ici **66 %** sur
-  les paraphrases — nettement au-dessus du sac-de-mots (51 %).
+  fautes de frappe par construction. 100 % local, minuscule. Ici **71 %** sur
+  les paraphrases, au-dessus du sac-de-mots (68 %).
 - **Contre** : n'apprend que ce que contiennent nos quelques centaines
   d'exemples ; pas de connaissance du monde extérieur. Plafonne vite.
 
@@ -170,7 +171,7 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 - **Pour** : **transfert d'apprentissage** — les vecteurs sont entraînés sur
   Common Crawl + Wikipédia français (des milliards de mots), donc « voiture » et
   « véhicule » sont déjà proches. On moyenne les vecteurs de la phrase et on
-  pose une régression logistique dessus. Ici **74 %**, sans avoir vu nos
+  pose une régression logistique dessus. Ici **73 %**, sans avoir vu nos
   paraphrases. Excellent rapport sens/simplicité.
 - **Contre** : le modèle pèse **~4,5 Go** (téléchargement), quelques Go de RAM.
   Les vecteurs sont **statiques** : « avocat » (fruit vs juriste) a un seul

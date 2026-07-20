@@ -56,18 +56,19 @@ domaine :
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>sac-de-mots<br/>51 %"] --> B["2 · fastText<br/>sous-mots appris<br/>66 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>74 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>86 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>82 %"]
+    A["1 · TF-IDF<br/>sac-de-mots<br/>68 %"] --> B["2 · fastText<br/>sous-mots appris<br/>71 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>77 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>70 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
-    style C fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
-    style D fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style C fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style D fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
 ```
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
-des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude monte
-**51 % → 66 % → 74 % → 86 %** des moteurs 1→4 et le LLM ajoute l'extraction de
-slots. Et surtout, il montre les **réserves honnêtes** qui comptent pour un(e)
+des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude tenue
+à l'écart monte **68 % → 71 % → 73 % → 77 %** des moteurs 1→4 et le LLM ajoute
+l'extraction de slots. Et surtout, il montre les **réserves honnêtes** qui
+comptent pour un(e)
 praticien(ne) : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
 variance train/test (**validation croisée** k-fold), la mauvaise calibration
 des réseaux de neurones (trop sûrs d'eux hors-périmètre) et la confidentialité
@@ -184,7 +185,7 @@ la leçon en une requête.
 
 ---
 
-## Résultats mesurés (21 intentions, 88 paraphrases tenues à l'écart)
+## Résultats mesurés (21 intentions, 210 paraphrases tenues à l'écart)
 
 Reproductibles : `python -m eval.harness` (exactitude/latence) et
 `python -m eval.crossval` (distributions bootstrap + validation croisée).
@@ -195,16 +196,16 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 
 | # | Moteur | Exactitude | CPU / appel | Slots |
 |---|--------|-----------:|------------:|:-----:|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF + RandomForest** | 51 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 66 % | ~33 µs | ❌ |
-| 3 | <span style="color:#AF52DE">■</span> **fastText (pré-entraîné)** | 74 % | ~250 µs | ❌ |
-| 4 | <span style="color:#28CD41">■</span> **BERT (SBERT + MLP)** | 86 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 67 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 77 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 87 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 93 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF">■</span> **TF-IDF + RandomForest** | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41">■</span> **fastText (pré-entraîné)** | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE">■</span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
 
-<sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval — seul le LLM génératif le fait. ¹ Les quatre configs LLM sont mesurées sur l'échantillon de 30 exemples de l'expérience de prompt ; les quatre classifieurs sur les 88 paraphrases tenues à l'écart. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
+<sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval ; seul le LLM génératif le fait. Les quatre scores classifieurs sont l'exactitude argmax brute de skore sur les **210 paraphrases tenues à l'écart** (sans abstention) ; ¹ les quatre configs LLM sont mesurées sur ces **mêmes 210** avec leur sortie JSON native. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
 
 > **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
 > (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
@@ -217,20 +218,22 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 **Les distributions, pas juste les points.** Les quatre classifieurs
 *entraînables* passent une **validation croisée répétée 5 blocs** : 5 blocs ×
 5 mélanges = **25 mesures réelles** chacun (apprendre sur 4/5 des K = 21
-intentions / N = 500 exemples, tester sur le 1/5 restant), tracés en **violons**
-lisses. Les quatre configs LLM sont zéro-shot — rien n'est entraîné, donc chacune
-est *un seul* nombre held-out, un **Dirac** tracé en une ligne horizontale.
+intentions / N = 1008 exemples, tester sur le 1/5 restant), scorés par **skore**
+et tracés en **violons** lisses. Les quatre configs LLM sont zéro-shot : rien
+n'est entraîné, donc chacune est *un seul* nombre held-out, un **Dirac** tracé
+en une ligne horizontale.
 Chaque moteur garde la couleur qu'il porte dans le tableau des résultats
 ci-dessus et dans toutes les autres figures du dépôt :
 
 ![Exactitude par moteur — violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
-> l'exactitude monte 51 → 66 → 74 → 86 %. Mais en **validation croisée** sur les
-> exemples in-distribution de la KB, les moteurs sont *plus proches* : le lexical
-> s'en sort quand le test ressemble à l'entraînement et s'effondre sous le
-> changement de distribution (paraphrases) — la raison d'être des représentations
-> sémantiques.
+> l'exactitude held-out monte 68 → 71 → 73 → 77 %. En **validation croisée** sur
+> les exemples in-distribution de la KB le même ordre tient (72 → 75 → 76 →
+> 78 %), un peu plus haut car les blocs ressemblent davantage à leur texte
+> d'entraînement : le lexical s'en sort quand le test ressemble à l'entraînement
+> et perd le plus sous le changement de distribution (paraphrases), la raison
+> d'être des représentations sémantiques.
 >
 > Filet hors-périmètre : sur 15 phrases hors sujet, TF-IDF s'abstient ~93 % du
 > temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) —
@@ -238,11 +241,12 @@ ci-dessus et dans toutes les autres figures du dépôt :
 > complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
 >
 > **Sur le choix du LLM.** Le défaut est le compact `gemma3:4b` (~5 s à chaud) :
-> il atteint **82 %**, *sous* BERT — un petit LLM local troque de l'exactitude
-> contre de la vitesse et son vrai atout est l'**extraction de slots + le
-> zero-shot**, pas la précision brute. Le plus gros `gemma4:e4b` monte à ~93 %
-> mais à ~40 s/appel (`INTENT_LLM_MODEL` le rebranche). Plus lourd ≠ meilleur —
-> on choisit selon le besoin.
+> sa meilleure config atteint **70 %**, *sous* les 77 % de BERT. Un petit LLM
+> local troque de l'exactitude contre de la vitesse et son vrai atout est
+> l'**extraction de slots + le zero-shot**, pas la précision brute. Un plus gros
+> modèle monte plus haut mais paie en secondes par appel (`INTENT_LLM_MODEL`
+> change le modèle). Plus lourd n'est pas automatiquement meilleur : on choisit
+> selon le besoin.
 
 ### Où chaque moteur se trompe ? Matrices de confusion
 
@@ -274,14 +278,14 @@ prompt (soigné) constant :
 
 ![Modèle et few shots : de mieux en mieux](docs/img/shootout-fr.png)
 
-> **Le modèle fait le grand saut ; le few-shot ajoute un petit plus.**
-> L'exactitude grimpe **67 → 77 → 87 → 93 %** : passer du petit modèle au plus
-> gros, c'est le bond de +20 points ; ajouter une poignée d'exemples few-shot
-> gagne ~10 points de plus sur chaque modèle. La morale qu'un(e) praticien(ne)
-> reconnaît : *prends d'abord un modèle plus fort, puis grappille les derniers
-> points avec des exemples bien choisis — encore faut-il qu'ils soient frais,
-> sinon on ne mesure que de la fuite.* (Échantillon tenu à l'écart de 30 ;
-> prédictions mises en cache par config dans `eval/.llm_shootout/`.)
+> **Le modèle fait le saut ; le few-shot ajoute un petit plus.**
+> L'exactitude grimpe **63 → 64 → 68 → 70 %** : passer du petit modèle au plus
+> gros, c'est le mouvement le plus net ; ajouter une poignée d'exemples few-shot
+> gagne un point ou deux de plus sur chaque modèle. La morale qu'un(e)
+> praticien(ne) reconnaît : *prends d'abord un modèle plus fort, puis grappille
+> les derniers points avec des exemples bien choisis ; encore faut-il qu'ils
+> soient frais, sinon on ne mesure que de la fuite.* (Scoré sur les 210 tenus à
+> l'écart ; prédictions mises en cache par config dans `eval/.llm_shootout/`.)
 
 ---
 
@@ -314,8 +318,8 @@ flowchart LR
     style R fill:#F8F8F8,stroke:#808080,color:#1C1C1E
     style E1 fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style E2 fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
-    style E3 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
-    style E4 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E3 fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
+    style E4 fill:#EFDCF8,stroke:#AF52DE,color:#1C1C1E
     style E5 fill:#FFD8D6,stroke:#FF3B30,color:#1C1C1E
     style API fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style CLI fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
