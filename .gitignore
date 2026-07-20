@@ -96,3 +96,4 @@ eval/llm_shootout_results.json
 
 # skore frozen-embedding cache (regenerable; large .npz)
 eval/.skore_emb/
+todo.md
