@@ -17,11 +17,11 @@ history of NLP**, from bag-of-words to generative LLM:
 
 | # | Engine | Representation | Classifier | The trade-off |
 |---|--------|---------------|-----------|---------------|
-| 1 | <span style="color:#007AFF"> **TF-IDF**</span> | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | subword embeddings **learned on our examples** | fastText softmax | Light; a step up from bag-of-words. |
-| 3 | <span style="color:#28CD41">■</span> **fastText (pretrained)** | **cc.fr.300** French vectors (Common Crawl) | logistic regression | Transfer learning: already knows *voiture* ≈ *véhicule*. |
-| 4 | <span style="color:#AF52DE">■</span> **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
-| 5 | <span style="color:#FF3B30">■</span> **LLM** | (prompt) | **Gemma / qwen** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
+| 1 | <span style="color:#007AFF">TF-IDF</span> | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
+| 2 | <span style="color:#1D8C8D">fastText (learned)</span> | subword embeddings **learned on our examples** | fastText softmax | Light; a step up from bag-of-words. |
+| 3 | <span style="color:#28CD41">fastText (pretrained)</span> | **cc.fr.300** French vectors (Common Crawl) | logistic regression | Transfer learning: already knows *voiture* ≈ *véhicule*. |
+| 4 | <span style="color:#AF52DE">BERT</span> | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
+| 5 | <span style="color:#FF3B30">LLM</span> | (prompt) | **Gemma / qwen** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
 
 > The UI is **bilingual EN/FR** : a 🇬🇧/🇫🇷 flag toggle (top-right, next to a
 > light/dark button); the LLM is even prompted in the query's own detected
@@ -51,7 +51,7 @@ Read the engine table top to bottom and you are walking the field's history:
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>bag-of-words<br/>68 %"] --> B["2 · fastText<br/>learned subwords<br/>71 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>77 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>70 %"]
+    A["1 · TF-IDF<br/>bag-of-words<br/>68 %"] --> B["2 · fastText<br/>learned subwords<br/>71 %"] --> C["3 · fastText<br/>pretrained cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextual<br/>77 %"] --> E["5 · LLM Gemma<br/>generative + slots<br/>79 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
     style C fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
@@ -61,8 +61,11 @@ flowchart LR
 
 The comparator then shows the **pay-off** with real, measured numbers (not
 opinions): on a **paraphrase-heavy** test set, held-out accuracy climbs
-monotonically **68 % → 71 % → 73 % → 77 %** across engines 1→4, and the LLM adds
-slot extraction on top. And crucially, it shows the **honest caveats** an ML
+**68 % → 71 % → 73 % → 77 % → 79 %** across the five engines, and the LLM
+additionally extracts structured **slots** (urgency, type of asset) that no
+classifier does. *The 79 % is with `gemma4:e4b-mlx`; the compact default
+`gemma3:4b` reaches 70 %, below BERT — the model size matters, see
+[Measured results](#measured-results-21-intent-kb-210-example-paraphrase-test-set).* And crucially, it shows the **honest caveats** an ML
 practitioner cares about, sampling uncertainty (bootstrap violin plots),
 train/test-split variance (k-fold cross-validation), model mis-calibration
 (neural nets are over-confident on out-of-scope input), and privacy (why it
@@ -118,9 +121,13 @@ fallback), a local **Ollama**.
 Then pull the models:
 
 ```bash
-ollama pull gemma3:4b           # LLM engine (compact + fast; ~5 s/call warm)
+ollama pull gemma4:e4b-mlx      # LLM engine — best accuracy (79 %, ~5 s/call warm)
 ollama pull nomic-embed-text    # embedding fallback for the BERT engine
 ```
+
+> **Compact alternative:** `ollama pull gemma3:4b` is smaller and faster (~3 GB vs ~9 GB)
+> but scores 70 % — below BERT's 77 %. Use it if disk/RAM is tight; swap back with
+> `INTENT_LLM_MODEL=gemma4:e4b-mlx` when you want the top result.
 
 ### 2. The project
 
@@ -206,16 +213,17 @@ worth:
 
 | # | Engine | Accuracy | CPU / call | Slots |
 |---|--------|---------:|-----------:|:-----:|
-| 1 | <span style="color:#007AFF"> </span> **TF-IDF + Random Forest** | 68 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D"> </span> **fastText (learned)** | 71 % | ~33 µs | ❌ |
-| 3 | <span style="color:#28CD41"> </span> **fastText (pretrained)** | 73 % | ~250 µs | ❌ |
-| 4 | <span style="color:#AF52DE"> </span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00"> </span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500"> </span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4"> </span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30"> </span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF">TF-IDF + Random Forest</span> | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">fastText (learned)</span> | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41">fastText (pretrained)</span> | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE">BERT (SBERT + MLP)</span> | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">qwen2.5:3b · zero shot</span> | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">qwen2.5:3b · few shots</span> | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">gemma3:4b · zero shot</span> | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">gemma3:4b · few shots</span> | 70 %¹ | ~5 s | ✅ |
+| 9 | <span style="color:#5856D6">**gemma4:e4b-mlx · few shots**</span> | **79 %¹** | ~5 s | ✅ |
 
-<sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR; only the generative LLM does this. The four classifier scores are skore's raw argmax accuracy on the **held-out 210 paraphrases** (no abstention); ¹ the four LLM configs are scored on the **same 210** with their natural JSON output. Colours match every figure in this repo.</sup>
+<sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR; only the generative LLM does this. The four classifier scores are skore's raw argmax accuracy on the **held-out 210 paraphrases** (no abstention); ¹ the LLM configs are scored on the **same 210** with their natural JSON output (gemma4:e4b full run 210/210; others 210/210 too). Colours match every figure in this repo.</sup>
 
 > **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
 > (~50 ms) is actually the **slowest non-LLM engine** : the forest's hundreds of
@@ -228,36 +236,34 @@ worth:
 classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
 **25 real measurements** each (train on 4/5 of the K = 21 intents / N = 1008
 examples, test on the held-out 1/5), scored by **skore** and drawn as smooth
-**violins**. The four LLM
-configs are zero-shot, nothing is trained, so each is a *single* held-out
-number, a **Dirac** drawn as one horizontal line. Each engine keeps the colour
-it carries in the results table above and in every other figure of this repo:
+**violins**. The LLM configs are zero-shot (nothing is trained), so each is a
+*single* held-out accuracy — a **Dirac** drawn as one horizontal line. Each
+engine keeps the colour it carries in the results table above and in every other
+figure of this repo:
 
 ![Accuracy per engine, violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
 
 > **Two lenses, one honest story.** On the paraphrase set above, held-out
-> accuracy climbs 68 → 71 → 73 → 77 %. Under **cross-validation** on the
-> in-distribution KB examples the same order holds (72 → 75 → 76 → 78 %), a
-> little higher because the folds look more like their training text: lexical
-> methods do fine when the test resembles the training, and lose the most under
-> paraphrase shift, which is the whole reason semantic representations exist.
+> accuracy climbs 68 → 71 → 73 → 77 % for classifiers 1→4. Under
+> **cross-validation** on the in-distribution KB examples the same order holds
+> (72 → 75 → 76 → 78 %), a little higher because the folds look more like their
+> training text: lexical methods do fine when the test resembles the training,
+> and lose the most under paraphrase shift — which is the whole reason semantic
+> representations exist.
 >
 > Out-of-scope safety net: on 15 off-topic inputs (weather, maths, cooking…),
 > TF-IDF abstains ~93 % of the time; the neural BERT is more over-confident
 > (~73 % after tuning its threshold), a real lesson on **neural-net
 > calibration**. Full analysis + sources in [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **On the LLM choice, and does a bigger LLM beat BERT?** The default compact
-> `gemma3:4b` (~5 s warm) lands at **70 %**, *below* BERT's 77 %: a small local LLM
-> trades accuracy for speed, its real edge being **slot extraction + zero-shot**.
-> But **size matters** : on the same held-out set, a bigger local model reclaims
-> the top: **`gemma4:e4b-mlx` 79 %** (full 210-phrase run) and **`gemma4:12b-mlx`
-> ~78 %** (partial run, 166/210 phrases, the rank is solid but treat the exact
-> figure as a lower bound), both edging past BERT's 77 %. So the small model was
-> simply *under-sized*; the hierarchy holds and the biggest generative models lead
-> again, at a real cost of seconds per call versus BERT's ~20 ms. Pick by need
-> (`INTENT_LLM_MODEL` swaps the model). *Held-out set auto-generated, margins a
-> few points: read the ranking, not the decimals.*
+> **Model size matters.** The compact `gemma3:4b` lands at **70 %** — below
+> BERT's 77 %. A bigger model reclaims the lead: `gemma4:e4b-mlx` reaches
+> **79 %** (row 9 in the table, full 210-phrase run), edging past BERT at a
+> real cost of seconds per call versus BERT's ~20 ms. `gemma4:12b-mlx` scores
+> ~78 % (166/210 phrases; treat as a lower bound). The small model was simply
+> *under-sized*; the hierarchy holds. Pick by need (`INTENT_LLM_MODEL` swaps
+> the model at runtime). *Margins a few points: read the ranking, not the
+> decimals.*
 
 ### Where does each engine go wrong? Confusion matrices
 
@@ -279,23 +285,23 @@ few-shot examples.
 
 Regenerate all eight with `python -m eval.confusion`.
 
-### Bigger model, or a few examples? A 2×2 on the LLM
+### Bigger model, or a few examples? LLM progression
 
 The *representation* lesson above is about the classifier. This one is about the
-**LLM**, along two independent switches, the **model** (a small `qwen2.5:3b` vs
-the larger `gemma3:4b`) and the **examples** (zero-shot vs three worked few-shot
-examples, on *fresh* sentences never in the test set, so no leakage), at a
-fixed, engineered prompt:
+**LLM**: the **model size** (a small `qwen2.5:3b` → a mid-size `gemma3:4b` →
+a bigger `gemma4:e4b-mlx`) and the **examples** (zero-shot vs few-shot, on
+*fresh* sentences never in the test set — no leakage), at a fixed, engineered
+prompt:
 
 ![Model and few shots: better and better](docs/img/shootout-en.png)
 
-> **The model buys the jump; few-shot adds a little on top.** Accuracy climbs
-> **63 → 64 → 68 → 70 %**: going from the small model to the larger one is the
-> bigger move, and adding a handful of few-shot examples lifts each model a
-> further point or two. The practitioner's takeaway: *reach for a stronger model
-> first, then squeeze the last points with well-chosen examples; the few-shot
-> examples must be fresh, or you are just measuring leakage.* (Scored on the full
-> 210 held-out; predictions cached per config in `eval/.llm_shootout/`.)
+> **The model buys the jump; few-shot adds a little on top; and a bigger model
+> rewrites the story.** Accuracy climbs **63 → 64 → 68 → 70 → 79 %**:
+> going from the small model to the mid-size one is the first big move, few-shot
+> adds a point or two, and upgrading to `gemma4:e4b-mlx` crosses BERT's 77 % by
+> two clear points. The practitioner's takeaway: *reach for a stronger model
+> first, then squeeze the last points with well-chosen examples.* (Scored on the
+> full 210 held-out; predictions cached per config in `eval/.llm_shootout/`.)
 
 ---
 

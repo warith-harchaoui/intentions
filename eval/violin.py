@@ -145,6 +145,15 @@ ENGINES: list[dict[str, str]] = [
         "model": "gemma3:4b",
         "prompt": "good-fs",
     },
+    {
+        "key": "gemma4-fs",
+        "fr": "gemma4:e4b\nfew shots",
+        "en": "gemma4:e4b\nfew shots",
+        "color": "#5856D6",  # Indigo — bigger model, clearly distinct
+        "kind": "llm",
+        "model": "gemma4:e4b-mlx",
+        "prompt": "good-fs",
+    },
 ]
 
 # Bilingual chart strings (kept tiny — the real explanation is in the docs).

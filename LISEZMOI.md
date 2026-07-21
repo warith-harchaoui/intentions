@@ -20,11 +20,11 @@ volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 
 | # | Moteur | Représentation | Classifieur | Le compromis |
 |---|--------|----------------|-------------|--------------|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF** | n-grammes creux (car./mots) | **Random Forest** | Instantané, minuscule. Mémorise les formes de surface. |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | sous-mots **appris sur nos exemples** | softmax fastText | Léger ; un cran au-dessus du sac-de-mots. |
-| 3 | <span style="color:#28CD41">■</span> **fastText (pré-entraîné)** | vecteurs **cc.fr.300** (Common Crawl) | régression logistique | Transfert : sait déjà que *voiture* ≈ *véhicule*. |
-| 4 | <span style="color:#AF52DE">■</span> **BERT** | embeddings contextuels (**SBERT**) | **MLP PyTorch** | Comprend le sens ; gagne sur les paraphrases. Local. |
-| 5 | <span style="color:#FF3B30">■</span> **LLM** | (prompt) | **Gemma / qwen** via Ollama, **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent, le plus malin. |
+| 1 | <span style="color:#007AFF">TF-IDF</span> | n-grammes creux (car./mots) | **Random Forest** | Instantané, minuscule. Mémorise les formes de surface. |
+| 2 | <span style="color:#1D8C8D">fastText (appris)</span> | sous-mots **appris sur nos exemples** | softmax fastText | Léger ; un cran au-dessus du sac-de-mots. |
+| 3 | <span style="color:#28CD41">fastText (pré-entraîné)</span> | vecteurs **cc.fr.300** (Common Crawl) | régression logistique | Transfert : sait déjà que *voiture* ≈ *véhicule*. |
+| 4 | <span style="color:#AF52DE">BERT</span> | embeddings contextuels (**SBERT**) | **MLP PyTorch** | Comprend le sens ; gagne sur les paraphrases. Local. |
+| 5 | <span style="color:#FF3B30">LLM</span> | (prompt) | **Gemma / qwen** via Ollama, **JSON strict** | Zéro entraînement, extrait les slots. Le plus lent, le plus malin. |
 
 📊 Le comparatif détaillé et sourcé (benchmarks, RGPD, coûts) : **[`PROS_CONS.md`](PROS_CONS.md)**.
 📖 Le mode d'emploi pas à pas (avec captures) : **[`MODEDEMPLOI.md`](MODEDEMPLOI.md)**.
@@ -55,7 +55,7 @@ domaine :
 
 ```mermaid
 flowchart LR
-    A["1 · TF-IDF<br/>sac-de-mots<br/>68 %"] --> B["2 · fastText<br/>sous-mots appris<br/>71 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>77 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>70 %"]
+    A["1 · TF-IDF<br/>sac-de-mots<br/>68 %"] --> B["2 · fastText<br/>sous-mots appris<br/>71 %"] --> C["3 · fastText<br/>pré-entraîné cc.fr.300<br/>73 %"] --> D["4 · BERT + MLP<br/>contextuel<br/>77 %"] --> E["5 · LLM Gemma<br/>génératif + slots<br/>79 %"]
     style A fill:#CCE4FF,stroke:#007AFF,color:#1C1C1E
     style B fill:#C4F1F1,stroke:#1D8C8D,color:#1C1C1E
     style C fill:#D4F5D9,stroke:#28CD41,color:#1C1C1E
@@ -65,8 +65,11 @@ flowchart LR
 
 Le comparateur montre ensuite le **gain** avec des chiffres réels mesurés (pas
 des opinions) : sur un jeu de test **riche en paraphrases**, l'exactitude tenue
-à l'écart monte **68 % → 71 % → 73 % → 77 %** des moteurs 1→4 et le LLM ajoute
-l'extraction de slots. Et surtout, il montre les **réserves honnêtes** qui
+à l'écart monte **68 % → 71 % → 73 % → 77 % → 79 %** sur les cinq moteurs, et le
+LLM extrait en prime des **slots** structurés (urgence, type de bien) qu'aucun
+classifieur ne produit. *Les 79 % sont obtenus avec `gemma4:e4b-mlx` ; le modèle
+compact par défaut `gemma3:4b` atteint 70 %, en-dessous de BERT -- la taille du
+modèle compte, voir [Résultats mesurés](#résultats-mesurés).* Et surtout, il montre les **réserves honnêtes** qui
 comptent pour un(e)
 praticien(ne) : l'incertitude d'échantillonnage (**violin plots** bootstrap), la
 variance train/test (**validation croisée** k-fold), la mauvaise calibration
@@ -117,9 +120,14 @@ BERT), **Ollama** en local.
 Puis récupérez les modèles :
 
 ```bash
-ollama pull gemma3:4b           # moteur LLM (compact + rapide ; ~5 s/appel à chaud)
+ollama pull gemma4:e4b-mlx      # moteur LLM -- meilleure précision (79 %, ~5 s/appel à chaud)
 ollama pull nomic-embed-text    # repli d'embeddings pour le moteur BERT
 ```
+
+> **Alternative compacte :** `ollama pull gemma3:4b` est plus léger et plus rapide
+> (~3 Go vs ~9 Go) mais plafonne à 70 % -- en-dessous de BERT (77 %). Utilisez-le
+> si la mémoire/disque est limitée ; rebasclez avec
+> `INTENT_LLM_MODEL=gemma4:e4b-mlx` quand vous voulez le meilleur résultat.
 
 ### 2. Le projet
 
@@ -201,16 +209,17 @@ mémorisation du vocabulaire, c'est là que la représentation prouve sa valeur.
 
 | # | Moteur | Exactitude | CPU / appel | Slots |
 |---|--------|-----------:|------------:|:-----:|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF + RandomForest** | 68 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (appris)** | 71 % | ~33 µs | ❌ |
-| 3 | <span style="color:#28CD41">■</span> **fastText (pré-entraîné)** | 73 % | ~250 µs | ❌ |
-| 4 | <span style="color:#AF52DE">■</span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF">TF-IDF + RandomForest</span> | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D">fastText (appris)</span> | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41">fastText (pré-entraîné)</span> | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE">BERT (SBERT + MLP)</span> | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00">qwen2.5:3b · zero shot</span> | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500">qwen2.5:3b · few shots</span> | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4">gemma3:4b · zero shot</span> | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30">gemma3:4b · few shots</span> | 70 %¹ | ~5 s | ✅ |
+| 9 | <span style="color:#5856D6">**gemma4:e4b-mlx · few shots**</span> | **79 %¹** | ~5 s | ✅ |
 
-<sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval ; seul le LLM génératif le fait. Les quatre scores classifieurs sont l'exactitude argmax brute de skore sur les **210 paraphrases tenues à l'écart** (sans abstention) ; ¹ les quatre configs LLM sont mesurées sur ces **mêmes 210** avec leur sortie JSON native. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
+<sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval ; seul le LLM génératif le fait. Les quatre scores classifieurs sont l'exactitude argmax brute de skore sur les **210 paraphrases tenues à l'écart** (sans abstention) ; ¹ les configs LLM sont mesurées sur ces **mêmes 210** avec leur sortie JSON native (gemma4:e4b run complet 210/210). Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
 
 > **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
 > (~50 ms) est en fait le **moteur non-LLM le plus lent** : les centaines d'arbres
@@ -224,40 +233,34 @@ mémorisation du vocabulaire, c'est là que la représentation prouve sa valeur.
 *entraînables* passent une **validation croisée répétée 5 blocs** : 5 blocs ×
 5 mélanges = **25 mesures réelles** chacun (apprendre sur 4/5 des K = 21
 intentions / N = 1008 exemples, tester sur le 1/5 restant), scorés par **skore**
-et tracés en **violons** lisses. Les quatre configs LLM sont zéro-shot : rien
-n'est entraîné, donc chacune est *un seul* nombre held-out, un **Dirac** tracé
-en une ligne horizontale.
-Chaque moteur garde la couleur qu'il porte dans le tableau des résultats
-ci-dessus et dans toutes les autres figures du dépôt :
+et tracés en **violons** lisses. Les configs LLM sont zéro-shot : rien n'est
+entraîné, donc chacune est *un seul* nombre held-out, un **Dirac** tracé en une
+ligne horizontale. Chaque moteur garde la couleur qu'il porte dans le tableau
+des résultats ci-dessus et dans toutes les autres figures du dépôt :
 
 ![Exactitude par moteur, violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
-> l'exactitude held-out monte 68 → 71 → 73 → 77 %. En **validation croisée** sur
-> les exemples in-distribution de la KB le même ordre tient (72 → 75 → 76 →
-> 78 %), un peu plus haut car les blocs ressemblent davantage à leur texte
-> d'entraînement : le lexical s'en sort quand le test ressemble à l'entraînement
-> et perd le plus sous le changement de distribution (paraphrases), la raison
-> d'être des représentations sémantiques.
+> l'exactitude held-out monte 68 → 71 → 73 → 77 % pour les classifieurs 1→4. En
+> **validation croisée** sur les exemples in-distribution de la KB le même ordre
+> tient (72 → 75 → 76 → 78 %), un peu plus haut car les blocs ressemblent
+> davantage à leur texte d'entraînement : le lexical s'en sort quand le test
+> ressemble à l'entraînement et perd le plus sous paraphrase -- la raison d'être
+> des représentations sémantiques.
 >
 > Filet hors-périmètre : sur 15 phrases hors sujet, TF-IDF s'abstient ~93 % du
-> temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) -
+> temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) --
 > une vraie leçon sur la **calibration des réseaux de neurones**. Analyse
 > complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **Sur le choix du LLM, et un gros LLM bat-il BERT ?** Le compact `gemma3:4b`
-> par défaut (~5 s à chaud) atteint **70 %**, *sous* les 77 % de BERT : un petit
-> LLM local troque de l'exactitude contre de la vitesse, son vrai atout étant
-> l'**extraction de slots + le zéro-shot**. Mais **la taille compte** : sur le
-> même jeu held-out, un plus gros modèle local reprend la tête :
-> **`gemma4:e4b-mlx` 79 %** (run complet, 210 phrases) et **`gemma4:12b-mlx`
-> ~78 %** (run partiel, 166/210 phrases, le classement est solide mais la valeur
-> exacte est un plancher), tous deux devant les 77 % de BERT. Le petit modèle
-> était simplement *sous-dimensionné* ; la hiérarchie tient et les plus gros
-> modèles génératifs repassent en tête, au prix réel de secondes par appel contre
-> ~20 ms pour BERT. On choisit selon le besoin (`INTENT_LLM_MODEL` change le
-> modèle). *Jeu held-out auto-généré, marges de quelques points : lire le
-> classement, pas les décimales.*
+> **La taille du modèle compte.** Le compact `gemma3:4b` atteint **70 %** --
+> sous les 77 % de BERT. Un modèle plus gros reprend la tête :
+> `gemma4:e4b-mlx` atteint **79 %** (ligne 9 du tableau, run complet 210
+> phrases), devant BERT, au prix de secondes par appel contre ~20 ms pour BERT.
+> `gemma4:12b-mlx` ~78 % (166/210 phrases, plancher). Le petit modèle était
+> simplement *sous-dimensionné* ; la hiérarchie tient. On choisit selon le
+> besoin (`INTENT_LLM_MODEL` change le modèle au vol). *Marges quelques points :
+> lire le classement, pas les décimales.*
 
 ### Où chaque moteur se trompe ? Matrices de confusion
 
@@ -279,21 +282,22 @@ configs LLM se resserrent encore avec un meilleur modèle et des exemples few-sh
 
 On régénère les huit avec `python -m eval.confusion`.
 
-### Un modèle plus gros ou quelques exemples ? Un 2×2 sur le LLM
+### Un modèle plus gros ou quelques exemples ? Progression LLM
 
 La leçon *représentation* ci-dessus parle du classifieur. Celle-ci parle du
-**LLM**, selon deux réglages indépendants, le **modèle** (un petit `qwen2.5:3b`
-vs le plus gros `gemma3:4b`) et les **exemples** (zéro-shot vs trois exemples
-few-shot, sur des phrases **fraîches** hors jeu de test, donc sans tricher), à
-prompt (soigné) constant :
+**LLM** : la **taille du modèle** (petit `qwen2.5:3b` → moyen `gemma3:4b` →
+gros `gemma4:e4b-mlx`) et les **exemples** (zéro-shot vs few-shot sur des
+phrases **fraîches** hors jeu de test, donc sans tricher), à prompt soigné
+constant :
 
 ![Modèle et few shots : de mieux en mieux](docs/img/shootout-fr.png)
 
-> **Le modèle fait le saut ; le few-shot ajoute un petit plus.**
-> L'exactitude grimpe **63 → 64 → 68 → 70 %** : passer du petit modèle au plus
-> gros, c'est le mouvement le plus net ; ajouter une poignée d'exemples few-shot
-> gagne un point ou deux de plus sur chaque modèle. La morale qu'un(e)
-> praticien(ne) reconnaît : *prends d'abord un modèle plus fort, puis grappille
+> **Le modèle fait le saut ; le few-shot ajoute un petit plus ; un modèle plus
+> grand réécrit l'histoire.** L'exactitude grimpe **63 → 64 → 68 → 70 → 79 %** :
+> passer du petit au moyen est le premier grand mouvement, le few-shot grappille
+> un point ou deux, et passer à `gemma4:e4b-mlx` franchit les 77 % de BERT de
+> deux points nets. La morale pratique : *prends d'abord un modèle plus fort,
+> puis grappille
 > les derniers points avec des exemples bien choisis ; encore faut-il qu'ils
 > soient frais, sinon on ne mesure que de la fuite.* (Scoré sur les 210 tenus à
 > l'écart ; prédictions mises en cache par config dans `eval/.llm_shootout/`.)
