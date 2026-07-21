@@ -244,12 +244,14 @@ ci-dessus et dans toutes les autres figures du dépôt :
 > LLM local troque de l'exactitude contre de la vitesse, son vrai atout étant
 > l'**extraction de slots + le zéro-shot**. Mais **la taille compte** — sur le
 > même jeu held-out, un plus gros modèle local reprend la tête :
-> **`gemma4:e4b-mlx` 79 %** et **`gemma4:12b-mlx` ~78 %**, tous deux devant les
-> 77 % de BERT. Le petit modèle était simplement *sous-dimensionné* ; la hiérarchie
-> tient et les plus gros modèles génératifs repassent en tête, au prix réel de
-> secondes par appel contre ~20 ms pour BERT. On choisit selon le besoin
-> (`INTENT_LLM_MODEL` change le modèle). *Jeu held-out auto-généré, marges de
-> quelques points : lire le classement, pas les décimales.*
+> **`gemma4:e4b-mlx` 79 %** (run complet, 210 phrases) et **`gemma4:12b-mlx`
+> ~78 %** (run partiel, 166/210 phrases — le classement est solide mais la valeur
+> exacte est un plancher), tous deux devant les 77 % de BERT. Le petit modèle
+> était simplement *sous-dimensionné* ; la hiérarchie tient et les plus gros
+> modèles génératifs repassent en tête, au prix réel de secondes par appel contre
+> ~20 ms pour BERT. On choisit selon le besoin (`INTENT_LLM_MODEL` change le
+> modèle). *Jeu held-out auto-généré, marges de quelques points : lire le
+> classement, pas les décimales.*
 
 ### Où chaque moteur se trompe ? Matrices de confusion
 

@@ -245,12 +245,13 @@ it carries in the results table above and in every other figure of this repo:
 > `gemma3:4b` (~5 s warm) lands at **70 %**, *below* BERT's 77 %: a small local LLM
 > trades accuracy for speed, its real edge being **slot extraction + zero-shot**.
 > But **size matters** — on the same held-out set, a bigger local model reclaims
-> the top: **`gemma4:e4b-mlx` 79 %** and **`gemma4:12b-mlx` ~78 %**, both edging
-> past BERT's 77 %. So the small model was simply *under-sized*; the hierarchy
-> holds and the biggest generative models lead again, at a real cost of seconds
-> per call versus BERT's ~20 ms. Pick by need (`INTENT_LLM_MODEL` swaps the
-> model). *Held-out set auto-generated, margins a few points: read the ranking,
-> not the decimals.*
+> the top: **`gemma4:e4b-mlx` 79 %** (full 210-phrase run) and **`gemma4:12b-mlx`
+> ~78 %** (partial run, 166/210 phrases — the rank is solid but treat the exact
+> figure as a lower bound), both edging past BERT's 77 %. So the small model was
+> simply *under-sized*; the hierarchy holds and the biggest generative models lead
+> again, at a real cost of seconds per call versus BERT's ~20 ms. Pick by need
+> (`INTENT_LLM_MODEL` swaps the model). *Held-out set auto-generated, margins a
+> few points: read the ranking, not the decimals.*
 
 ### Where does each engine go wrong? Confusion matrices
 
