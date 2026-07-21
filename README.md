@@ -17,7 +17,7 @@ history of NLP**, from bag-of-words to generative LLM:
 
 | # | Engine | Representation | Classifier | The trade-off |
 |---|--------|---------------|-----------|---------------|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF** | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
+| 1 | <span style="color:#007AFF"> **TF-IDF**</span> | sparse char/word n-grams | **Random Forest** | Instant, tiny, offline. Memorises surface forms. |
 | 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | subword embeddings **learned on our examples** | fastText softmax | Light; a step up from bag-of-words. |
 | 3 | <span style="color:#28CD41">■</span> **fastText (pretrained)** | **cc.fr.300** French vectors (Common Crawl) | logistic regression | Transfer learning: already knows *voiture* ≈ *véhicule*. |
 | 4 | <span style="color:#AF52DE">■</span> **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
