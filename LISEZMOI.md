@@ -1,11 +1,11 @@
-# Déraison Assurances — un *intent engine*, en 5 approches
+# Déraison Assurances : un *intent engine*, en 5 approches
 
 [🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md)
 
 📖 Mode d'emploi : [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
 > « Mes collègues me demandent **comment on fait** un moteur de détection
-> d'intention. » — Ce dépôt répond, en montrant **cinq façons** de le faire,
+> d'intention. », Ce dépôt répond, en montrant **cinq façons** de le faire,
 > côte à côte, sur un cas concret : le chatbot d'aiguillage d'une compagnie
 > d'assurance (fictive) qui oriente ses clients au **téléphone** comme
 > à l'**écrit**.
@@ -15,7 +15,7 @@
 Un client dit *« j'ai eu un accident ce matin, ma voiture est cabossée »* et le
 système doit comprendre l'**intention** (`declarer_sinistre_auto`), aiguiller
 vers le bon **service** et, idéalement, extraire les **informations utiles**
-(urgence, type de bien). Cinq moteurs font ce travail — une **traversée
+(urgence, type de bien). Cinq moteurs font ce travail, une **traversée
 volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 
 | # | Moteur | Représentation | Classifieur | Le compromis |
@@ -31,7 +31,7 @@ volontaire de l'histoire du NLP**, du sac-de-mots au LLM génératif :
 🍳 Le cookbook exécutable : **[`EXAMPLES.md`](EXAMPLES.md)**.
 📐 Le standard de code suivi partout : **[`CODING.md`](CODING.md)**.
 
-## Pourquoi ce projet — l'objectif pédagogique
+## Pourquoi ce projet : l'objectif pédagogique
 
 C'est un **artefact d'enseignement Data Science / Machine Learning / IA**. Le
 but n'est pas de livrer le meilleur classifieur ; c'est de faire **ressentir,
@@ -42,16 +42,16 @@ classifieur.**
 Lisez le tableau des moteurs de haut en bas et vous parcourez l'histoire du
 domaine :
 
-1. **Sac-de-mots (TF-IDF)** — on compte des n-grammes ; le modèle voit des
+1. **Sac-de-mots (TF-IDF)** : on compte des n-grammes ; le modèle voit des
    *chaînes*, pas du *sens*. Un synonyme jamais vu lui est invisible.
-2. **Sous-mots appris (fastText, sur nos données)** — le modèle commence à
+2. **Sous-mots appris (fastText, sur nos données)** : le modèle commence à
    rapprocher les mots proches, à partir de quelques centaines d'exemples.
-3. **Vecteurs pré-entraînés (fastText cc.fr.300)** — transfert : la
+3. **Vecteurs pré-entraînés (fastText cc.fr.300)** : transfert : la
    connaissance de milliards de mots de français est versée gratuitement.
-4. **Embeddings contextuels (BERT/SBERT) + réseau de neurones** — du sens qui
+4. **Embeddings contextuels (BERT/SBERT) + réseau de neurones** : du sens qui
    dépend du contexte, plus un classifieur non-linéaire.
-5. **LLM génératif (Gemma)** — aucun entraînement ; du raisonnement à partir
-   d'un prompt et — c'est unique — l'extraction de *slots* structurés.
+5. **LLM génératif (Gemma)** : aucun entraînement ; du raisonnement à partir
+   d'un prompt et (c'est unique) l'extraction de *slots* structurés.
 
 ```mermaid
 flowchart LR
@@ -166,18 +166,18 @@ python -m intent_engine classify --engine tfidf "je veux résilier"
 python -m intent_engine execute "il me faut une prise en charge pour l'hôpital"
 ```
 
-Exemple de sortie de `compare` (sur une paraphrase — voyez les moteurs lexicaux
+Exemple de sortie de `compare` (sur une paraphrase, voyez les moteurs lexicaux
 s'abstenir tandis que les sémantiques trouvent) :
 
 | Moteur | Prédiction | Confiance | CPU / appel |
 |--------|-----------|:---------:|------------:|
-| `tfidf` | *(s'abstient)* | — | ~50 ms |
+| `tfidf` | *(s'abstient)* |, | ~50 ms |
 | `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
-| `fasttext_pretrained` | *(s'abstient)* | — | ~250 µs |
+| `fasttext_pretrained` | *(s'abstient)* |, | ~250 µs |
 | `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
 | `llm` | `declarer_sinistre_auto` | **0.95** | ~4,7 s |
 
-Le LLM extrait en plus des **slots** — `type_bien: auto`, `urgence: haute` — ce
+Le LLM extrait en plus des **slots** (`type_bien: auto`, `urgence: haute`) ce
 qu'aucun classifieur ne fait. Les deux moteurs lexicaux s'abstiennent ou passent
 tout juste la barre sur cette paraphrase ; les sémantiques sont confiants. *Voilà*
 la leçon en une requête.
@@ -191,7 +191,7 @@ Reproductibles : `python -m eval.harness` (exactitude/latence) et
 
 Le jeu de test est volontairement **riche en paraphrases** (faible recouvrement
 lexical avec l'entraînement) : il mesure la **généralisation**, pas la
-mémorisation du vocabulaire — c'est là que la représentation prouve sa valeur.
+mémorisation du vocabulaire, c'est là que la représentation prouve sa valeur.
 
 | # | Moteur | Exactitude | CPU / appel | Slots |
 |---|--------|-----------:|------------:|:-----:|
@@ -207,11 +207,11 @@ mémorisation du vocabulaire — c'est là que la représentation prouve sa vale
 <sup>**Slots** = champs structurés extraits en plus de l'intention (urgence, type de bien, numéro de contrat…), prêts pour un CRM/SVI aval ; seul le LLM génératif le fait. Les quatre scores classifieurs sont l'exactitude argmax brute de skore sur les **210 paraphrases tenues à l'écart** (sans abstention) ; ¹ les quatre configs LLM sont mesurées sur ces **mêmes 210** avec leur sortie JSON native. Les couleurs sont les mêmes dans toutes les figures du dépôt.</sup>
 
 > **Une surprise de latence à remarquer.** Le *classique* `TF-IDF + RandomForest`
-> (~50 ms) est en fait le **moteur non-LLM le plus lent** — les centaines d'arbres
+> (~50 ms) est en fait le **moteur non-LLM le plus lent** : les centaines d'arbres
 > de la forêt coûtent plus cher que la tête MLP de BERT à deux produits matriciels
 > (~20 ms) ou la recherche de vecteurs de fastText (~33 µs). « À l'ancienne » ne
 > veut pas dire « rapide » et « neuronal » ne veut pas dire « lent » : on mesure,
-> on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps —
+> on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps -
 > voir `eval/bench.py` ; le chiffre du LLM est le calcul propre d'Ollama.)
 
 **Les distributions, pas juste les points.** Les quatre classifieurs
@@ -224,7 +224,7 @@ en une ligne horizontale.
 Chaque moteur garde la couleur qu'il porte dans le tableau des résultats
 ci-dessus et dans toutes les autres figures du dépôt :
 
-![Exactitude par moteur — violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
+![Exactitude par moteur, violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
 > l'exactitude held-out monte 68 → 71 → 73 → 77 %. En **validation croisée** sur
@@ -235,17 +235,17 @@ ci-dessus et dans toutes les autres figures du dépôt :
 > d'être des représentations sémantiques.
 >
 > Filet hors-périmètre : sur 15 phrases hors sujet, TF-IDF s'abstient ~93 % du
-> temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) —
+> temps ; le réseau BERT est plus sûr de lui (~73 % après réglage du seuil) -
 > une vraie leçon sur la **calibration des réseaux de neurones**. Analyse
 > complète et sources dans [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **Sur le choix du LLM — et un gros LLM bat-il BERT ?** Le compact `gemma3:4b`
+> **Sur le choix du LLM, et un gros LLM bat-il BERT ?** Le compact `gemma3:4b`
 > par défaut (~5 s à chaud) atteint **70 %**, *sous* les 77 % de BERT : un petit
 > LLM local troque de l'exactitude contre de la vitesse, son vrai atout étant
-> l'**extraction de slots + le zéro-shot**. Mais **la taille compte** — sur le
+> l'**extraction de slots + le zéro-shot**. Mais **la taille compte** : sur le
 > même jeu held-out, un plus gros modèle local reprend la tête :
 > **`gemma4:e4b-mlx` 79 %** (run complet, 210 phrases) et **`gemma4:12b-mlx`
-> ~78 %** (run partiel, 166/210 phrases — le classement est solide mais la valeur
+> ~78 %** (run partiel, 166/210 phrases, le classement est solide mais la valeur
 > exacte est un plancher), tous deux devant les 77 % de BERT. Le petit modèle
 > était simplement *sous-dimensionné* ; la hiérarchie tient et les plus gros
 > modèles génératifs repassent en tête, au prix réel de secondes par appel contre
@@ -276,9 +276,9 @@ On régénère les huit avec `python -m eval.confusion`.
 ### Un modèle plus gros ou quelques exemples ? Un 2×2 sur le LLM
 
 La leçon *représentation* ci-dessus parle du classifieur. Celle-ci parle du
-**LLM**, selon deux réglages indépendants — le **modèle** (un petit `qwen2.5:3b`
+**LLM**, selon deux réglages indépendants, le **modèle** (un petit `qwen2.5:3b`
 vs le plus gros `gemma3:4b`) et les **exemples** (zéro-shot vs trois exemples
-few-shot, sur des phrases **fraîches** hors jeu de test, donc sans tricher) — à
+few-shot, sur des phrases **fraîches** hors jeu de test, donc sans tricher), à
 prompt (soigné) constant :
 
 ![Modèle et few shots : de mieux en mieux](docs/img/shootout-fr.png)
@@ -358,7 +358,7 @@ python -m eval.violin                  # génère le violon dans docs/img/
 
 Le **moteur d'intention** tourne **en local** (scikit-learn, fastText & SBERT
 auto-hébergés, LLM via Ollama) : le texte d'une requête ne quitte pas la
-machine — un choix délibéré, car en assurance une seule phrase peut être une
+machine, un choix délibéré, car en assurance une seule phrase peut être une
 **donnée de santé sensible** au sens de l'art. 9 RGPD. *« Il me faut une prise
 en charge pour l'Institut de cancérologie »* révèle un diagnostic de cancer ;
 l'envoyer à un LLM cloud exfiltrerait exactement la donnée que la loi protège

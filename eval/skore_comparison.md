@@ -1,4 +1,4 @@
-# skore evaluation — trainable intent engines
+# skore evaluation : trainable intent engines
 
 Raw argmax accuracy (no abstention). CV = 25-fold RepeatedKFold on the
 1008 balanced training utterances; held-out = fit on 1008, scored on the
@@ -11,7 +11,7 @@ Raw argmax accuracy (no abstention). CV = 25-fold RepeatedKFold on the
 | fastText (pretrained) | 75.6% ± 3.5% | 72.9% |
 | BERT + MLP | 78.2% ± 3.4% | 77.1% |
 
-## skore ComparisonReport — held-out metrics
+## skore ComparisonReport : held-out metrics
 
 ```
 Estimator                                        TF-IDF + Random Forest  fastText (learned)  fastText (pretrained)  BERT + MLP

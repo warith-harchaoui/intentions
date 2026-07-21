@@ -1,4 +1,4 @@
-# Intent Engine — 5 approches comparées
+# Intent Engine : 5 approches comparées
 
 > Grand tableau comparatif pour choisir **comment détecter l'intention** d'un
 > client d'assurance : à l'ancienne (TF-IDF), avec une représentation type
@@ -19,7 +19,7 @@
 
 > Note sur le **grand tableau théorique** ci-dessous : il oppose les trois
 > *archétypes* (lexical, embeddings, LLM). Les deux moteurs fastText sont le
-> pont concret entre lexical et embeddings — fastText *appris* est proche du
+> pont concret entre lexical et embeddings, fastText *appris* est proche du
 > lexical (sous-mots sur nos données), fastText *pré-entraîné* bascule côté
 > embeddings (transfert). BERT est l'embedding contextuel abouti.
 
@@ -29,13 +29,13 @@
 
 | Critère | Lexical (TF-IDF, fastText appris) | Embeddings (fastText pré-entraîné, BERT) | LLM (local) |
 |---|---|---|---|
-| **Généralisation aux paraphrases** | Faible — colle aux mots exacts¹ | Bonne — capture le sens² | Excellente — comprend le langage³ |
+| **Généralisation aux paraphrases** | Faible (colle aux mots exacts¹ | Bonne) capture le sens² | Excellente, comprend le langage³ |
 | **Données requises / intention** | Dizaines d'exemples¹ | 5–10 (few-shot)² | 0–5 (dans le prompt)³ |
 | **Latence d'inférence** | µs (fastText) à ~50 ms (RandomForest) | Rapide (~250 µs–20 ms CPU)² | Lente (s à dizaines de s en local)³ |
 | **Compute / matériel** | CPU, empreinte minuscule | CPU ok, modèle ~100–500 Mo² | GPU/Apple Silicon conseillé³ |
 | **Coût monétaire** | Gratuit, local | Gratuit si auto-hébergé | Gratuit en local / **payant en API**⁴ |
-| **Explicabilité** | Excellente — poids par mot¹ | Moyenne — voisins/kNN² | Faible-moyenne, non déterministe⁵ |
-| **Multilingue / français** | Faible — un modèle par langue¹ | Fort — modèles multilingues² | Excellent nativement³ |
+| **Explicabilité** | Excellente (poids par mot¹ | Moyenne) voisins/kNN² | Faible-moyenne, non déterministe⁵ |
+| **Multilingue / français** | Faible (un modèle par langue¹ | Fort) modèles multilingues² | Excellent nativement³ |
 | **Fautes de frappe** | Faible (atténué par n-grammes char)⁶ | Bonne² | Excellente³ |
 | **Ajouter une intention** | Ré-entraîner + collecter des données¹ | Ré-entraîner le **petit** classifieur² | Éditer une ligne du prompt³ |
 | **Confidentialité / RGPD** | Idéal (on-premise) | Idéal (on-premise) | Idéal en **local** ; **risque en cloud**⁷ |
@@ -78,7 +78,7 @@ paraphrases** (faible recouvrement lexical) : il mesure la **généralisation**.
 ### Les distributions, pas juste les points (bootstrap + violin)
 
 Un chiffre unique ment. Le rééchantillonnage **bootstrap** (2000×) du jeu de
-test donne la *distribution* d'exactitude de chaque moteur — et montre que, sur
+test donne la *distribution* d'exactitude de chaque moteur, et montre que, sur
 ce jeu difficile, ils sont **réellement** distincts (TF-IDF et BERT ne se
 chevauchent pas), pas séparés par le hasard :
 
@@ -103,15 +103,15 @@ la **durée de calcul rapportée par Ollama** (`eval_duration`) pour le LLM.
 
 | Moteur | wall | **CPU** | hors-CPU ≈ GPU |
 |---|---:|---:|---:|
-| TF-IDF + RandomForest | ~50 ms | **~50 ms** | — |
-| fastText appris | ~33 µs | **~33 µs** | — |
-| fastText pré-entraîné | ~250 µs | **~250 µs** | — |
+| TF-IDF + RandomForest | ~50 ms | **~50 ms** |, |
+| fastText appris | ~33 µs | **~33 µs** |, |
+| fastText pré-entraîné | ~250 µs | **~250 µs** |, |
 | BERT (SBERT + MLP) | ~52 ms | **~20 ms** | **~32 ms (MPS/GPU)** |
 
-- **fastText est réellement instantané** (~33–250 µs CPU) — jamais « 0 ms » :
+- **fastText est réellement instantané** (~33–250 µs CPU), jamais « 0 ms » :
   l'affichage bascule en microsecondes (`format_duration`) pour ne pas mentir.
 - **Surprise** : le *classique* **TF-IDF + RandomForest (~50 ms)** est le moteur
-  **le plus lent hors LLM** — les centaines d'arbres de la forêt coûtent plus que
+  **le plus lent hors LLM** : les centaines d'arbres de la forêt coûtent plus que
   la tête MLP de BERT (~20 ms). « À l'ancienne » ≠ « rapide ».
 - **BERT** : ~20 ms de CPU **plus ~32 ms hors-CPU** = le **GPU Metal (MPS)** fait
   une bonne moitié du travail. Le split CPU/GPU est directement visible.
@@ -127,7 +127,7 @@ serveur) sont bien plus fiables que le wall-clock** pour comparer des coûts.
 
 Refuser de deviner est aussi important que bien classer. TF-IDF s'abstient
 **~93 %** du temps sur le hors-périmètre ; le **réseau BERT est trop sûr de
-lui** et n'abstient que ~13 % *avant* réglage — un cas d'école de **mauvaise
+lui** et n'abstient que ~13 % *avant* réglage, un cas d'école de **mauvaise
 calibration des réseaux de neurones**. En remontant son seuil de confiance à
 0,6, on passe à ~73 % d'abstention en ne perdant presque rien en exactitude
 in-scope (les bons hits sont à ~0,99 de confiance). C'est un arbitrage réel de
@@ -142,16 +142,16 @@ production, pas un détail.
 **Pour**
 - Le plus **rapide** et le plus **léger** : inférence en µs/ms, aucun GPU, entraînement en secondes.
 - **Explicabilité maximale** : les poids linéaires disent quels mots poussent vers quelle intention ; déterministe, débogable¹.
-- **100 % local**, gratuit, rien ne sort du SI — idéal RGPD.
+- **100 % local**, gratuit, rien ne sort du SI, idéal RGPD.
 - Robustesse aux fautes récupérable via **n-grammes de caractères** (recommandé aussi par Rasa)⁶.
 
 **Contre**
-- **Ne comprend pas le sens** : la doc scikit-learn le dit — TF-IDF « ne tient pas compte de l'ordre des mots ni du contexte »¹. Deux synonymes = deux vecteurs orthogonaux.
+- **Ne comprend pas le sens** : la doc scikit-learn le dit, TF-IDF « ne tient pas compte de l'ordre des mots ni du contexte »¹. Deux synonymes = deux vecteurs orthogonaux.
 - **Besoin de données étiquetées** ; pas de zero-shot. En few-shot pur (5 ex./intention) les baselines lexicales s'effondrent bien plus que les encodeurs de phrases⁹.
 - **Un modèle par langue**, tokenisation/stop-words spécifiques au français.
 - **Dérive de vocabulaire** : quand le langage client évolue (jargon, nouveaux produits), la performance baisse silencieusement → ré-entraînement périodique¹.
 
-### 2 & 3 · fastText — appris, puis pré-entraîné
+### 2 & 3 · fastText : appris, puis pré-entraîné
 
 fastText (Bojanowski/Joulin et al., 2016-2018) représente chaque mot comme un
 **sac de n-grammes de caractères**, ce qui lui donne des vecteurs même pour des
@@ -168,21 +168,21 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 
 **fastText *pré-entraîné* (cc.fr.300)**
 
-- **Pour** : **transfert d'apprentissage** — les vecteurs sont entraînés sur
+- **Pour** : **transfert d'apprentissage** : les vecteurs sont entraînés sur
   Common Crawl + Wikipédia français (des milliards de mots), donc « voiture » et
   « véhicule » sont déjà proches. On moyenne les vecteurs de la phrase et on
   pose une régression logistique dessus. Ici **73 %**, sans avoir vu nos
   paraphrases. Excellent rapport sens/simplicité.
 - **Contre** : le modèle pèse **~4,5 Go** (téléchargement), quelques Go de RAM.
   Les vecteurs sont **statiques** : « avocat » (fruit vs juriste) a un seul
-  vecteur, sans contexte — c'est la limite que BERT lève.
+  vecteur, sans contexte, c'est la limite que BERT lève.
 
 ### 4 · Embeddings type BERT (SBERT) + classifieur
 
 **Pour**
 - **Généralise au sens** : SBERT (Reimers & Gurevych, 2019) rend les phrases comparables par cosinus, ramenant la recherche de similarité de **~65 h à ~5 s** vs BERT brut². Paraphrases sans mot commun → même voisinage.
 - **Few-shot** : ~85 % sur BANKING77 avec **10 exemples/intention** (dual encoders), dépassant un BERT fine-tuné en régime few-shot⁹.
-- **Multilingue** natif (modèles `paraphrase-multilingual-*`, LaBSE) — atout majeur pour le français².
+- **Multilingue** natif (modèles `paraphrase-multilingual-*`, LaBSE), atout majeur pour le français².
 - **Maintenance légère** : ajouter une intention = ré-entraîner **seulement le petit classifieur** (secondes), l'encodeur reste figé ; en kNN/prototypes, parfois sans ré-entraînement du tout.
 - **On-premise** possible à 100 % (modèle téléchargé).
 
@@ -190,22 +190,22 @@ mots jamais vus (fautes, flexions). Deux usages, deux étages de la progression.
 - **Plus lourd** que TF-IDF : modèle de ~100–500 Mo à charger, coût compute d'inférence non nul².
 - **Explicabilité intermédiaire** : on inspecte les voisins/scores, mais l'espace dense est moins lisible que des poids par mot.
 - Sans exemples, **pas de zero-shot strict** (il faut au moins amorcer le classifieur).
-- La **qualité dépend du modèle d'embedding** : notre repli `nomic-embed-text` fait 77 %, le SBERT multilingue fait 84 % — le choix du modèle compte.
+- La **qualité dépend du modèle d'embedding** : notre repli `nomic-embed-text` fait 77 %, le SBERT multilingue fait 84 %, le choix du modèle compte.
 
 ### 5 · LLM génératif + prompt JSON (Ollama, local)
 
 **Pour**
 - **Zero-shot / few-shot** : fonctionne sans donnée d'entraînement, juste le catalogue dans le prompt³. Démarrage à froid immédiat.
-- **Extraction de slots** dans le même appel (numéro de contrat, urgence, type de bien) — ce qu'il faut pour *exécuter* la demande, pas seulement l'étiqueter.
+- **Extraction de slots** dans le même appel (numéro de contrat, urgence, type de bien), ce qu'il faut pour *exécuter* la demande, pas seulement l'étiqueter.
 - **Robustesse maximale** aux formulations inédites, fautes, français familier³.
 - **Maintenance triviale** : nouvelle intention = une ligne de prompt, aucun ré-entraînement.
 - **Gratuit en local** (Ollama/Gemma) : coût = matériel + électricité.
 
 **Contre**
-- **Le plus lent et le plus lourd** : de quelques secondes à quelques dizaines de secondes par requête en local³ (ici **~5 s à chaud** sur `gemma3:4b`, contre ~40 s pour le plus gros `gemma4:e4b` — le choix du modèle change tout ; ~25 s au tout premier appel à froid).
-- **Hallucination** : peut inventer une intention hors catalogue. **Mitigation** : JSON contraint (Ollama `format:"json"`) + rejet des id inconnus — implémenté ici⁸. ⚠️ Contrepartie : forcer un format strict peut légèrement dégrader le raisonnement¹⁰ (d'où l'astuce d'un champ `reformulation` libre).
+- **Le plus lent et le plus lourd** : de quelques secondes à quelques dizaines de secondes par requête en local³ (ici **~5 s à chaud** sur `gemma3:4b`, contre ~40 s pour le plus gros `gemma4:e4b` : le choix du modèle change tout ; ~25 s au tout premier appel à froid).
+- **Hallucination** : peut inventer une intention hors catalogue. **Mitigation** : JSON contraint (Ollama `format:"json"`) + rejet des id inconnus, implémenté ici⁸. ⚠️ Contrepartie : forcer un format strict peut légèrement dégrader le raisonnement¹⁰ (d'où l'astuce d'un champ `reformulation` libre).
 - **Précision qui chute quand les intentions sont nombreuses/fines** : ~89 % zero-shot sur 9 intentions, mais ~74 % sur 60 intentions et ~61 % sur 13 intentions ambiguës⁹.
-- **En API cloud** : coût par token⁴ **et surtout** exfiltration de données — critique en assurance (voir ci-dessous).
+- **En API cloud** : coût par token⁴ **et surtout** exfiltration de données, critique en assurance (voir ci-dessous).
 - **Non déterministe** : deux appels peuvent différer (atténué par température 0).
 
 ---
@@ -233,7 +233,7 @@ Aucune approche ne gagne sur tous les axes. En production d'assurance :
 1. **SBERT multilingue + classifieur** pour le **volume** : rapide, robuste aux
    paraphrases, explicable par voisinage, on-premise.
 2. **LLM local (Ollama) en repli** pour les intentions **rares/ambiguës**, le
-   **démarrage à froid** zero-shot et surtout l'**extraction de slots** — avec
+   **démarrage à froid** zero-shot et surtout l'**extraction de slots** : avec
    **JSON contraint** pour éliminer les hallucinations.
 3. **TF-IDF** comme **garde-fou** ultra-rapide et **baseline de référence** :
    s'il est très confiant, inutile de réveiller un modèle plus lourd.
@@ -264,19 +264,19 @@ Débits « phrases/s » très dépendants du matériel ; tarifs API volatils.
 
 ## Bibliographie
 
-- **[a]** Benchmark NLU (CLINC150 / BANKING77 / HWU64) — arXiv 2012.03929 — <https://ar5iv.labs.arxiv.org/html/2012.03929>
-- **[b]** Casanueva et al. 2020, *Efficient Intent Detection with Dual Sentence Encoders* (BANKING77) — <https://arxiv.org/abs/2003.04807>
-- **[c]** Parikh et al. 2023, *Exploring Zero and Few-shot Techniques for Intent Classification* (ACL Industry) — <https://aclanthology.org/2023.acl-industry.71.pdf>
-- **[d]** Reimers & Gurevych 2019, *Sentence-BERT* — <https://arxiv.org/abs/1908.10084>
-- Bridging Zero-Shot & Fine-Tuned via Retrieval-Augmented Prompting (BANKING77) — <https://asrjetsjournal.org/American_Scientific_Journal/article/view/12048>
-- *Let Me Speak Freely?* (impact des contraintes de format JSON) — <https://arxiv.org/pdf/2408.02442>
-- Constrained decoding / structured outputs — <https://mbrenndoerfer.com/writing/constrained-decoding-structured-llm-output>
-- scikit-learn — Feature extraction (TF-IDF, limitations) — <https://scikit-learn.org/stable/modules/feature_extraction.html>
-- Rasa — 10 Best Practices for NLU Training Data (fautes, out-of-scope) — <https://rasa.com/blog/10-best-practices-for-designing-nlu-training-data>
-- Tarifs API LLM 2025-2026 (ordres de grandeur) — <https://benchlm.ai/llm-pricing> · <https://intuitionlabs.ai/articles/llm-api-pricing-comparison-2025>
-- CNIL — Chatbots & droits des personnes — <https://www.cnil.fr/fr/chatbots-les-conseils-de-la-cnil-pour-respecter-les-droits-des-personnes>
-- CNIL — Minimisation & données de santé (assurance) — <https://www.cnil.fr/fr/le-principe-de-minimisation-et-les-traitements-du-nir-et-des-donnees-de-sante-dans-le-secteur-de>
-- Article 9 RGPD (données sensibles) — <https://monexpertrgpd.com/article-9/>
+- **[a]** Benchmark NLU (CLINC150 / BANKING77 / HWU64) (arXiv 2012.03929) <https://ar5iv.labs.arxiv.org/html/2012.03929>
+- **[b]** Casanueva et al. 2020, *Efficient Intent Detection with Dual Sentence Encoders* (BANKING77), <https://arxiv.org/abs/2003.04807>
+- **[c]** Parikh et al. 2023, *Exploring Zero and Few-shot Techniques for Intent Classification* (ACL Industry), <https://aclanthology.org/2023.acl-industry.71.pdf>
+- **[d]** Reimers & Gurevych 2019, *Sentence-BERT*, <https://arxiv.org/abs/1908.10084>
+- Bridging Zero-Shot & Fine-Tuned via Retrieval-Augmented Prompting (BANKING77), <https://asrjetsjournal.org/American_Scientific_Journal/article/view/12048>
+- *Let Me Speak Freely?* (impact des contraintes de format JSON), <https://arxiv.org/pdf/2408.02442>
+- Constrained decoding / structured outputs, <https://mbrenndoerfer.com/writing/constrained-decoding-structured-llm-output>
+- scikit-learn (Feature extraction (TF-IDF, limitations)) <https://scikit-learn.org/stable/modules/feature_extraction.html>
+- Rasa (10 Best Practices for NLU Training Data (fautes, out-of-scope)) <https://rasa.com/blog/10-best-practices-for-designing-nlu-training-data>
+- Tarifs API LLM 2025-2026 (ordres de grandeur), <https://benchlm.ai/llm-pricing> · <https://intuitionlabs.ai/articles/llm-api-pricing-comparison-2025>
+- CNIL (Chatbots & droits des personnes) <https://www.cnil.fr/fr/chatbots-les-conseils-de-la-cnil-pour-respecter-les-droits-des-personnes>
+- CNIL (Minimisation & données de santé (assurance)) <https://www.cnil.fr/fr/le-principe-de-minimisation-et-les-traitements-du-nir-et-des-donnees-de-sante-dans-le-secteur-de>
+- Article 9 RGPD (données sensibles), <https://monexpertrgpd.com/article-9/>
 
 ### Renvois de notes
 

@@ -1,4 +1,4 @@
-# Examples — Déraison Assurances intent engine
+# Examples : Déraison Assurances intent engine
 
 A runnable cookbook for the five-approaches intent engine. Every snippet is
 copy-pasteable. English per the coding standard; the domain data and answers
@@ -27,7 +27,7 @@ ollama pull nomic-embed-text    # embedding fallback for the BERT engine
 
 ---
 
-## 1. CLI — list the intents
+## 1. CLI : list the intents
 
 ```bash
 python -m intent_engine intents
@@ -41,7 +41,7 @@ python -m intent_engine intents
   ...
 ```
 
-## 2. CLI — compare the five engines
+## 2. CLI : compare the five engines
 
 ```bash
 python -m intent_engine compare "on s'est rentrés dedans à un carrefour"
@@ -49,18 +49,18 @@ python -m intent_engine compare "on s'est rentrés dedans à un carrefour"
 
 | Engine | Prediction | Confidence | CPU / call |
 |--------|-----------|:----------:|-----------:|
-| `tfidf` | *(abstains)* | — | ~50 ms |
+| `tfidf` | *(abstains)* |, | ~50 ms |
 | `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
-| `fasttext_pretrained` | *(abstains)* | — | ~250 µs |
+| `fasttext_pretrained` | *(abstains)* |, | ~250 µs |
 | `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
 | `llm` | `declarer_sinistre_auto` | **0.95** | ~4.7 s |
 
-The LLM also extracts slots — `type_bien: auto`, `urgence: haute`.
+The LLM also extracts slots, `type_bien: auto`, `urgence: haute`.
 
 Watch the lexical engines abstain on a paraphrase while the semantic ones
-nail it — the whole pedagogical point in one command.
+nail it, the whole pedagogical point in one command.
 
-## 3. CLI — one engine, natural-language execution
+## 3. CLI : one engine, natural-language execution
 
 ```bash
 python -m intent_engine execute --engine tfidf "je voudrais résilier mon assurance auto"
@@ -76,7 +76,7 @@ Je comprends. Grâce à la loi Hamon, après un an d'engagement vous pouvez...
 
 ---
 
-## 4. Python — use an engine directly
+## 4. Python : use an engine directly
 
 ```python
 from intent_engine import KnowledgeBase, TfidfIntentEngine
@@ -90,7 +90,7 @@ print(round(result.top().score, 2))
 # 0.7
 ```
 
-## 5. Python — the router (compare + execute)
+## 5. Python : the router (compare + execute)
 
 ```python
 from intent_engine import IntentRouter
@@ -113,7 +113,7 @@ print(execution.action)   # route:remboursements_sante
 print(execution.slots)    # {'type_service': 'hospitalisation', ...}
 ```
 
-## 6. Python — the LLM engine with strict JSON
+## 6. Python : the LLM engine with strict JSON
 
 ```python
 from intent_engine import KnowledgeBase, LlmIntentEngine
@@ -127,7 +127,7 @@ print(result.slots)                     # {'urgence': ...}
 print(result.meta["reformulation"])     # the model's one-line summary
 ```
 
-## 7. Python — force a specific embedding backend for BERT
+## 7. Python : force a specific embedding backend for BERT
 
 ```python
 from intent_engine import KnowledgeBase, BertIntentEngine

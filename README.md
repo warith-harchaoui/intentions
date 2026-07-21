@@ -1,4 +1,4 @@
-# Déraison Assurances — one *intent engine*, five ways
+# Déraison Assurances : one *intent engine*, five ways
 
 [🇫🇷 Français](LISEZMOI.md) · [🇬🇧 English](README.md)
 
@@ -12,7 +12,7 @@
 A customer says *"I had an accident this morning, my car is dented"* and the
 system must understand the **intent** (`declarer_sinistre_auto`), route to the
 right **department**, and ideally extract the **useful entities** (urgency,
-kind of asset). Five engines do this job — a deliberate **walk through the
+kind of asset). Five engines do this job, a deliberate **walk through the
 history of NLP**, from bag-of-words to generative LLM:
 
 | # | Engine | Representation | Classifier | The trade-off |
@@ -23,13 +23,13 @@ history of NLP**, from bag-of-words to generative LLM:
 | 4 | <span style="color:#AF52DE">■</span> **BERT** | contextual sentence embeddings (**SBERT**) | **PyTorch MLP** | Understands meaning; wins on paraphrases. Local. |
 | 5 | <span style="color:#FF3B30">■</span> **LLM** | (prompt) | **Gemma / qwen** via Ollama, **strict JSON** | Zero training, extracts slots. The slowest, the smartest. |
 
-> The UI is **bilingual EN/FR** — a 🇬🇧/🇫🇷 flag toggle (top-right, next to a
+> The UI is **bilingual EN/FR** : a 🇬🇧/🇫🇷 flag toggle (top-right, next to a
 > light/dark button); the LLM is even prompted in the query's own detected
 > language. The *knowledge base* stays French (a French insurer's content). The
 > code, docstrings and this README are English; a full French mirror of this
 > page lives in [`LISEZMOI.md`](LISEZMOI.md).
 
-## Why this project exists — the pedagogical goal
+## Why this project exists : the pedagogical goal
 
 This is a **teaching artefact for Data Science / Machine Learning / AI**. The
 point is not to ship the best classifier; it is to make a group of colleagues
@@ -38,16 +38,16 @@ idea in applied NLP: **the representation matters more than the classifier.**
 
 Read the engine table top to bottom and you are walking the field's history:
 
-1. **Bag-of-words (TF-IDF)** — count n-grams; the model sees *strings*, not
+1. **Bag-of-words (TF-IDF)** : count n-grams; the model sees *strings*, not
    *meaning*. A synonym it never saw is invisible to it.
-2. **Learned subword embeddings (fastText, trained on our data)** — the model
+2. **Learned subword embeddings (fastText, trained on our data)** : the model
    starts to place similar words near each other, from a few hundred examples.
-3. **Pretrained embeddings (fastText cc.fr.300)** — transfer learning: knowledge
+3. **Pretrained embeddings (fastText cc.fr.300)** : transfer learning: knowledge
    from billions of words of French is poured in for free.
-4. **Contextual embeddings (BERT/SBERT) + a neural net** — meaning that depends
+4. **Contextual embeddings (BERT/SBERT) + a neural net** : meaning that depends
    on context, plus a non-linear classifier.
-5. **Generative LLM (Gemma)** — no training at all; reasoning from a prompt,
-   and — uniquely — pulling structured *slots* out of the sentence.
+5. **Generative LLM (Gemma)** : no training at all; reasoning from a prompt,
+   and (uniquely) pulling structured *slots* out of the sentence.
 
 ```mermaid
 flowchart LR
@@ -63,11 +63,11 @@ The comparator then shows the **pay-off** with real, measured numbers (not
 opinions): on a **paraphrase-heavy** test set, held-out accuracy climbs
 monotonically **68 % → 71 % → 73 % → 77 %** across engines 1→4, and the LLM adds
 slot extraction on top. And crucially, it shows the **honest caveats** an ML
-practitioner cares about — sampling uncertainty (bootstrap violin plots),
+practitioner cares about, sampling uncertainty (bootstrap violin plots),
 train/test-split variance (k-fold cross-validation), model mis-calibration
 (neural nets are over-confident on out-of-scope input), and privacy (why it
 all runs locally). The goal is that a non-ML colleague leaves understanding
-*why* you would pick one approach over another — which is the judgement this
+*why* you would pick one approach over another, which is the judgement this
 project exists to transmit.
 
 📊 The detailed, sourced comparison (benchmarks, GDPR, costs): **[`PROS_CONS.md`](PROS_CONS.md)**.
@@ -166,18 +166,18 @@ python -m intent_engine classify --engine tfidf "je veux résilier"
 python -m intent_engine execute "il me faut une prise en charge pour l'hôpital"
 ```
 
-Example `compare` output (on a paraphrase — note how the lexical engines fall
+Example `compare` output (on a paraphrase, note how the lexical engines fall
 apart while the semantic ones hold):
 
 | Engine | Prediction | Confidence | CPU / call |
 |--------|-----------|:----------:|-----------:|
-| `tfidf` | *(abstains)* | — | ~50 ms |
+| `tfidf` | *(abstains)* |, | ~50 ms |
 | `fasttext_custom` | `declarer_sinistre_auto` | 0.33 | ~33 µs |
-| `fasttext_pretrained` | *(abstains)* | — | ~250 µs |
+| `fasttext_pretrained` | *(abstains)* |, | ~250 µs |
 | `bert` | `declarer_sinistre_auto` | **0.98** | ~20 ms |
 | `llm` | `declarer_sinistre_auto` | **0.95** | ~4.7 s |
 
-The LLM also extracts **slots** — `type_bien: auto`, `urgence: haute` — which no
+The LLM also extracts **slots** (`type_bien: auto`, `urgence: haute`) which no
 classifier does. The two lexical engines abstain or barely clear the bar on this
 paraphrase; the semantic ones are confident. *That* is the lesson in one query.
 
@@ -190,7 +190,7 @@ Reproducible with `python -m eval.harness` (accuracy/latency) and
 
 The held-out test set is deliberately **paraphrase-heavy** (low lexical
 overlap with the training phrasings), so it measures *generalisation*, not
-vocabulary memorisation — which is exactly where the representation shows its
+vocabulary memorisation, which is exactly where the representation shows its
 worth:
 
 > ⏱️ **Read latencies as orders of magnitude, not benchmarks.** They were
@@ -212,22 +212,22 @@ worth:
 <sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR; only the generative LLM does this. The four classifier scores are skore's raw argmax accuracy on the **held-out 210 paraphrases** (no abstention); ¹ the four LLM configs are scored on the **same 210** with their natural JSON output. Colours match every figure in this repo.</sup>
 
 > **A latency surprise worth noticing.** The *classic* `TF-IDF + Random Forest`
-> (~50 ms) is actually the **slowest non-LLM engine** — the forest's hundreds of
+> (~50 ms) is actually the **slowest non-LLM engine** : the forest's hundreds of
 > trees cost more than BERT's two-matmul MLP head (~20 ms) or fastText's vector
 > lookup (~33 µs). "Old-school" doesn't mean "fast", and "neural" doesn't mean
 > "slow": measure, don't assume. (CPU time via `process_time`, immune to other
-> apps' load — see `eval/bench.py`; the LLM figure is Ollama's own compute.)
+> apps' load, see `eval/bench.py`; the LLM figure is Ollama's own compute.)
 
 **The distributions, not just the point estimates.** The four *trainable*
 classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
 **25 real measurements** each (train on 4/5 of the K = 21 intents / N = 1008
 examples, test on the held-out 1/5), scored by **skore** and drawn as smooth
 **violins**. The four LLM
-configs are zero-shot — nothing is trained, so each is a *single* held-out
+configs are zero-shot, nothing is trained, so each is a *single* held-out
 number, a **Dirac** drawn as one horizontal line. Each engine keeps the colour
 it carries in the results table above and in every other figure of this repo:
 
-![Accuracy per engine — violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
+![Accuracy per engine, violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
 
 > **Two lenses, one honest story.** On the paraphrase set above, held-out
 > accuracy climbs 68 → 71 → 73 → 77 %. Under **cross-validation** on the
@@ -238,15 +238,15 @@ it carries in the results table above and in every other figure of this repo:
 >
 > Out-of-scope safety net: on 15 off-topic inputs (weather, maths, cooking…),
 > TF-IDF abstains ~93 % of the time; the neural BERT is more over-confident
-> (~73 % after tuning its threshold) — a real lesson on **neural-net
+> (~73 % after tuning its threshold), a real lesson on **neural-net
 > calibration**. Full analysis + sources in [`PROS_CONS.md`](PROS_CONS.md).
 >
-> **On the LLM choice — and does a bigger LLM beat BERT?** The default compact
+> **On the LLM choice, and does a bigger LLM beat BERT?** The default compact
 > `gemma3:4b` (~5 s warm) lands at **70 %**, *below* BERT's 77 %: a small local LLM
 > trades accuracy for speed, its real edge being **slot extraction + zero-shot**.
-> But **size matters** — on the same held-out set, a bigger local model reclaims
+> But **size matters** : on the same held-out set, a bigger local model reclaims
 > the top: **`gemma4:e4b-mlx` 79 %** (full 210-phrase run) and **`gemma4:12b-mlx`
-> ~78 %** (partial run, 166/210 phrases — the rank is solid but treat the exact
+> ~78 %** (partial run, 166/210 phrases, the rank is solid but treat the exact
 > figure as a lower bound), both edging past BERT's 77 %. So the small model was
 > simply *under-sized*; the hierarchy holds and the biggest generative models lead
 > again, at a real cost of seconds per call versus BERT's ~20 ms. Pick by need
@@ -276,9 +276,9 @@ Regenerate all eight with `python -m eval.confusion`.
 ### Bigger model, or a few examples? A 2×2 on the LLM
 
 The *representation* lesson above is about the classifier. This one is about the
-**LLM**, along two independent switches — the **model** (a small `qwen2.5:3b` vs
+**LLM**, along two independent switches, the **model** (a small `qwen2.5:3b` vs
 the larger `gemma3:4b`) and the **examples** (zero-shot vs three worked few-shot
-examples, on *fresh* sentences never in the test set, so no leakage) — at a
+examples, on *fresh* sentences never in the test set, so no leakage), at a
 fixed, engineered prompt:
 
 ![Model and few shots: better and better](docs/img/shootout-en.png)
@@ -360,7 +360,7 @@ the [`eval/`](eval/) modules and their docstrings.
 ## Privacy
 
 The **intent engine** runs **locally** (scikit-learn, self-hosted fastText &
-SBERT, LLM via Ollama): the text of a request never leaves the machine — a
+SBERT, LLM via Ollama): the text of a request never leaves the machine, a
 deliberate choice, because in insurance a single sentence can be **sensitive
 health data** under GDPR art. 9. *"Il me faut une prise en charge pour l'Institut
 de cancérologie"* reveals a cancer diagnosis; sending it to a cloud LLM would

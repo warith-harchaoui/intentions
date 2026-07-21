@@ -15,7 +15,7 @@ hands off to a human). The catalogue lives in `knowledge_base/*.md`
 
 ---
 
-## 2. Data (the foundation — everything else depends on it)
+## 2. Data (the foundation : everything else depends on it)
 
 Generated with a local LLM (`scripts/generate_examples.py`, gemma3:4b), then
 integrated by `scripts/integrate_examples.py`. Design constraints, all
@@ -25,15 +25,15 @@ integrated by `scripts/integrate_examples.py`. Design constraints, all
 |-------|-----:|-----------:|------|
 | **Train** | **1008** | **48** (exactly, all 21) | `knowledge_base/*.md` |
 | **Test** (held-out) | **210** | **10** (exactly, all 21) | `eval/dataset.jsonl` |
-| **Out-of-scope** | 15 | — (off-topic) | `eval/dataset_oos.jsonl` |
+| **Out-of-scope** | 15 |, (off-topic) | `eval/dataset_oos.jsonl` |
 
 Guarantees:
 
-- **Balanced** — every intent has exactly 48 train / 10 test (no majority-class
+- **Balanced** : every intent has exactly 48 train / 10 test (no majority-class
   inflation, no intent starved).
-- **Disjoint** — train ∩ test = ∅ (**0** overlap, case-insensitive). No leakage.
-- **Deduplicated** — the 1008 training utterances are unique.
-- **Held-out** — the test set never enters training or few-shot prompts.
+- **Disjoint** : train ∩ test = ∅ (**0** overlap, case-insensitive). No leakage.
+- **Deduplicated** : the 1008 training utterances are unique.
+- **Held-out** : the test set never enters training or few-shot prompts.
 
 ### 2.1 Verify it yourself
 
@@ -72,11 +72,11 @@ PY
 Four **trainable** classifiers (trained on the 1008-train) and the **LLM**
 (zero-/few-shot, no training):
 
-1. **TF-IDF + Random Forest** — char/word n-grams → forest.
-2. **fastText (learned)** — subword embeddings trained on our examples → softmax.
-3. **fastText (pretrained)** — cc.fr.300 sentence vectors → logistic regression.
-4. **BERT + MLP** — SBERT sentence embeddings → PyTorch MLP.
-5. **LLM** — `gemma3:4b` (and `qwen2.5:3b` for the prompt study) via Ollama,
+1. **TF-IDF + Random Forest** : char/word n-grams → forest.
+2. **fastText (learned)** : subword embeddings trained on our examples → softmax.
+3. **fastText (pretrained)** : cc.fr.300 sentence vectors → logistic regression.
+4. **BERT + MLP** : SBERT sentence embeddings → PyTorch MLP.
+5. **LLM** : `gemma3:4b` (and `qwen2.5:3b` for the prompt study) via Ollama,
    strict-JSON output. Prompt kept in `locales/i18n.yaml`, per language.
 
 ---
@@ -86,15 +86,15 @@ Four **trainable** classifiers (trained on the 1008-train) and the **LLM**
 Every engine is scored **on the same held-out 210-test, spanning all 21
 intents**. No engine sees a different sample.
 
-- **Held-out accuracy** — fraction correct on the 210-test (`eval/harness.py`,
+- **Held-out accuracy** : fraction correct on the 210-test (`eval/harness.py`,
   `eval/crossval.py`). This is the headline generalisation number.
-- **Repeated 5-fold cross-validation** — for the *trainable* engines only:
+- **Repeated 5-fold cross-validation** : for the *trainable* engines only:
   5 folds × 5 shuffles = **25 fits**, stratified, on the training pool
   (`eval/crossval.py`). Measures variance and in-distribution accuracy. The LLM
-  has no CV (it is not trained) — it contributes a single held-out point.
-- **Confusion matrices** — K×K counts on the 210-test, one per engine, with an
+  has no CV (it is not trained), it contributes a single held-out point.
+- **Confusion matrices** : K×K counts on the 210-test, one per engine, with an
   `Abstain` column (`eval/confusion.py`).
-- **Out-of-scope abstention** — fraction of the 15 off-topic inputs each engine
+- **Out-of-scope abstention** : fraction of the 15 off-topic inputs each engine
   correctly refuses (`eval/thresholds.py`). Refusing to guess is a first-class
   metric.
 

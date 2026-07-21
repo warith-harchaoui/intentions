@@ -1,6 +1,6 @@
 # escalade_humain
 
-> **Titre** : Je ne sais pas — passer à un conseiller humain
+> **Titre** : Je ne sais pas, passer à un conseiller humain
 > **Service** : Accueil téléphonique
 > **Action** : route:conseiller_humain
 > **Urgence** : moyenne
@@ -56,7 +56,7 @@
 - Je suis très mal à l'aise avec cette interface...
 - J’ai des questions, beaucoup de questions!
 ## Réponse
-Pas d'inquiétude — si vous ne savez pas, je préfère vous passer un vrai
+Pas d'inquiétude, si vous ne savez pas, je préfère vous passer un vrai
 conseiller plutôt que de vous laisser seul face à une machine. Je vous mets
 en relation avec une personne qui prendra le temps de comprendre votre
 situation. Un instant, je vous transfère.

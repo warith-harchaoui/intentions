@@ -1,14 +1,14 @@
-# Stack technique — Moteur d'intention « Déraison Assurances »
+# Stack technique : Moteur d'intention « Déraison Assurances »
 
 > Carte de la stack : *quelle brique, pour quel rôle, et pourquoi.* Document de référence
 > pour reprendre le projet ou l'auditer. Tout est **100 % local** (scikit-learn, fastText, SBERT,
-> LLM via Ollama) — le texte d'une requête ne quitte jamais la machine (enjeu RGPD art. 9 :
+> LLM via Ollama), le texte d'une requête ne quitte jamais la machine (enjeu RGPD art. 9 :
 > une phrase d'assurance peut être une donnée de santé).
 
 ## Philosophie
 
 Artefact **pédagogique** (Data Science / ML / IA) : faire *sentir*, en un écran, l'idée centrale
-du NLP appliqué — **la représentation compte plus que le classifieur** — en comparant **cinq
+du NLP appliqué (**la représentation compte plus que le classifieur**) en comparant **cinq
 moteurs** côte à côte, du sac-de-mots au LLM génératif, sur le **même** jeu, avec des chiffres
 **mesurés rigoureusement** (skore) et des **réserves honnêtes** (incertitude, calibration).
 
@@ -76,7 +76,7 @@ Tous exposent le même contrat `IntentEngine` (`base.py`) ; seule change la **re
 | **API** | **FastAPI** + **uvicorn** + **pydantic** / **pydantic-settings** (`intent_engine/api.py`) ; `/api/i18n` |
 | **Front** | **vanilla JS** + **Tailwind** (house style *front-ui*, trois-Roboto) ; bilingue **FR/EN** (drapeau 🇫🇷/🇬🇧) + thème clair/sombre ; a11y lint 0 |
 | **i18n** | **`locales/i18n.yaml`** = source unique (copie GUI **et** prompts LLM) |
-| **Langue** | **langdetect** — détecte la langue de la requête → prompt LLM FR ou EN |
+| **Langue** | **langdetect** : détecte la langue de la requête → prompt LLM FR ou EN |
 
 ## Chronométrage
 

@@ -29,7 +29,7 @@ Do not silently omit a language, a file, or a function from these rules.
 
 ## 1. Use Numpy-style docstrings for every function and class
 
-Every function and class — **public or private, including `def _*` and `def __*`** — should include a Numpy-style docstring.
+Every function and class (**public or private, including `def _*` and `def __*`**) should include a Numpy-style docstring.
 
 Recommended sections, in order:
 
@@ -98,7 +98,7 @@ For private functions, the `Examples` section may be shortened when the function
 
 ## 2. Add a module-level docstring to every `.py` file
 
-Every Python file should start with a module-level docstring. This includes private modules (`_internal.py`, `_utils.py`) — no exceptions.
+Every Python file should start with a module-level docstring. This includes private modules (`_internal.py`, `_utils.py`), no exceptions.
 
 It should explain what the module does, why it exists, what it consumes, and what it produces.
 
@@ -137,7 +137,7 @@ Project maintainers.
 
 ## 3. Use full typing
 
-Type-annotate **every** function signature — public, private (`_*`), name-mangled (`__*`), and dunder methods — including parameters and return values.
+Type-annotate **every** function signature (public, private (`_*`), name-mangled (`__*`), and dunder methods) including parameters and return values.
 
 Also type-annotate class attributes (including private attributes like `_cache`) and module-level constants where reasonable.
 
@@ -165,7 +165,7 @@ class UserRecord(TypedDict):
     is_active: bool
 ```
 
-Private example — same rigor:
+Private example, same rigor:
 
 ```python
 def _load_cache(path: Path) -> dict[str, UserRecord]:
@@ -175,7 +175,7 @@ def _load_cache(path: Path) -> dict[str, UserRecord]:
 
 ---
 
-## 4. Comment generously — everywhere, in every function
+## 4. Comment generously : everywhere, in every function
 
 Comment **a lot**. Good old comments are a first-class deliverable of this standard, not decoration. Code without comments is considered incomplete, exactly like code without tests.
 
@@ -184,18 +184,18 @@ This rule applies **everywhere, with no exceptions**:
 * Public functions and private functions (`_*`, `__*`)
 * Dunder methods, nested functions, one-liners with non-obvious intent
 * Scripts, tests, CI files, configuration, shell scripts
-* Every language in the repository (`#`, `//`, `/* */`, `<!-- -->`, `--`, `;` — use whatever the language provides)
+* Every language in the repository (`#`, `//`, `/* */`, `<!-- -->`, `--`, `;` : use whatever the language provides)
 
 Practical expectations:
 
 * Every **logical block** of code (a loop, a branch, a transformation step, a tricky expression) gets a comment above it explaining what it does and **why**.
 * A reader should be able to follow the flow of any function by reading **only the comments**, top to bottom, like a narrated story.
 * When in doubt, add the comment. Over-commenting is a much cheaper problem than under-commenting.
-* Prefer block comments above the code rather than cramped inline comments — but short inline comments are fine for clarifying a single value or condition.
+* Prefer block comments above the code rather than cramped inline comments, but short inline comments are fine for clarifying a single value or condition.
 
 Recommended ratio:
 
-* **Target ≈ 1 comment line for every 3–4 lines of code** (≈25–30 % density), measured per file, **docstrings excluded**. Docstrings are excluded so the ratio measures actual in-code narration, not API documentation — a file can be fully docstringed and still have zero comments inside its function bodies, which is exactly what this ratio is designed to catch.
+* **Target ≈ 1 comment line for every 3–4 lines of code** (≈25–30 % density), measured per file, **docstrings excluded**. Docstrings are excluded so the ratio measures actual in-code narration, not API documentation, a file can be fully docstringed and still have zero comments inside its function bodies, which is exactly what this ratio is designed to catch.
 * **Higher density is never a defect.** There is no upper limit: going well above the target because the code genuinely needs the narration is encouraged, not tolerated.
 * **Floor: never below 1 comment line per 6 lines of code** (≈15 %) in any source file. A file under the floor is treated like a file with missing tests: fix it before merging.
 * Trivial glue files (short `__init__.py`, re-export modules) may fall below the floor, but they still need their module docstring.
@@ -273,7 +273,7 @@ See [`EXAMPLES.md`](EXAMPLES.md) for more recipes.
 
 ## 6. Avoid bare `print(...)` in library and script code
 
-Do not use bare `print(...)` in actual `.py` source files. This includes private modules and private functions — a `print` hidden inside `_debug_helper` is still a `print`.
+Do not use bare `print(...)` in actual `.py` source files. This includes private modules and private functions, a `print` hidden inside `_debug_helper` is still a `print`.
 
 Use a proper logging surface instead:
 
@@ -342,7 +342,7 @@ The example file should include:
 * Dummy values
 * **Profuse comments** whenever the format allows them
 
-Comment-friendly formats (YAML, TOML, JSONC, INI, `.env`) should be **heavily commented** — this is rule 4 applied to configuration. In particular, every dummy value must be accompanied by a comment explaining:
+Comment-friendly formats (YAML, TOML, JSONC, INI, `.env`) should be **heavily commented** : this is rule 4 applied to configuration. In particular, every dummy value must be accompanied by a comment explaining:
 
 * **What** the value is and what it is used for
 * **How to obtain the real value** (which dashboard, which page, which command)
@@ -381,7 +381,7 @@ timeout_seconds: 30
 smtp_password: ""
 ```
 
-JSON fallback (no comments possible — keep values self-describing and
+JSON fallback (no comments possible, keep values self-describing and
 document each key in `README.md` instead):
 
 ```jsonc
@@ -458,7 +458,7 @@ Canonical block:
 
 Additional requirements:
 
-* **Every `brew install` mention, anywhere in the documentation**, must be immediately followed by the [brew.sh](https://brew.sh/) hint shown above — not only in the main install section. First-time macOS users may land on any snippet and won't know what `brew` is.
+* **Every `brew install` mention, anywhere in the documentation**, must be immediately followed by the [brew.sh](https://brew.sh/) hint shown above, not only in the main install section. First-time macOS users may land on any snippet and won't know what `brew` is.
 * If a package is genuinely unavailable on a platform, say so explicitly rather than silently omitting the platform:
 
 ```markdown
@@ -501,7 +501,7 @@ Recommended requirements:
 * Use plain `pytest` functions and fixtures where possible.
 * Put shared fixtures in `tests/conftest.py`.
 * Mirror the source tree as the project grows.
-* Ensure **every function and class is covered at least once, including private ones** (`_helper`, `__internal`) — coverage may come from functional/scenario tests that exercise many functions at once; a dedicated test per function is not required (see the 100-test rule below).
+* Ensure **every function and class is covered at least once, including private ones** (`_helper`, `__internal`), coverage may come from functional/scenario tests that exercise many functions at once; a dedicated test per function is not required (see the 100-test rule below).
 * Prefer meaningful coverage over chasing 100% coverage.
 * Track coverage with `pytest-cov` when useful.
 * Keep tests deterministic.
@@ -540,7 +540,7 @@ Test count is not a quality metric. When a project's suite reaches **~100 tests*
 * **Merge and prune.** Fold overlapping micro-tests into parameterized tests (`@pytest.mark.parametrize`) or scenario tests; delete tests that only re-verify what another test already proves.
 * **Keep targeted unit tests where they earn their place**: tricky algorithms, edge cases, regression tests pinned to a past bug (with a comment referencing the issue).
 
-Practical rhythm: at ~100 tests, hold a suite review. Ask of each test: *what failure would this catch that nothing else catches?* If the answer is "none", merge it or delete it. Coverage should stay stable or improve during rationalization — the goal is fewer, stronger tests, not less protection.
+Practical rhythm: at ~100 tests, hold a suite review. Ask of each test: *what failure would this catch that nothing else catches?* If the answer is "none", merge it or delete it. Coverage should stay stable or improve during rationalization, the goal is fewer, stronger tests, not less protection.
 
 ---
 
@@ -587,15 +587,15 @@ Do not rely on "vibe checks" as the only validation layer.
 
 ---
 
-## 15. Enforce PEP 8 — automatically, in CI, no exceptions
+## 15. Enforce PEP 8 : automatically, in CI, no exceptions
 
-All Python code follows [PEP 8](https://peps.python.org/pep-0008/), the official Python style guide. The rules in this document build **on top of** PEP 8 — they never replace it.
+All Python code follows [PEP 8](https://peps.python.org/pep-0008/), the official Python style guide. The rules in this document build **on top of** PEP 8, they never replace it.
 
 PEP 8 compliance is **enforced, not suggested**:
 
 * A linter/formatter checking PEP 8 **must** run in CI on every push and pull request.
 * A PEP 8 violation **blocks merging** to the main branch, exactly like a failing test.
-* Enforcement is automatic — humans review logic, tools review style. Style debates in review are a waste of everyone's time.
+* Enforcement is automatic, humans review logic, tools review style. Style debates in review are a waste of everyone's time.
 * No file, function, or contributor is exempt (see rule 0). `# noqa` suppressions are allowed only with a comment justifying **why**, and should be rare.
 
 In practice, PEP 8 governs:
@@ -606,7 +606,7 @@ In practice, PEP 8 governs:
 * **Whitespace**: around operators and after commas, none just inside brackets.
 * **Comparisons**: `is None` / `is not None`, no comparison to `True`/`False`, `isinstance()` over type equality.
 
-Required setup — a linter config committed to the repository:
+Required setup, a linter config committed to the repository:
 
 ```toml
 # pyproject.toml — Ruff enforces PEP 8 (pycodestyle "E"/"W" rules) and much more.
@@ -630,8 +630,8 @@ Notes:
 
 * **Line length**: PEP 8 says 79 characters. Diverging (e.g. 88, Black's default) is acceptable *only* if the project pins the chosen value in its formatter config so every contributor and CI agree.
 * **Docstrings**: PEP 8 defers to PEP 257; this document goes further and mandates Numpy-style docstrings (rule 1). Rule 1 wins.
-* **Comments**: PEP 8's guidance on comments (complete sentences, `# ` with a space, block comments over inline) applies — and rule 4's density requirements come on top of it.
-* **Other languages** (see rule 0): enforce the equivalent canonical style guide and formatter the same way — `gofmt` for Go, `rustfmt` for Rust, Prettier + ESLint for JS/TS, `shfmt`/ShellCheck for shell — all CI-gated.
+* **Comments**: PEP 8's guidance on comments (complete sentences, `# ` with a space, block comments over inline) applies, and rule 4's density requirements come on top of it.
+* **Other languages** (see rule 0): enforce the equivalent canonical style guide and formatter the same way (`gofmt` for Go, `rustfmt` for Rust, Prettier + ESLint for JS/TS, `shfmt`/ShellCheck for shell) all CI-gated.
 
 ---
 
@@ -639,7 +639,7 @@ Notes:
 
 ### With an AI-augmented programming agent (recommended)
 
-The fastest way to apply this document is to hand it to an AI-augmented programming agent or editor — [Claude Code](https://code.claude.com/docs/), [OpenCode](https://github.com/sst/opencode), [Cursor](https://cursor.com), [VS Code](https://code.visualstudio.com) with Copilot, [Antigravity](https://antigravity.google), or any similar tool — and let it enforce the rules while it works.
+The fastest way to apply this document is to hand it to an AI-augmented programming agent or editor ([Claude Code](https://code.claude.com/docs/), [OpenCode](https://github.com/sst/opencode), [Cursor](https://cursor.com), [VS Code](https://code.visualstudio.com) with Copilot, [Antigravity](https://antigravity.google), or any similar tool) and let it enforce the rules while it works.
 
 **The easiest way at first: copy-paste this entire document into the prompt** of your agent, along with your request:
 
@@ -678,8 +678,8 @@ comment density, PEP 8, tests, and example configs.
 When editing an existing `.py` file:
 
 1. Bring the touched file closer to compliance.
-2. Add missing types and docstrings where practical — including on private `_*` functions.
-3. Add comments to every logical block you touch — the edited code should read like a narrated story.
+2. Add missing types and docstrings where practical, including on private `_*` functions.
+3. Add comments to every logical block you touch, the edited code should read like a narrated story.
 4. Avoid leaving newly edited code half-styled.
 5. Add or update tests for changed behavior.
 
@@ -689,7 +689,7 @@ When creating a new `.py` file:
 2. Add a module-level docstring.
 3. Type all functions and classes, private ones included.
 4. Add Numpy-style docstrings to all functions and classes, private ones included.
-5. Comment every logical block generously, from the very first draft — never "I'll add comments later".
+5. Comment every logical block generously, from the very first draft, never "I'll add comments later".
 6. Add tests from the start.
 
 When making a documentation-only or style-only release:
@@ -704,4 +704,4 @@ When making a documentation-only or style-only release:
 
 A good repository should be understandable by a new reader, testable by a contributor, reproducible in CI, and usable without private context.
 
-Documentation, examples, typing, tests, and evaluation are not extras. They are part of the software — for every function, in every language, with no private-code exceptions.
+Documentation, examples, typing, tests, and evaluation are not extras. They are part of the software, for every function, in every language, with no private-code exceptions.
