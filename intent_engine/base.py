@@ -186,7 +186,8 @@ class IntentEngine(ABC):
         this as a class attribute.
     """
 
-    # Subclasses override this with "tfidf" / "bert" / "llm". Declared here
+    # Subclasses set this to their key: "tfidf", "fasttext_custom",
+    # "fasttext_pretrained", "bert", or "llm". Declared here
     # so type checkers know every engine exposes a ``name``.
     name: str = "base"
 

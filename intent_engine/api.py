@@ -64,8 +64,8 @@ class ClassifyRequest(BaseModel):
     text : str
         The user's natural-language utterance.
     engine : str | None
-        Engine name (``"tfidf"``, ``"bert"``, ``"llm"``); ``None`` uses the
-        configured default.
+        Engine name (``"tfidf"``, ``"fasttext_custom"``, ``"fasttext_pretrained"``,
+        ``"bert"``, ``"llm"``); ``None`` uses the configured default.
     """
 
     # The sentence to classify/execute. ``min_length=1`` rejects empty posts.

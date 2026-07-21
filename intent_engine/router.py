@@ -219,7 +219,8 @@ class IntentRouter:
         Parameters
         ----------
         name : str
-            One of ``"tfidf"``, ``"bert"``, ``"llm"``.
+            One of ``"tfidf"``, ``"fasttext_custom"``, ``"fasttext_pretrained"``,
+            ``"bert"``, ``"llm"``.
 
         Returns
         -------
