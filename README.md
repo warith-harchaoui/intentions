@@ -232,19 +232,19 @@ worth:
 > "slow": measure, don't assume. (CPU time via `process_time`, immune to other
 > apps' load, see `eval/bench.py`; the LLM figure is Ollama's own compute.)
 
-**The distributions, not just the point estimates.** The four *trainable*
-classifiers get a **repeated 5-fold cross-validation**: 5 folds × 5 shuffles =
-**25 real measurements** each (train on 4/5 of the K = 21 intents / N = 1008
-examples, test on the held-out 1/5), scored by **skore** and drawn as smooth
-**violins**. The LLM configs are zero-shot (nothing is trained), so each is a
-*single* held-out accuracy — a **Dirac** drawn as one horizontal line. Each
-engine keeps the colour it carries in the results table above and in every other
-figure of this repo:
+**The distributions, not just the point estimates.** All 9 engines are shown
+as **violins**. The four *trainable* classifiers use a **repeated 5-fold
+cross-validation**: 5 folds × 5 shuffles = **25 real measurements** each,
+scored by **skore**. The five LLM configs are zero-shot (nothing is trained),
+so their violin is built from **200 binomial bootstrap samples** drawn at the
+observed accuracy on 210 held-out examples — same visual language, directly
+comparable, honest about uncertainty. Each engine keeps the colour it carries
+in the results table above and in every other figure of this repo:
 
-![Accuracy per engine, violins (classifiers) + Dirac lines (LLM)](docs/img/violin-accuracy-en.png)
+![Accuracy per engine — violins for all 9 engines](docs/img/violin-accuracy-en.png)
 
 > **Two lenses, one honest story.** On the paraphrase set above, held-out
-> accuracy climbs 68 → 71 → 73 → 77 % for classifiers 1→4. Under
+> accuracy climbs 68 → 71 → 73 → 77 → 79 % across all five engine families. Under
 > **cross-validation** on the in-distribution KB examples the same order holds
 > (72 → 75 → 76 → 78 %), a little higher because the folds look more like their
 > training text: lexical methods do fine when the test resembles the training,

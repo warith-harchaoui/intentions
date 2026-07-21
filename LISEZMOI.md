@@ -229,19 +229,20 @@ mémorisation du vocabulaire, c'est là que la représentation prouve sa valeur.
 > on ne suppose pas. (Temps CPU via `process_time`, insensible aux autres apps -
 > voir `eval/bench.py` ; le chiffre du LLM est le calcul propre d'Ollama.)
 
-**Les distributions, pas juste les points.** Les quatre classifieurs
-*entraînables* passent une **validation croisée répétée 5 blocs** : 5 blocs ×
-5 mélanges = **25 mesures réelles** chacun (apprendre sur 4/5 des K = 21
-intentions / N = 1008 exemples, tester sur le 1/5 restant), scorés par **skore**
-et tracés en **violons** lisses. Les configs LLM sont zéro-shot : rien n'est
-entraîné, donc chacune est *un seul* nombre held-out, un **Dirac** tracé en une
-ligne horizontale. Chaque moteur garde la couleur qu'il porte dans le tableau
-des résultats ci-dessus et dans toutes les autres figures du dépôt :
+**Les distributions, pas juste les points.** Les 9 moteurs sont tous
+représentés en **violons**. Les quatre classifieurs *entraînables* passent une
+**validation croisée répétée 5 blocs** : 5 blocs × 5 mélanges = **25 mesures
+réelles** chacun, scorés par **skore**. Les cinq configs LLM sont zéro-shot
+(rien n'est entraîné) : leur violon est construit à partir de **200 tirages
+bootstrap binomiaux** à la précision observée sur 210 exemples held-out —
+même langage visuel, directement comparable, honnête sur l'incertitude. Chaque
+moteur garde la couleur qu'il porte dans le tableau des résultats ci-dessus et
+dans toutes les autres figures du dépôt :
 
-![Exactitude par moteur, violons (classifieurs) + lignes Dirac (LLM)](docs/img/violin-accuracy-fr.png)
+![Exactitude par moteur — violons pour les 9 moteurs](docs/img/violin-accuracy-fr.png)
 
 > **Deux angles, une histoire honnête.** Sur les paraphrases ci-dessus,
-> l'exactitude held-out monte 68 → 71 → 73 → 77 % pour les classifieurs 1→4. En
+> l'exactitude held-out monte 68 → 71 → 73 → 77 → 79 % sur les cinq familles. En
 > **validation croisée** sur les exemples in-distribution de la KB le même ordre
 > tient (72 → 75 → 76 → 78 %), un peu plus haut car les blocs ressemblent
 > davantage à leur texte d'entraînement : le lexical s'en sort quand le test
