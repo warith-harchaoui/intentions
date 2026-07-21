@@ -5,7 +5,7 @@
 📖 Mode d'emploi : [🇫🇷 MODEDEMPLOI](MODEDEMPLOI.md) · [🇬🇧 USERGUIDE](USERGUIDE.md)
 
 > « Mes collègues me demandent **comment on fait** un moteur de détection
-> d'intention. », Ce dépôt répond, en montrant **cinq façons** de le faire,
+> d'intention. » Ce dépôt répond, en montrant **cinq façons** de le faire,
 > côte à côte, sur un cas concret : le chatbot d'aiguillage d'une compagnie
 > d'assurance (fictive) qui oriente ses clients au **téléphone** comme
 > à l'**écrit**.
@@ -125,20 +125,26 @@ ollama pull nomic-embed-text    # repli d'embeddings pour le moteur BERT
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # Windows 🪟 : .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Optionnel — le chemin SBERT + MLP PyTorch du moteur BERT (~2 Go) :
-pip install "sentence-transformers>=3.0.0" torch
-# Optionnel — le moteur fastText pré-entraîné : télécharger cc.fr.300 (~4,5 Go au téléchargement, ~7 Go sur disque) :
-python scripts/download_fasttext.py
-# Optionnel — la couche d'évaluation (DeepEval ; Giskard exige Python ≤ 3.11) :
-pip install ".[eval]"
+source .venv/bin/activate        # Windows 🇼🇳 : .venv\Scripts\activate
+pip install -r requirements.txt  # démo : TF-IDF + fastText + LLM
 ```
 
-> La démo **se dégrade gracieusement** : sans `sentence-transformers`+`torch`,
-> le moteur BERT est indisponible ; sans `cc.fr.300.bin`, le fastText
-> pré-entraîné est masqué ; sans Ollama, le LLM est masqué. TF-IDF et fastText
+**Environnement dev complet** (tests, lint, moteur BERT) :
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+**Extras optionnels :**
+
+```bash
+# Moteur fastText pré-entraîné : télécharger cc.fr.300 (~4,5 Go, ~7 Go sur disque) :
+python scripts/download_fasttext.py
+```
+
+> La démo **se dégrade gracieusement** : sans `sentence-transformers`+`torch`,
+> le moteur BERT est indisponible ; sans `cc.fr.300.bin`, le fastText
+> pré-entraîné est masqué ; sans Ollama, le LLM est masqué. TF-IDF et fastText
 > appris tournent toujours.
 
 ---

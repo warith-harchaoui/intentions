@@ -127,14 +127,20 @@ ollama pull nomic-embed-text    # embedding fallback for the BERT engine
 ```bash
 python -m venv .venv
 source .venv/bin/activate         # Windows 🪟 : .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt   # demo: TF-IDF + fastText + LLM
+```
 
-# Optional — the SBERT + PyTorch MLP path for the BERT engine (~2 GB):
-pip install "sentence-transformers>=3.0.0" torch
-# Optional — the pretrained fastText engine: download cc.fr.300 (~4.5 GB compressed, ~7 GB on disk):
+**Full dev environment** (tests, lint, BERT engine):
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+**Optional extras:**
+
+```bash
+# Pretrained fastText engine: download cc.fr.300 (~4.5 GB compressed, ~7 GB on disk):
 python scripts/download_fasttext.py
-# Optional — the evaluation layer (DeepEval; Giskard needs Python ≤ 3.11):
-pip install ".[eval]"
 ```
 
 > The demo **degrades gracefully**: without `sentence-transformers`+`torch` the
