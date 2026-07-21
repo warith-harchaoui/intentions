@@ -206,14 +206,14 @@ worth:
 
 | # | Engine | Accuracy | CPU / call | Slots |
 |---|--------|---------:|-----------:|:-----:|
-| 1 | <span style="color:#007AFF">■</span> **TF-IDF + Random Forest** | 68 % | ~50 ms | ❌ |
-| 2 | <span style="color:#1D8C8D">■</span> **fastText (learned)** | 71 % | ~33 µs | ❌ |
-| 3 | <span style="color:#28CD41">■</span> **fastText (pretrained)** | 73 % | ~250 µs | ❌ |
-| 4 | <span style="color:#AF52DE">■</span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
-| 5 | <span style="color:#FFCC00">■</span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
-| 6 | <span style="color:#FF9500">■</span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
-| 7 | <span style="color:#FF8AC4">■</span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
-| 8 | <span style="color:#FF3B30">■</span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
+| 1 | <span style="color:#007AFF"> </span> **TF-IDF + Random Forest** | 68 % | ~50 ms | ❌ |
+| 2 | <span style="color:#1D8C8D"> </span> **fastText (learned)** | 71 % | ~33 µs | ❌ |
+| 3 | <span style="color:#28CD41"> </span> **fastText (pretrained)** | 73 % | ~250 µs | ❌ |
+| 4 | <span style="color:#AF52DE"> </span> **BERT (SBERT + MLP)** | 77 % | ~20 ms | ❌ |
+| 5 | <span style="color:#FFCC00"> </span> **qwen2.5:3b · zero shot** | 63 %¹ | ~2 s | ✅ |
+| 6 | <span style="color:#FF9500"> </span> **qwen2.5:3b · few shots** | 64 %¹ | ~2 s | ✅ |
+| 7 | <span style="color:#FF8AC4"> </span> **gemma3:4b · zero shot** | 68 %¹ | ~5 s | ✅ |
+| 8 | <span style="color:#FF3B30"> </span> **gemma3:4b · few shots** | 70 %¹ | ~5 s | ✅ |
 
 <sup>**Slots** = structured fields extracted alongside the intent (urgency, type of asset, contract number…), ready for a downstream CRM/IVR; only the generative LLM does this. The four classifier scores are skore's raw argmax accuracy on the **held-out 210 paraphrases** (no abstention); ¹ the four LLM configs are scored on the **same 210** with their natural JSON output. Colours match every figure in this repo.</sup>
 
