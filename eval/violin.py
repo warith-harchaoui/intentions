@@ -5,18 +5,17 @@ Module summary
 Two figures, each produced in **French and English** (``-fr`` / ``-en``) so
 each README variant shows a chart in its own language:
 
-* **Cross-validation violins** (``violin-accuracy-{lang}.png``) — for the four
-  *trainable* engines (TF-IDF, the two fastText engines, BERT), one violin
-  per engine built from the **real** accuracies of a repeated 5-fold
-  cross-validation (5 folds × 5 shuffles = 25 measurements). No resampling
-  tricks: every point in the density is a genuine train-on-4/5, test-on-1/5
-  score. The LLM is zero-shot (it never trains), so it has no cross-validation
-  and is discussed in the text, not shown here.
+* **Accuracy violins** (``violin-accuracy-{lang}.png``) — one violin per
+  engine, all 9 side by side. For the four *trainable* engines (TF-IDF, the
+  two fastText engines, BERT), the violin is built from the **real** accuracies
+  of a repeated 5-fold cross-validation (5 folds × 5 shuffles = 25
+  measurements). For the five **LLM** configs, which are zero-shot (no CV),
+  the violin is built from 200 binomial bootstrap samples drawn at the observed
+  accuracy on 210 held-out examples — same visual language, honest about
+  uncertainty, and directly comparable to the CV violins.
 
 * **LLM shootout bars** (``shootout-{lang}.png``) — a plain bar chart of each
-  (model, prompt) configuration's accuracy on the held-out sample. The LLM
-  cannot be cross-validated either, so a clean bar (one number per bar) is the
-  honest picture; the sample size and caveats live in the surrounding text.
+  (model, prompt) configuration's accuracy on the held-out sample.
 
 The charts are deliberately **minimal** (title + axis, house palette). All the
 methodology — how many intents, how many training examples, what the test set
@@ -36,6 +35,8 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -206,13 +207,28 @@ _BASE_CONFIG = {
 }
 
 
+_N_BOOTSTRAP = 200
+_N_HELD_OUT = 210
+_RNG = np.random.default_rng(seed=42)
+
+
+def _bootstrap_llm(acc: float, n: int = _N_HELD_OUT, b: int = _N_BOOTSTRAP) -> list[float]:
+    """Return ``b`` bootstrap accuracy samples for an LLM with observed ``acc`` on ``n`` examples.
+
+    Each sample is drawn as Binomial(n, acc)/n — the exact distribution of
+    the held-out accuracy estimator under i.i.d. Bernoulli trials.
+    """
+    return (_RNG.binomial(n, acc, size=b) / n).tolist()
+
+
 def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
-    """Build the all-8-engines accuracy figure in ``lang``.
+    """Build the all-9-engines accuracy figure in ``lang``.
 
     One column per engine, in :data:`ENGINES` order, coloured by the shared
-    palette. The four **trainable** engines are smooth CV **violins** (25 folds
-    each); the four **LLM** configs are single held-out accuracies, each drawn
-    as a **Dirac** — one horizontal line (no width = no distribution).
+    palette. All engines are rendered as **violins**: the four *trainable*
+    engines use their real CV fold accuracies (25 folds); the five **LLM**
+    configs use 200 binomial bootstrap samples drawn at the observed held-out
+    accuracy — same visual language, directly comparable.
 
     Parameters
     ----------
@@ -226,13 +242,13 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
     Returns
     -------
     dict
-        A Vega-Lite v5 faceted, layered specification.
+        A Vega-Lite v5 faceted specification.
     """
     cv: dict[str, list[float]] = cv_results.get("cv", {})
     llm_accs = _llm_accuracies(shootout_results)
 
-    # One shared dataset; ``kind`` tells violins (many rows) from Diracs (one
-    # row) so the two layers below never collide. Engines kept in ENGINES order.
+    # One shared dataset; all rows are ``kind: "cv"`` so the single violin
+    # layer handles every engine uniformly. Engines kept in ENGINES order.
     rows: list[dict[str, object]] = []
     present: list[str] = []
     colours: list[str] = []
@@ -245,14 +261,13 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
             colours.append(eng["color"])
             for value in cv[eng["key"]]:
                 rows.append({"engine": label, "accuracy": value, "kind": "cv"})
-        else:  # llm
+        else:  # llm → bootstrap violin
             if eng["key"] not in llm_accs:
                 continue
             present.append(label)
             colours.append(eng["color"])
-            rows.append(
-                {"engine": label, "accuracy": llm_accs[eng["key"]], "kind": "llm"}
-            )
+            for value in _bootstrap_llm(llm_accs[eng["key"]]):
+                rows.append({"engine": label, "accuracy": value, "kind": "cv"})
 
     color_enc = {
         "field": "engine",
@@ -300,12 +315,11 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
             "height": 420,
             "layer": [
                 {
-                    # Violins: the trainable engines, smoothed by KDE. The
-                    # density x-axis is hidden except its bottom *domain* line —
-                    # with facet spacing 0 (below), those per-column lines join
-                    # into ONE straight baseline running left→right at 0 %.
+                    # All engines are now violins (CV folds or bootstrap samples).
+                    # The density x-axis is hidden except its bottom *domain* line —
+                    # with facet spacing 0, those per-column lines join into ONE
+                    # straight baseline running left→right at 0 %.
                     "transform": [
-                        {"filter": "datum.kind === 'cv'"},
                         {
                             "density": "accuracy",
                             "groupby": ["engine"],
@@ -333,13 +347,6 @@ def build_cv_spec(cv_results: dict, shootout_results: dict, lang: str) -> dict:
                         },
                         "color": color_enc,
                     },
-                },
-                {
-                    # LLM Diracs: one horizontal line per config at its held-out
-                    # accuracy (no width = no distribution).
-                    "transform": [{"filter": "datum.kind === 'llm'"}],
-                    "mark": {"type": "rule", "size": 4},
-                    "encoding": {"y": y_enc, "color": color_enc},
                 },
             ],
         },
