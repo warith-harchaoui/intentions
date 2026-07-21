@@ -225,6 +225,7 @@ def test_llm_engine_handles_invalid_json(kb: KnowledgeBase) -> None:
 
 def test_fasttext_custom_classifies(kb: KnowledgeBase) -> None:
     """The fastText supervised engine learns the toy intents."""
+    pytest.importorskip("fasttext", reason="fasttext-wheel not installed")
     from intent_engine.fasttext_engine import FastTextSupervisedEngine
 
     # Trains fastText's own classifier on the KB examples (no download).
